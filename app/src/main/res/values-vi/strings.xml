@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Miuix Recorder</string>
+    <string name="app_subtitle">Quay màn hình và âm thanh</string>
+    <string name="tile_label">Quay màn hình</string>
+
+    <string name="status_idle_title">Sẵn sàng quay</string>
+    <string name="status_idle_summary">Chọn tùy chọn bên dưới rồi bắt đầu quay.</string>
+    <string name="status_countdown_title">Bắt đầu sau</string>
+    <string name="status_preparing_title">Đang chuẩn bị…</string>
+    <string name="status_recording_title">Đang quay</string>
+    <string name="status_stopping_title">Đang lưu…</string>
+    <string name="status_saved_title">Đã lưu</string>
+    <string name="status_error_title">Quay thất bại</string>
+    <string name="status_saved_summary">Video đã được lưu trong Movies/MiuixRecorder.</string>
+    <string name="status_preparing_summary">Đang chờ khung hình đầu tiên…</string>
+    <string name="status_stopping_summary">Đang hoàn tất tệp MP4. Vui lòng giữ ứng dụng mở một chút.</string>
+    <string name="status_error_summary">Xem thông báo bên dưới rồi thử lại.</string>
+
+    <string name="action_start">Bắt đầu quay</string>
+    <string name="action_stop">Dừng quay</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_open">Mở</string>
+    <string name="action_share">Chia sẻ</string>
+    <string name="action_retry">Thử lại</string>
+    <string name="action_close">Đóng</string>
+    <string name="action_check_root">Kiểm tra lại</string>
+    <string name="action_enable_root">Bật chế độ Root</string>
+    <string name="action_open_settings">Mở cài đặt</string>
+    <string name="action_switch_mic">Dùng micrô</string>
+
+    <string name="section_recording">Ghi hình</string>
+    <string name="section_audio">Âm thanh</string>
+    <string name="section_video">Video</string>
+    <string name="section_timing">Hẹn giờ</string>
+    <string name="section_behavior">Hành vi</string>
+    <string name="section_appearance">Giao diện</string>
+    <string name="section_help">Trợ giúp</string>
+    <string name="section_last_recording">Bản ghi gần đây</string>
+    <string name="section_root">Chế độ Root</string>
+
+    <string name="pref_capture_mode">Chế độ ghi</string>
+    <string name="pref_capture_mode_summary_standard">MediaProjection + MediaCodec. Hỗ trợ âm thanh của điện thoại.</string>
+    <string name="pref_capture_mode_summary_root">screenrecord qua root. Không hiện hộp thoại cấp quyền, chỉ ghi micrô.</string>
+    <string name="pref_audio_source">Nguồn âm thanh</string>
+    <string name="pref_resolution">Độ phân giải</string>
+    <string name="pref_frame_rate">Tốc độ khung hình</string>
+    <string name="pref_bitrate">Bitrate</string>
+    <string name="pref_countdown">Đếm ngược</string>
+    <string name="pref_auto_stop">Tự dừng</string>
+    <string name="pref_haptics">Rung khi bắt đầu và dừng</string>
+    <string name="pref_stop_screen_off">Dừng khi tắt màn hình</string>
+    <string name="pref_theme">Chủ đề</string>
+    <string name="pref_help">Hướng dẫn và giới hạn</string>
+    <string name="pref_root_status">Trạng thái root</string>
+    <string name="pref_version">Phiên bản</string>
+    <string name="pref_storage">Thư mục lưu</string>
+    <string name="pref_storage_summary">Movies/MiuixRecorder</string>
+
+    <string name="capture_standard">Chuẩn (MediaProjection)</string>
+    <string name="capture_root">Root (screenrecord)</string>
+    <string name="capture_standard_summary">MediaProjection + MediaCodec. Hỗ trợ âm thanh của điện thoại.</string>
+    <string name="capture_root_summary">Root + screenrecord. Không cần cấp quyền màn hình, chỉ micrô.</string>
+
+    <string name="audio_none">Không âm thanh</string>
+    <string name="audio_mic">Micrô</string>
+    <string name="audio_device">Âm thanh của điện thoại</string>
+    <string name="audio_mix">Micrô + điện thoại</string>
+    <string name="audio_none_summary">Quay video không có âm thanh.</string>
+    <string name="audio_mic_summary">Ghi âm bằng micrô.</string>
+    <string name="audio_device_summary">Ghi âm thanh do các ứng dụng trên máy phát ra.</string>
+    <string name="audio_mix_summary">Trộn micrô với âm thanh của điện thoại.</string>
+    <string name="audio_device_warning">Ứng dụng có thể chặn ghi âm nội bộ; cuộc gọi, nội dung DRM và một số game có thể bị im lặng.</string>
+    <string name="audio_root_warning">Chế độ Root dùng micrô. Âm thanh của điện thoại chỉ có ở chế độ Chuẩn.</string>
+
+    <string name="resolution_720">720p</string>
+    <string name="resolution_1080">1080p</string>
+    <string name="resolution_1440">1440p</string>
+    <string name="resolution_native">Gốc</string>
+    <string name="fps_value">%1$d fps</string>
+    <string name="fps_root_summary">Chế độ Root dùng tần số quét của màn hình.</string>
+    <string name="bitrate_auto">Tự động</string>
+    <string name="bitrate_value">%1$d Mbps</string>
+    <string name="countdown_off">Tắt</string>
+    <string name="countdown_seconds">%1$d giây</string>
+    <string name="auto_stop_never">Không</string>
+    <string name="auto_stop_minutes">%1$d phút</string>
+    <string name="theme_system">Theo hệ thống</string>
+    <string name="theme_light">Sáng</string>
+    <string name="theme_dark">Tối</string>
+
+    <string name="root_status_unknown">Chưa kiểm tra</string>
+    <string name="root_status_checking">Đang kiểm tra root…</string>
+    <string name="root_status_available">Đã có root</string>
+    <string name="root_status_unavailable">Chưa có root</string>
+    <string name="root_status_no_su">Không tìm thấy su hoặc quyền đã bị từ chối.</string>
+    <string name="root_status_timeout">Hết thời gian chờ cấp quyền root.</string>
+    <string name="root_status_no_screenrecord">Không tìm thấy công cụ screenrecord.</string>
+    <string name="root_note_title">Lưu ý về chế độ Root</string>
+    <string name="root_note">screenrecord ghi video thành từng đoạn 180 giây và tự ghép lại khi dừng. Không ghi được âm thanh của điện thoại; ứng dụng sẽ dùng micrô. Cửa sổ bảo mật vẫn hiển thị màu đen.</string>
+    <string name="root_internal_warning">Chế độ Root không ghi được âm thanh của điện thoại. Micrô sẽ được dùng thay thế.</string>
+
+    <string name="mic_fallback_warning">Không ghi được âm thanh của điện thoại. Đã chuyển sang micrô.</string>
+    <string name="mixed_fallback_warning">Một nguồn âm thanh không khả dụng. Tiếp tục ghi bằng nguồn còn lại.</string>
+    <string name="audio_unavailable_warning">Không khởi động được âm thanh. Tiếp tục quay không có tiếng.</string>
+    <string name="root_unexpected_stop_warning">Chế độ Root dừng đột ngột. Phần đã quay đang được lưu.</string>
+    <string name="root_mic_only_warning">Chế độ Root chỉ ghi âm bằng micrô.</string>
+
+    <string name="root_mode_dialog_title">Bật chế độ Root?</string>
+    <string name="root_mode_dialog_message">Chế độ Root dùng screenrecord, không cần hộp thoại cấp quyền MediaProjection. Chế độ này chỉ ghi micrô và tự chia video dài thành các đoạn 3 phút. Không hỗ trợ âm thanh của điện thoại.</string>
+    <string name="root_required_title">Cần quyền root</string>
+    <string name="root_required_message">Hãy cấp quyền su cho Miuix Recorder trong Magisk, KernelSU hoặc trình quản lý root, rồi thử lại.</string>
+    <string name="root_error_title">Không dùng được chế độ Root</string>
+
+    <string name="permission_mic_title">Cần quyền micrô</string>
+    <string name="permission_mic_message">Hãy cấp quyền micrô cho ứng dụng trong Cài đặt để ghi âm.</string>
+    <string name="projection_denied">Bạn đã từ chối quyền quay màn hình.</string>
+    <string name="projection_unavailable">Thiết bị này không hỗ trợ quay màn hình.</string>
+    <string name="notification_permission_hint">Thông báo đang tắt. Bạn vẫn quay được, nhưng nút dừng sẽ không hiện trong thanh thông báo.</string>
+    <string name="error_open_recording">Không có ứng dụng nào mở được video này.</string>
+    <string name="error_share_recording">Không có ứng dụng nào chia sẻ được video này.</string>
+
+    <string name="last_none_title">Chưa có bản ghi</string>
+    <string name="last_none_summary">Video đã quay sẽ xuất hiện ở đây và trong Movies/MiuixRecorder.</string>
+    <string name="last_saved_at">Đã lưu %1$s</string>
+    <string name="last_meta">%1$s • %2$s</string>
+    <string name="duration_unknown">Không rõ thời lượng</string>
+    <string name="size_unknown">Không rõ dung lượng</string>
+
+    <string name="help_title">Hướng dẫn và giới hạn</string>
+    <string name="help_quick_settings_title">Nút trên Bảng điều khiển nhanh</string>
+    <string name="help_quick_settings_body">Mở Bảng điều khiển nhanh, nhấn Chỉnh sửa rồi kéo “Quay màn hình” vào bảng. Nhấn nút để bắt đầu quay; khi đang quay, nhấn lần nữa để dừng mà không cần mở ứng dụng. Lần bắt đầu đầu tiên vẫn mở ứng dụng để Android hiện hộp thoại cấp quyền quay màn hình.</string>
+    <string name="help_audio_title">Âm thanh của điện thoại</string>
+    <string name="help_audio_body">Âm thanh của điện thoại dùng API ghi âm phát lại của Android. Ứng dụng có thể loại trừ âm thanh của mình; cuộc gọi, nội dung bảo vệ DRM và một số game có thể bị im lặng. Chế độ Root không hỗ trợ âm thanh của điện thoại, hãy dùng chế độ Chuẩn.</string>
+    <string name="help_root_title">Chế độ Root</string>
+    <string name="help_root_body">Chế độ Root chạy screenrecord với quyền root và không cần cấp quyền MediaProjection. Video được ghi thành các đoạn 180 giây và ghép lại khi bạn dừng. Chỉ hỗ trợ âm thanh micrô. Cửa sổ bảo mật vẫn hiển thị màu đen.</string>
+    <string name="help_storage_title">Nơi lưu video</string>
+    <string name="help_storage_body">Video được lưu trong Movies/MiuixRecorder. Ứng dụng giữ một lối tắt đến bản ghi mới nhất ở màn hình chính.</string>
+
+    <string name="notification_channel_recording">Quay màn hình</string>
+    <string name="notification_channel_recording_desc">Trạng thái đang quay và nút dừng</string>
+    <string name="notification_channel_results">Kết quả ghi hình</string>
+    <string name="notification_channel_results_desc">Thông báo đã lưu và lỗi ghi hình</string>
+    <string name="notification_preparing_title">Đang chuẩn bị quay</string>
+    <string name="notification_preparing_text">Đang khởi tạo bộ mã hóa…</string>
+    <string name="notification_countdown_title">Bắt đầu quay sau %1$d giây</string>
+    <string name="notification_countdown_text">Nhấn Dừng để hủy.</string>
+    <string name="notification_recording_title">Đang quay màn hình</string>
+    <string name="notification_recording_text">%1$s • %2$s</string>
+    <string name="notification_recording_text_no_audio">%1$s • Không có tiếng</string>
+    <string name="notification_stopping_title">Đang lưu bản ghi</string>
+    <string name="notification_stopping_text">Vui lòng giữ ứng dụng mở một chút.</string>
+    <string name="notification_saved_title">Đã lưu bản ghi</string>
+    <string name="notification_saved_text">%1$s • %2$s</string>
+    <string name="notification_error_title">Ghi hình thất bại</string>
+    <string name="notification_action_stop">Dừng</string>
+    <string name="notification_action_open">Mở</string>
+    <string name="notification_action_share">Chia sẻ</string>
+    <string name="notification_projection_stopped_title">Đã kết thúc quay màn hình</string>
+    <string name="notification_projection_stopped_text">Hệ thống đã dừng phiên quay. Phần đã quay đang được lưu.</string>
+
+    <string name="warning_audio_unavailable">Không khởi động được âm thanh. Tiếp tục quay không có tiếng.</string>
+    <string name="warning_internal_audio_unavailable">Không ghi được âm thanh của điện thoại. Tiếp tục quay không có tiếng.</string>
+    <string name="warning_audio_stopped_video_saved">Âm thanh đã dừng giữa chừng. Video vẫn được lưu.</string>
+    <string name="warning_mixed_audio_fallback">Một nguồn âm thanh không khả dụng. Tiếp tục ghi bằng nguồn còn lại.</string>
+    <string name="error_video_drain_timeout">Bộ mã hóa video không kết thúc kịp.</string>
+    <string name="error_empty_recording">Tệp ghi hình bị rỗng.</string>
+    <string name="error_recording_interrupted">Quá trình ghi hình bị gián đoạn.</string>
+    <string name="error_root_unavailable">Không có quyền root.</string>
+    <string name="error_root_timeout">Hết thời gian chờ cấp quyền root.</string>
+    <string name="error_root_screenrecord_missing">Không tìm thấy screenrecord trên thiết bị này.</string>
+    <string name="error_root_start_timeout">Chế độ Root không khởi động kịp.</string>
+    <string name="error_root_no_video">Không quay được video.</string>
+    <string name="error_root_start_failed">Không khởi động được screenrecord.</string>
+    <string name="error_root_screenrecord_failed">screenrecord dừng đột ngột.</string>
+    <string name="error_root_screenrecord_failed_with_reason">screenrecord dừng đột ngột: %1$s</string>
+    <string name="error_root_stopped_early">screenrecord dừng quá sớm.</string>
+    <string name="warning_root_unexpected_stop">Chế độ Root dừng đột ngột. Phần đã quay đang được lưu.</string>
+    <string name="warning_root_mic_only">Chế độ Root chỉ ghi âm bằng micrô.</string>
+
+    <string name="recording_summary">%1$s • %2$s • %3$s • %4$d fps</string>
+    <string name="recording_summary_root">%1$s • %2$s • %3$s</string>
+    <string name="error_notification_permission">Quyền thông báo bị từ chối. Thông báo ghi hình có thể không hiển thị.</string>
+    
+</resources>
