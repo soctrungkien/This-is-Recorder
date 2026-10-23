@@ -1,4 +1,4 @@
-package com.snowddo.recorder.data
+package com.hihi.recorder.data
 
 import android.content.ContentValues
 import android.content.Context
@@ -13,7 +13,7 @@ import java.util.Locale
 /** Temporary files and MediaStore publication for finished recordings. */
 object RecordingStorage {
 
-    private const val FOLDER = "MiuixRecorder"
+    private const val FOLDER = "ThisIsRecorder"
     private const val TEMP_FOLDER = "recordings"
     private const val MAX_TEMP_AGE_MS = 24L * 60L * 60L * 1000L
 
@@ -45,7 +45,7 @@ object RecordingStorage {
     }
 
     /**
-     * Publishes [source] into Movies/MiuixRecorder. The temporary file is deleted
+     * Publishes [source] into Movies/ThisIsRecorder. The temporary file is deleted
      * only after the MediaStore row has been finalized.
      */
     fun publish(
@@ -119,6 +119,6 @@ object RecordingStorage {
 
     private fun buildDisplayName(): String {
         val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        return "MiuixRecorder_$stamp.mp4"
+        return "ThisIsRecorder_$stamp.mp4"
     }
 }

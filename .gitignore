@@ -10,3 +10,6 @@
 app/build
 /jadx/
 .kotlin/
+/.signing/
+*.jks
+*.keystore

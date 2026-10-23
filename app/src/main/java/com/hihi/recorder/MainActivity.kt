@@ -1,4 +1,4 @@
-package com.snowddo.recorder
+package com.hihi.recorder
 
 import android.Manifest
 import android.app.Activity
@@ -20,14 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
-import com.snowddo.recorder.data.AudioSource
-import com.snowddo.recorder.data.CaptureMode
-import com.snowddo.recorder.data.RecordingStateStore
-import com.snowddo.recorder.root.RootChecker
-import com.snowddo.recorder.root.RootStatus
-import com.snowddo.recorder.service.RecordingService
-import com.snowddo.recorder.ui.RecorderApp
-import com.snowddo.recorder.ui.RecorderTheme
+import com.hihi.recorder.data.AudioSource
+import com.hihi.recorder.data.CaptureMode
+import com.hihi.recorder.data.RecordingStateStore
+import com.hihi.recorder.root.RootChecker
+import com.hihi.recorder.root.RootStatus
+import com.hihi.recorder.service.RecordingService
+import com.hihi.recorder.ui.RecorderApp
+import com.hihi.recorder.ui.RecorderTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -309,7 +309,7 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        const val EXTRA_AUTO_START = "com.snowddo.recorder.extra.AUTO_START"
+        const val EXTRA_AUTO_START = "com.hihi.recorder.extra.AUTO_START"
         private const val UI_PREFS = "miuix_recorder_ui"
         private const val KEY_NOTIFICATION_ASKED = "notification_asked"
         private const val KEY_PENDING_START = "pending_start"

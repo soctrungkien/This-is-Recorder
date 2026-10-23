@@ -1,4 +1,4 @@
-package com.snowddo.recorder.service
+package com.hihi.recorder.service
 
 import android.app.PendingIntent
 import android.content.ComponentName
@@ -7,11 +7,11 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import com.snowddo.recorder.MainActivity
-import com.snowddo.recorder.R
-import com.snowddo.recorder.data.RecordingPhase
-import com.snowddo.recorder.data.RecordingState
-import com.snowddo.recorder.data.RecordingStateStore
+import com.hihi.recorder.MainActivity
+import com.hihi.recorder.R
+import com.hihi.recorder.data.RecordingPhase
+import com.hihi.recorder.data.RecordingState
+import com.hihi.recorder.data.RecordingStateStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

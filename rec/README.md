@@ -21,7 +21,7 @@
 - Đếm ngược 3 / 10 giây, tự dừng sau 5 / 15 / 30 / 60 phút.
 - Rung khi bắt đầu/dừng, tự dừng khi tắt màn hình.
 - Nút **Quay màn hình** trên Bảng điều khiển nhanh (Quick Settings).
-- Lưu video vào `Movies/MiuixRecorder`; hiển thị bản ghi gần nhất, ảnh thu nhỏ, nút Mở/Chia sẻ.
+- Lưu video vào `Movies/ThisIsRecorder`; hiển thị bản ghi gần nhất, ảnh thu nhỏ, nút Mở/Chia sẻ.
 - Thông báo đang quay có nút Dừng.
 - Chế độ Root tùy chọn, dùng `screenrecord` và tự ghép các đoạn 180 giây.
 
@@ -50,7 +50,7 @@ Android không cho ứng dụng ghi mọi âm thanh một cách vô điều ki�
 1. Mở tab **Actions** của kho GitHub.
 2. Chọn workflow **Build This is Recorder APK**.
 3. Nhấn **Run workflow** (hoặc push code).
-4. Sau khi build xong, tải artifact **MiuixRecorder-release-...** (hoặc bản **debug** nếu cần gỡ lỗi).
+4. Sau khi build xong, tải artifact **ThisIsRecorder-release-...** (hoặc bản **debug** nếu cần gỡ lỗi).
 5. Giải nén và cài `app-release.apk` trên điện thoại (cho phép cài đặt từ nguồn không xác định).
 
 Nếu push một tag (ví dụ `v1.0.0`), workflow cũng đính kèm cả APK debug và release vào GitHub Release.

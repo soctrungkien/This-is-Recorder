@@ -1,10 +1,10 @@
-package com.snowddo.recorder
+package com.hihi.recorder
 
 import android.app.Application
-import com.snowddo.recorder.data.RecordingLibrary
-import com.snowddo.recorder.data.RecordingStorage
-import com.snowddo.recorder.data.SettingsRepository
-import com.snowddo.recorder.service.NotificationHelper
+import com.hihi.recorder.data.RecordingLibrary
+import com.hihi.recorder.data.RecordingStorage
+import com.hihi.recorder.data.SettingsRepository
+import com.hihi.recorder.service.NotificationHelper
 
 class RecorderApplication : Application() {
 

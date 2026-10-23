@@ -1,4 +1,4 @@
-package com.snowddo.recorder.root
+package com.hihi.recorder.root
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers

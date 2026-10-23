@@ -1,4 +1,4 @@
-# Miuix Recorder
+# This is Recorder
 
 Ứng dụng quay màn hình Android viết lại hoàn toàn bằng Kotlin, dùng giao diện **Miuix** (Jetpack Compose). Ứng dụng hỗ trợ hai chế độ:
 
@@ -21,7 +21,7 @@
 - Đếm ngược 3 / 10 giây, tự dừng sau 5 / 15 / 30 / 60 phút.
 - Rung khi bắt đầu/dừng, tự dừng khi tắt màn hình.
 - Nút **Quay màn hình** trên Bảng điều khiển nhanh (Quick Settings).
-- Lưu video vào `Movies/MiuixRecorder`; hiển thị bản ghi gần nhất, ảnh thu nhỏ, nút Mở/Chia sẻ.
+- Lưu video vào `Movies/ThisIsRecorder`; hiển thị bản ghi gần nhất, ảnh thu nhỏ, nút Mở/Chia sẻ.
 - Thông báo đang quay có nút Dừng.
 - Chế độ Root tùy chọn, dùng `screenrecord` và tự ghép các đoạn 180 giây.
 
@@ -48,12 +48,37 @@ Android không cho ứng dụng ghi mọi âm thanh một cách vô điều ki�
 ## Cài đặt APK từ GitHub Actions
 
 1. Mở tab **Actions** của kho GitHub.
-2. Chọn workflow **Build Miuix Recorder APK**.
+2. Chọn workflow **Build This is Recorder APK**.
 3. Nhấn **Run workflow** (hoặc push code).
-4. Sau khi build xong, tải artifact **MiuixRecorder-debug-...**.
-5. Giải nén và cài `app-debug.apk` trên điện thoại (cho phép cài đặt từ nguồn không xác định).
+4. Sau khi build xong, tải artifact **ThisIsRecorder-release-...** (bản đã ký bằng keystore trong secrets) hoặc **ThisIsRecorder-debug-...** nếu cần gỡ lỗi.
+5. Giải nén và cài `app-release.apk` (hoặc `app-debug.apk`) trên điện thoại (cho phép cài đặt từ nguồn không xác định).
 
-Nếu push một tag (ví dụ `v1.0.0`), workflow cũng đính kèm APK vào GitHub Release.
+Nếu push một tag (ví dụ `v1.0.0`), workflow cũng đính kèm cả APK debug và release vào GitHub Release.
+
+### Ký APK release bằng GitHub Secrets
+
+Thêm các secret sau trong **Settings → Secrets and variables → Actions** của repository:
+
+| Secret | Nội dung |
+| --- | --- |
+| `SIGNING_KEYSTORE_BASE64` | File keystore (`.jks` / `.keystore`) được mã hóa Base64 |
+| `SIGNING_STORE_PASSWORD` | Mật khẩu của keystore |
+| `SIGNING_KEY_ALIAS` | Alias của key |
+| `SIGNING_KEY_PASSWORD` | Mật khẩu của key |
+
+Tạo chuỗi Base64 trên máy:
+
+```bash
+base64 -w 0 release.jks > keystore.b64
+```
+
+Trên Windows PowerShell:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("release.jks")) | Set-Content keystore.b64
+```
+
+Gradle giải mã keystore vào `.signing/release.jks` (đã nằm trong `.gitignore`) và dùng nó để ký APK release. Nếu các secret chưa được cấu hình, bản release sẽ tạm ký bằng debug keystore để build vẫn thành công.
 
 ## Build trên máy
 
@@ -64,13 +89,14 @@ Yêu cầu:
 - Build Tools 36.0.0
 
 ```bash
-./gradlew :app:assembleDebug
+./gradlew :app:assembleDebug :app:assembleRelease
 ```
 
 APK nằm ở:
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
+app/build/outputs/apk/release/app-release.apk
 ```
 
 Workflow dùng Temurin JDK 21 và tự cài SDK cần thiết, nên không cần build cục bộ nếu bạn chỉ muốn lấy APK.
@@ -94,7 +120,7 @@ Android 14+ không cho Quick Settings tự lấy quyền MediaProjection, nên l
 ## Cấu trúc chính
 
 ```text
-app/src/main/java/com/snowddo/recorder/
+app/src/main/java/com/hihi/recorder/
 ├── MainActivity.kt           # quyền, MediaProjection, mở đầu ghi
 ├── data/                     # cài đặt, trạng thái, MediaStore, thư viện video
 ├── media/                    # engine MediaProjection và root screenrecord

@@ -1,4 +1,4 @@
-package com.snowddo.recorder.media
+package com.hihi.recorder.media
 
 import android.content.Context
 import android.hardware.display.DisplayManager
@@ -6,9 +6,9 @@ import android.hardware.display.VirtualDisplay
 import android.media.projection.MediaProjection
 import android.os.Handler
 import android.os.Looper
-import com.snowddo.recorder.R
-import com.snowddo.recorder.data.AudioSource
-import com.snowddo.recorder.data.RecorderSettings
+import com.hihi.recorder.R
+import com.hihi.recorder.data.AudioSource
+import com.hihi.recorder.data.RecorderSettings
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -68,7 +68,7 @@ class ProjectionRecorder(
             projection.registerCallback(callback, Handler(Looper.getMainLooper()))
 
             virtualDisplay = projection.createVirtualDisplay(
-                "MiuixRecorder",
+                "ThisIsRecorder",
                 size.width,
                 size.height,
                 resolveDisplayDensity(context),

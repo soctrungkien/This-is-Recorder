@@ -1,4 +1,4 @@
-package com.snowddo.recorder.media
+package com.hihi.recorder.media
 
 import android.media.MediaCodec
 import android.media.MediaFormat

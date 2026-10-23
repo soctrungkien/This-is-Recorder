@@ -358,7 +358,7 @@ class RecordingService : Service() {
         val power = getSystemService(PowerManager::class.java) ?: return
         wakeLock = power.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
-            "MiuixRecorder:recording",
+            "ThisIsRecorder:recording",
         ).apply {
             setReferenceCounted(false)
             acquire(6L * 60L * 60L * 1000L)

@@ -1,4 +1,4 @@
-package com.snowddo.recorder.data
+package com.hihi.recorder.data
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow

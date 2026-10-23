@@ -1,15 +1,15 @@
-package com.snowddo.recorder.media
+package com.hihi.recorder.media
 
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.SystemClock
-import com.snowddo.recorder.R
-import com.snowddo.recorder.data.RecorderSettings
-import com.snowddo.recorder.root.RootChecker
-import com.snowddo.recorder.root.RootFailure
-import com.snowddo.recorder.root.RootShell
-import com.snowddo.recorder.root.RootStatus
+import com.hihi.recorder.R
+import com.hihi.recorder.data.RecorderSettings
+import com.hihi.recorder.root.RootChecker
+import com.hihi.recorder.root.RootFailure
+import com.hihi.recorder.root.RootShell
+import com.hihi.recorder.root.RootStatus
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +80,7 @@ class RootRecorder(
             frameRate = settings.frameRate.value,
         )
 
-        val directory = com.snowddo.recorder.data.RecordingStorage.newSessionDirectory(context)
+        val directory = com.hihi.recorder.data.RecordingStorage.newSessionDirectory(context)
         sessionDir = directory
         val script = File(directory, "record_segment.sh").apply {
             writeText(SEGMENT_SCRIPT)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Miuix Recorder</string>
+    <string name="app_name">This is Recorder</string>
     <string name="app_subtitle">Quay màn hình và âm thanh</string>
     <string name="tile_label">Quay màn hình</string>
 
@@ -12,7 +12,7 @@
     <string name="status_stopping_title">Đang lưu…</string>
     <string name="status_saved_title">Đã lưu</string>
     <string name="status_error_title">Quay thất bại</string>
-    <string name="status_saved_summary">Video đã được lưu trong Movies/MiuixRecorder.</string>
+    <string name="status_saved_summary">Video đã được lưu trong Movies/ThisIsRecorder.</string>
     <string name="status_preparing_summary">Đang chờ khung hình đầu tiên…</string>
     <string name="status_stopping_summary">Đang hoàn tất tệp MP4. Vui lòng giữ ứng dụng mở một chút.</string>
     <string name="status_error_summary">Xem thông báo bên dưới rồi thử lại.</string>
@@ -55,7 +55,7 @@
     <string name="pref_root_status">Trạng thái root</string>
     <string name="pref_version">Phiên bản</string>
     <string name="pref_storage">Thư mục lưu</string>
-    <string name="pref_storage_summary">Movies/MiuixRecorder</string>
+    <string name="pref_storage_summary">Movies/ThisIsRecorder</string>
 
     <string name="capture_standard">Chuẩn (MediaProjection)</string>
     <string name="capture_root">Root (screenrecord)</string>
@@ -109,7 +109,7 @@
     <string name="root_mode_dialog_title">Bật chế độ Root?</string>
     <string name="root_mode_dialog_message">Chế độ Root dùng screenrecord, không cần hộp thoại cấp quyền MediaProjection. Chế độ này chỉ ghi micrô và tự chia video dài thành các đoạn 3 phút. Không hỗ trợ âm thanh của điện thoại.</string>
     <string name="root_required_title">Cần quyền root</string>
-    <string name="root_required_message">Hãy cấp quyền su cho Miuix Recorder trong Magisk, KernelSU hoặc trình quản lý root, rồi thử lại.</string>
+    <string name="root_required_message">Hãy cấp quyền su cho This is Recorder trong Magisk, KernelSU hoặc trình quản lý root, rồi thử lại.</string>
     <string name="root_error_title">Không dùng được chế độ Root</string>
 
     <string name="permission_mic_title">Cần quyền micrô</string>
@@ -121,7 +121,7 @@
     <string name="error_share_recording">Không có ứng dụng nào chia sẻ được video này.</string>
 
     <string name="last_none_title">Chưa có bản ghi</string>
-    <string name="last_none_summary">Video đã quay sẽ xuất hiện ở đây và trong Movies/MiuixRecorder.</string>
+    <string name="last_none_summary">Video đã quay sẽ xuất hiện ở đây và trong Movies/ThisIsRecorder.</string>
     <string name="last_saved_at">Đã lưu %1$s</string>
     <string name="last_meta">%1$s • %2$s</string>
     <string name="duration_unknown">Không rõ thời lượng</string>
@@ -135,7 +135,7 @@
     <string name="help_root_title">Chế độ Root</string>
     <string name="help_root_body">Chế độ Root chạy screenrecord với quyền root và không cần cấp quyền MediaProjection. Video được ghi thành các đoạn 180 giây và ghép lại khi bạn dừng. Chỉ hỗ trợ âm thanh micrô. Cửa sổ bảo mật vẫn hiển thị màu đen.</string>
     <string name="help_storage_title">Nơi lưu video</string>
-    <string name="help_storage_body">Video được lưu trong Movies/MiuixRecorder. Ứng dụng giữ một lối tắt đến bản ghi mới nhất ở màn hình chính.</string>
+    <string name="help_storage_body">Video được lưu trong Movies/ThisIsRecorder. Ứng dụng giữ một lối tắt đến bản ghi mới nhất ở màn hình chính.</string>
 
     <string name="notification_channel_recording">Quay màn hình</string>
     <string name="notification_channel_recording_desc">Trạng thái đang quay và nút dừng</string>

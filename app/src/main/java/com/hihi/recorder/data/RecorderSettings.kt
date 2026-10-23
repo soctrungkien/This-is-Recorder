@@ -1,4 +1,4 @@
-package com.snowddo.recorder.data
+package com.hihi.recorder.data
 
 /** Where the soundtrack of a recording comes from. */
 enum class AudioSource(

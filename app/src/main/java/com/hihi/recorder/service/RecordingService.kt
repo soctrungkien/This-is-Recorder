@@ -1,4 +1,4 @@
-package com.snowddo.recorder.service
+package com.hihi.recorder.service
 
 import android.app.Activity
 import android.app.Service
@@ -17,16 +17,16 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import com.snowddo.recorder.R
-import com.snowddo.recorder.data.CaptureMode
-import com.snowddo.recorder.data.RecorderSettings
-import com.snowddo.recorder.data.RecordingPhase
-import com.snowddo.recorder.data.RecordingStateStore
-import com.snowddo.recorder.data.RecordingStorage
-import com.snowddo.recorder.media.ProjectionRecorder
-import com.snowddo.recorder.media.RootRecorder
-import com.snowddo.recorder.recordingLibrary
-import com.snowddo.recorder.settingsRepository
+import com.hihi.recorder.R
+import com.hihi.recorder.data.CaptureMode
+import com.hihi.recorder.data.RecorderSettings
+import com.hihi.recorder.data.RecordingPhase
+import com.hihi.recorder.data.RecordingStateStore
+import com.hihi.recorder.data.RecordingStorage
+import com.hihi.recorder.media.ProjectionRecorder
+import com.hihi.recorder.media.RootRecorder
+import com.hihi.recorder.recordingLibrary
+import com.hihi.recorder.settingsRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -358,7 +358,7 @@ class RecordingService : Service() {
         val power = getSystemService(PowerManager::class.java) ?: return
         wakeLock = power.newWakeLock(
             PowerManager.PARTIAL_WAKE_LOCK,
-            "MiuixRecorder:recording",
+            "ThisIsRecorder:recording",
         ).apply {
             setReferenceCounted(false)
             acquire(6L * 60L * 60L * 1000L)
@@ -404,7 +404,7 @@ class RecordingService : Service() {
         super.onDestroy()
     }
 
-    private sealed interface ActiveRecorder {
+    private interface ActiveRecorder {
         val warning: String?
         suspend fun start()
         suspend fun stop()
@@ -426,9 +426,9 @@ class RecordingService : Service() {
     }
 
     companion object {
-        const val ACTION_START = "com.snowddo.recorder.action.START"
-        const val ACTION_STOP = "com.snowddo.recorder.action.STOP"
-        const val EXTRA_RESULT_CODE = "com.snowddo.recorder.extra.RESULT_CODE"
-        const val EXTRA_RESULT_DATA = "com.snowddo.recorder.extra.RESULT_DATA"
+        const val ACTION_START = "com.hihi.recorder.action.START"
+        const val ACTION_STOP = "com.hihi.recorder.action.STOP"
+        const val EXTRA_RESULT_CODE = "com.hihi.recorder.extra.RESULT_CODE"
+        const val EXTRA_RESULT_DATA = "com.hihi.recorder.extra.RESULT_DATA"
     }
 }

@@ -1,12 +1,12 @@
-package com.snowddo.recorder.media
+package com.hihi.recorder.media
 
 import android.content.Context
 import android.graphics.Point
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.view.Display
-import com.snowddo.recorder.data.VideoBitrate
-import com.snowddo.recorder.data.VideoResolution
+import com.hihi.recorder.data.VideoBitrate
+import com.hihi.recorder.data.VideoResolution
 import kotlin.math.min
 import kotlin.math.roundToInt
 

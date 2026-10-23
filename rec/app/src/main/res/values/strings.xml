@@ -12,7 +12,7 @@
     <string name="status_stopping_title">Saving…</string>
     <string name="status_saved_title">Saved</string>
     <string name="status_error_title">Recording failed</string>
-    <string name="status_saved_summary">Your video is in Movies/MiuixRecorder.</string>
+    <string name="status_saved_summary">Your video is in Movies/ThisIsRecorder.</string>
     <string name="status_preparing_summary">Waiting for the first frame…</string>
     <string name="status_stopping_summary">Finishing the MP4 file. Keep the app open for a moment.</string>
     <string name="status_error_summary">Check the message below and try again.</string>
@@ -55,7 +55,7 @@
     <string name="pref_root_status">Root status</string>
     <string name="pref_version">Version</string>
     <string name="pref_storage">Storage folder</string>
-    <string name="pref_storage_summary">Movies/MiuixRecorder</string>
+    <string name="pref_storage_summary">Movies/ThisIsRecorder</string>
 
     <string name="capture_standard">Standard (MediaProjection)</string>
     <string name="capture_root">Root (screenrecord)</string>
@@ -121,7 +121,7 @@
     <string name="error_share_recording">No app can share this video.</string>
 
     <string name="last_none_title">No recordings yet</string>
-    <string name="last_none_summary">Finished videos appear here and in Movies/MiuixRecorder.</string>
+    <string name="last_none_summary">Finished videos appear here and in Movies/ThisIsRecorder.</string>
     <string name="last_saved_at">Saved %1$s</string>
     <string name="last_meta">%1$s • %2$s</string>
     <string name="duration_unknown">Unknown length</string>
@@ -135,7 +135,7 @@
     <string name="help_root_title">Root mode</string>
     <string name="help_root_body">Root mode runs screenrecord as root and does not need MediaProjection consent. Videos are recorded in 180-second segments and joined when you stop. Only microphone audio is supported. Secure windows remain black.</string>
     <string name="help_storage_title">Where videos are saved</string>
-    <string name="help_storage_body">Videos are saved to Movies/MiuixRecorder. The app keeps a shortcut to the latest recording on the home screen.</string>
+    <string name="help_storage_body">Videos are saved to Movies/ThisIsRecorder. The app keeps a shortcut to the latest recording on the home screen.</string>
 
     <string name="notification_channel_recording">Screen recording</string>
     <string name="notification_channel_recording_desc">Ongoing recording status and stop action</string>

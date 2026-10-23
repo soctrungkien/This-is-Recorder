@@ -68,7 +68,7 @@ class ProjectionRecorder(
             projection.registerCallback(callback, Handler(Looper.getMainLooper()))
 
             virtualDisplay = projection.createVirtualDisplay(
-                "MiuixRecorder",
+                "ThisIsRecorder",
                 size.width,
                 size.height,
                 resolveDisplayDensity(context),

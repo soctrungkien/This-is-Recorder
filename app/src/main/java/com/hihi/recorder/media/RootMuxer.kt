@@ -1,11 +1,11 @@
-package com.snowddo.recorder.media
+package com.hihi.recorder.media
 
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.os.SystemClock
-import com.snowddo.recorder.root.RootShell
+import com.hihi.recorder.root.RootShell
 import java.io.Closeable
 import java.io.File
 import java.nio.ByteBuffer

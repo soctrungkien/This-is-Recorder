@@ -1,4 +1,4 @@
-package com.snowddo.recorder.ui
+package com.hihi.recorder.ui
 
 import android.app.Activity
 import android.content.Context
@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.snowddo.recorder.data.RecorderTheme
+import com.hihi.recorder.data.RecorderTheme
 import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.theme.ThemeController

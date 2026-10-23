@@ -1,4 +1,4 @@
-package com.snowddo.recorder.service
+package com.hihi.recorder.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,13 +10,13 @@ import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
-import com.snowddo.recorder.MainActivity
-import com.snowddo.recorder.R
-import com.snowddo.recorder.data.AudioSource
-import com.snowddo.recorder.data.CaptureMode
-import com.snowddo.recorder.data.RecorderSettings
-import com.snowddo.recorder.data.SavedRecording
-import com.snowddo.recorder.data.VideoResolution
+import com.hihi.recorder.MainActivity
+import com.hihi.recorder.R
+import com.hihi.recorder.data.AudioSource
+import com.hihi.recorder.data.CaptureMode
+import com.hihi.recorder.data.RecorderSettings
+import com.hihi.recorder.data.SavedRecording
+import com.hihi.recorder.data.VideoResolution
 
 /** Builds the ongoing and result notifications used by [RecordingService]. */
 object NotificationHelper {
@@ -165,7 +165,6 @@ object NotificationHelper {
             .setCategory(Notification.CATEGORY_SERVICE)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setOnlyAlertOnce(true)
-            .setSilent(true)
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)

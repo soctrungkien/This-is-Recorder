@@ -26,5 +26,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MiuixRecorder"
+rootProject.name = "ThisIsRecorder"
 include(":app")

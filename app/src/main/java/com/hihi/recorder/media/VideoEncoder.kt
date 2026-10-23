@@ -1,4 +1,4 @@
-package com.snowddo.recorder.media
+package com.hihi.recorder.media
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -39,7 +39,9 @@ class VideoEncoder(
         codec = created
 
         runCatching {
-            val capabilities = created.codecInfo.encoderCapabilities
+            val capabilities = created.codecInfo
+                .getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC)
+                .encoderCapabilities
             if (capabilities != null && capabilities.isBitrateModeSupported(MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR)) {
                 format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR)
             }

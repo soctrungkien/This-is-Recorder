@@ -1,8 +1,8 @@
-package com.snowddo.recorder
+package com.hihi.recorder
 
 import android.content.Context
-import com.snowddo.recorder.data.RecordingLibrary
-import com.snowddo.recorder.data.SettingsRepository
+import com.hihi.recorder.data.RecordingLibrary
+import com.hihi.recorder.data.SettingsRepository
 
 val Context.recorderApplication: RecorderApplication
     get() = applicationContext as RecorderApplication

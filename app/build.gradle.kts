@@ -1,4 +1,19 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Base64
+
+// CI provides the release keystore as base64 through the repository secrets.
+// When the secrets are absent (for example on pull requests from forks), the
+// release build falls back to the debug keystore so the APK can still be built.
+val signingKeystoreBase64 = System.getenv("SIGNING_KEYSTORE_BASE64")
+val signingStorePassword = System.getenv("SIGNING_STORE_PASSWORD")
+val signingKeyAlias = System.getenv("SIGNING_KEY_ALIAS")
+val signingKeyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+val hasReleaseSigning = listOf(
+    signingKeystoreBase64,
+    signingStorePassword,
+    signingKeyAlias,
+    signingKeyPassword,
+).all { !it.isNullOrBlank() }
 
 plugins {
     id("com.android.application")
@@ -6,7 +21,7 @@ plugins {
 }
 
 android {
-    namespace = "com.snowddo.recorder"
+    namespace = "com.hihi.recorder"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -15,7 +30,7 @@ android {
     buildToolsVersion = "36.0.0"
 
     defaultConfig {
-        applicationId = "com.snowddo.recorder"
+        applicationId = "com.hihi.recorder"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
@@ -26,6 +41,22 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                val keystoreFile = rootProject.layout.projectDirectory.file(".signing/release.jks").asFile
+                keystoreFile.parentFile.mkdirs()
+                keystoreFile.writeBytes(
+                    Base64.getMimeDecoder().decode(requireNotNull(signingKeystoreBase64)),
+                )
+                storeFile = keystoreFile
+                storePassword = signingStorePassword
+                keyAlias = signingKeyAlias
+                keyPassword = signingKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,6 +64,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                logger.warn(
+                    "Release signing secrets are not configured: " +
+                        "SIGNING_KEYSTORE_BASE64 / SIGNING_STORE_PASSWORD / " +
+                        "SIGNING_KEY_ALIAS / SIGNING_KEY_PASSWORD. " +
+                        "The release APK will be signed with the debug keystore.",
+                )
+                signingConfigs.getByName("debug")
+            }
         }
     }
 
