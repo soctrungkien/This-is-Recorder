@@ -50,10 +50,10 @@ Android không cho ứng dụng ghi mọi âm thanh một cách vô điều ki�
 1. Mở tab **Actions** của kho GitHub.
 2. Chọn workflow **Build This is Recorder APK**.
 3. Nhấn **Run workflow** (hoặc push code).
-4. Sau khi build xong, tải artifact **MiuixRecorder-debug-...**.
-5. Giải nén và cài `app-debug.apk` trên điện thoại (cho phép cài đặt từ nguồn không xác định).
+4. Sau khi build xong, tải artifact **MiuixRecorder-release-...** (hoặc bản **debug** nếu cần gỡ lỗi).
+5. Giải nén và cài `app-release.apk` trên điện thoại (cho phép cài đặt từ nguồn không xác định).
 
-Nếu push một tag (ví dụ `v1.0.0`), workflow cũng đính kèm APK vào GitHub Release.
+Nếu push một tag (ví dụ `v1.0.0`), workflow cũng đính kèm cả APK debug và release vào GitHub Release.
 
 ## Build trên máy
 
@@ -64,13 +64,14 @@ Yêu cầu:
 - Build Tools 36.0.0
 
 ```bash
-./gradlew :app:assembleDebug
+./gradlew :app:assembleDebug :app:assembleRelease
 ```
 
 APK nằm ở:
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
+app/build/outputs/apk/release/app-release.apk
 ```
 
 Workflow dùng Temurin JDK 21 và tự cài SDK cần thiết, nên không cần build cục bộ nếu bạn chỉ muốn lấy APK.

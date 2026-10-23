@@ -33,6 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // No production keystore is bundled, but CI still needs an installable
+            // release APK. Replace this with a dedicated signing config before
+            // publishing the app officially.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

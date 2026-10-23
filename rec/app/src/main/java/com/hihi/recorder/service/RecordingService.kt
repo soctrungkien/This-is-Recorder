@@ -404,7 +404,7 @@ class RecordingService : Service() {
         super.onDestroy()
     }
 
-    private sealed interface ActiveRecorder {
+    private interface ActiveRecorder {
         val warning: String?
         suspend fun start()
         suspend fun stop()
