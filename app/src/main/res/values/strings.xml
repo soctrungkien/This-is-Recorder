@@ -12,7 +12,7 @@
     <string name="status_stopping_title">Saving…</string>
     <string name="status_saved_title">Saved</string>
     <string name="status_error_title">Recording failed</string>
-    <string name="status_saved_summary">Your video is in Movies/ThisIsRecorder.</string>
+    <string name="status_saved_summary">Your video is in %1$s.</string>
     <string name="status_preparing_summary">Waiting for the first frame…</string>
     <string name="status_stopping_summary">Finishing the MP4 file. Keep the app open for a moment.</string>
     <string name="status_error_summary">Check the message below and try again.</string>
@@ -28,6 +28,14 @@
     <string name="action_enable_root">Turn on root mode</string>
     <string name="action_open_settings">Open settings</string>
     <string name="action_switch_mic">Use microphone</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_later">Later</string>
+    <string name="action_download">Download</string>
+    <string name="action_check">Check</string>
+    <string name="action_learn_more">Learn more</string>
 
     <string name="section_recording">Recording</string>
     <string name="section_audio">Audio</string>
@@ -38,6 +46,33 @@
     <string name="section_help">Help</string>
     <string name="section_last_recording">Latest recording</string>
     <string name="section_root">Root mode</string>
+    <string name="section_capture_mode">Capture mode</string>
+    <string name="section_storage">Storage</string>
+    <string name="section_updates">Updates</string>
+    <string name="section_about">About</string>
+
+    <string name="nav_record">Record</string>
+    <string name="nav_videos">Videos</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="videos_title">Saved videos</string>
+    <string name="videos_count">%1$d videos</string>
+    <string name="videos_empty_title">No saved videos</string>
+    <string name="videos_empty_message">Finish a recording and it will appear here. Videos from all save folders are shown.</string>
+    <string name="videos_loading">Loading videos…</string>
+    <string name="videos_unknown_folder">Saved by This is Recorder</string>
+    <string name="pull_to_refresh">Pull down to refresh</string>
+    <string name="release_to_refresh">Release to refresh</string>
+    <string name="refreshing">Refreshing…</string>
+    <string name="refresh_complete">Videos updated</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Appearance, storage, and updates</string>
+
+    <string name="mode_standard_short">Standard</string>
+    <string name="mode_root_short">Root</string>
+    <string name="recording_locked_hint">Stop recording to change these options.</string>
+    <string name="root_mic_switched">Root mode uses the microphone, so phone audio was switched off.</string>
 
     <string name="pref_capture_mode">Capture mode</string>
     <string name="pref_capture_mode_summary_standard">MediaProjection + MediaCodec. Supports phone audio.</string>
@@ -56,6 +91,53 @@
     <string name="pref_version">Version</string>
     <string name="pref_storage">Storage folder</string>
     <string name="pref_storage_summary">Movies/ThisIsRecorder</string>
+    <string name="pref_ui_style">App style</string>
+    <string name="pref_ui_style_summary">Choose Miuix for a HyperOS look, or Material 3 for stock Android.</string>
+    <string name="ui_style_miuix">Miuix</string>
+    <string name="ui_style_material">Material 3</string>
+    <string name="pref_material_spec">Color specification</string>
+    <string name="pref_material_spec_summary">2021 uses classic Material You. 2025 uses the updated tonal palette.</string>
+    <string name="material_spec_2021">2021</string>
+    <string name="material_spec_2025">2025</string>
+    <string name="material_spec_2021_summary">Classic Material 3 palette</string>
+    <string name="material_spec_2025_summary">Updated Material 3 Expressive palette</string>
+    <string name="pref_monet">Monet dynamic color</string>
+    <string name="pref_monet_summary">Use wallpaper colors throughout the app.</string>
+    <string name="pref_monet_unavailable">Dynamic color requires Android 12 or newer.</string>
+    <string name="pref_navigation_blur">Liquid glass blur</string>
+    <string name="pref_navigation_blur_summary">Blur the content behind the floating navigation bar.</string>
+    <string name="pref_navigation_blur_unavailable">Blur requires Android 13 or newer. A translucent bar is used instead.</string>
+    <string name="pref_save_folder">Save location</string>
+    <string name="pref_save_folder_summary">Folder inside Movies. Use / for nested folders.</string>
+    <string name="save_folder_title">Custom save location</string>
+    <string name="save_folder_message">Videos are saved inside Movies. Enter a folder name or a nested path such as Recordings/Screen.</string>
+    <string name="save_folder_placeholder">ThisIsRecorder</string>
+    <string name="pref_check_updates">Check for updates</string>
+    <string name="pref_check_updates_summary">Checked automatically when the app opens. Requests go through gh-proxy.</string>
+    <string name="pref_github">GitHub</string>
+    <string name="pref_github_summary">github.com/soctrungkien</string>
+    <string name="pref_telegram">Telegram</string>
+    <string name="pref_telegram_summary">@realknoname</string>
+    <string name="pref_verification">Android developer verification</string>
+    <string name="pref_verification_summary">Why this app may stop working on certified devices</string>
+
+    <string name="rename_title">Rename video</string>
+    <string name="rename_message">Enter a new name. The .mp4 extension is added automatically.</string>
+    <string name="rename_placeholder">Video name</string>
+    <string name="delete_title">Delete video?</string>
+    <string name="delete_message">“%1$s” will be permanently deleted from this phone.</string>
+
+    <string name="verification_title">Keep Android Open</string>
+    <string name="verification_message">Google will soon require every app on certified Android devices to be registered with the developer’s personal identity. This app is free and open source, and no verified identity is promised. After enforcement begins, builds installed outside an app store may stop working on certified devices. You can still install future builds over ADB or use a system without Google Play Services. Visit keepandroidopen.org to learn more and support the campaign.</string>
+
+    <string name="update_available_title">Update %1$s available</string>
+    <string name="update_available_message">A newer version has been published on GitHub. Download it through the gh-proxy mirror.</string>
+    <string name="update_up_to_date">You are using the latest version.</string>
+    <string name="update_no_releases">No GitHub releases were found yet.</string>
+    <string name="update_network_error">Could not reach GitHub through gh-proxy. Check your connection.</string>
+    <string name="update_rate_limited">GitHub rate limit reached. Try again later.</string>
+    <string name="update_server_error">GitHub returned an error. Try again later.</string>
+    <string name="update_invalid_response">GitHub returned an unexpected response.</string>
 
     <string name="capture_standard">Standard (MediaProjection)</string>
     <string name="capture_root">Root (screenrecord)</string>
@@ -119,9 +201,15 @@
     <string name="notification_permission_hint">Notifications are disabled. Recording can continue, but the stop button will not be visible in the notification shade.</string>
     <string name="error_open_recording">No app can open this video.</string>
     <string name="error_share_recording">No app can share this video.</string>
+    <string name="error_refresh_videos">Could not load saved videos.</string>
+    <string name="error_rename_video">Could not rename this video.</string>
+    <string name="error_delete_video">Could not delete this video.</string>
+    <string name="error_open_link">No app can open this link.</string>
+    <string name="rename_success">Video renamed.</string>
+    <string name="delete_success">Video deleted.</string>
 
     <string name="last_none_title">No recordings yet</string>
-    <string name="last_none_summary">Finished videos appear here and in Movies/ThisIsRecorder.</string>
+    <string name="last_none_summary">Finished videos appear here and in %1$s.</string>
     <string name="last_saved_at">Saved %1$s</string>
     <string name="last_meta">%1$s • %2$s</string>
     <string name="duration_unknown">Unknown length</string>
@@ -135,7 +223,7 @@
     <string name="help_root_title">Root mode</string>
     <string name="help_root_body">Root mode runs screenrecord as root and does not need MediaProjection consent. Videos are recorded in 180-second segments and joined when you stop. Only microphone audio is supported. Secure windows remain black.</string>
     <string name="help_storage_title">Where videos are saved</string>
-    <string name="help_storage_body">Videos are saved to Movies/ThisIsRecorder. The app keeps a shortcut to the latest recording on the home screen.</string>
+    <string name="help_storage_body">Videos are saved to %1$s. Change the folder in Settings → Storage; all folders used by this app are listed on the Videos page.</string>
 
     <string name="notification_channel_recording">Screen recording</string>
     <string name="notification_channel_recording_desc">Ongoing recording status and stop action</string>

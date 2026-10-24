@@ -143,14 +143,16 @@ class RecordingService : Service() {
         var type = 0
         if (settings.captureMode == CaptureMode.STANDARD) {
             type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
-            if (settings.audioSource.usesMicrophone) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                settings.audioSource.usesMicrophone
+            ) {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
             }
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             }
-            if (settings.usesAudio) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && settings.usesAudio) {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
             }
         }
@@ -235,7 +237,12 @@ class RecordingService : Service() {
             active.warning?.let { RecordingStateStore.markWarning(it) }
             val duration = (SystemClock.elapsedRealtime() - startedAt).coerceAtLeast(0L)
             val saved = withContext(Dispatchers.IO) {
-                RecordingStorage.publish(this@RecordingService, file, duration)
+                RecordingStorage.publish(
+                    context = this@RecordingService,
+                    source = file,
+                    durationMs = duration,
+                    folder = settings.saveFolder,
+                )
             }
             applicationContext.recordingLibrary.save(saved)
             RecordingStateStore.markSaved()

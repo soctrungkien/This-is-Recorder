@@ -33,8 +33,8 @@ android {
         applicationId = "com.hihi.recorder"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -111,6 +111,14 @@ dependencies {
     implementation("top.yukonga.miuix.kmp:miuix-ui-android:0.9.4")
     implementation("top.yukonga.miuix.kmp:miuix-preference-android:0.9.4")
     implementation("top.yukonga.miuix.kmp:miuix-icons-android:0.9.4")
+    implementation("top.yukonga.miuix.kmp:miuix-blur-android:0.9.4")
+
+    // Optional Material 3 presentation for people who prefer stock Android.
+    implementation("androidx.compose.material3:material3:1.4.0")
+
+    // FreeDroidWarn: reminds users about the Android developer verification
+    // deadline on application upgrades.
+    implementation("com.github.woheller69:FreeDroidWarn:V1.+")
 
     implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.activity:activity-compose:1.13.0")

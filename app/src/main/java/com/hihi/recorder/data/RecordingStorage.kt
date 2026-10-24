@@ -13,7 +13,6 @@ import java.util.Locale
 /** Temporary files and MediaStore publication for finished recordings. */
 object RecordingStorage {
 
-    private const val FOLDER = "ThisIsRecorder"
     private const val TEMP_FOLDER = "recordings"
     private const val MAX_TEMP_AGE_MS = 24L * 60L * 60L * 1000L
 
@@ -45,37 +44,38 @@ object RecordingStorage {
     }
 
     /**
-     * Publishes [source] into Movies/ThisIsRecorder. The temporary file is deleted
+     * Publishes [source] into `Movies/<folder>`. The temporary file is deleted
      * only after the MediaStore row has been finalized.
      */
     fun publish(
         context: Context,
         source: File,
         durationMs: Long,
+        folder: String = RecorderSettings.DEFAULT_SAVE_FOLDER,
     ): SavedRecording {
         require(source.isFile && source.length() > 0) { "Recording file is empty" }
 
         val resolver = context.contentResolver
         val displayName = buildDisplayName()
+        val relativePath = "${Environment.DIRECTORY_MOVIES}/${normalizeSaveFolder(folder)}"
         val collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val now = System.currentTimeMillis()
         val values = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, displayName)
             put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
-            put(
-                MediaStore.Video.Media.RELATIVE_PATH,
-                "${Environment.DIRECTORY_MOVIES}/$FOLDER",
-            )
-            put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.Video.Media.RELATIVE_PATH, relativePath)
+            put(MediaStore.Video.Media.DATE_TAKEN, now)
             put(MediaStore.Video.Media.IS_PENDING, 1)
+            put(MediaStore.Video.Media.OWNER_PACKAGE_NAME, context.packageName)
         }
 
         val uri = resolver.insert(collection, values)
-            ?: error("Không thể tạo mục trong thư viện ảnh")
+            ?: error("Could not create a MediaStore entry")
 
         try {
             resolver.openOutputStream(uri, "w")?.use { output ->
                 source.inputStream().use { input -> input.copyTo(output) }
-            } ?: error("Không thể mở tệp đầu ra")
+            } ?: error("Could not open the output file")
 
             val size = source.length()
             // Publishing the row must not depend on optional metadata columns
@@ -104,7 +104,8 @@ object RecordingStorage {
                 displayName = displayName,
                 durationMs = durationMs,
                 sizeBytes = size,
-                savedAtEpochMs = System.currentTimeMillis(),
+                savedAtEpochMs = now,
+                relativePath = relativePath,
             )
         } catch (error: Throwable) {
             runCatching { resolver.delete(uri, null, null) }

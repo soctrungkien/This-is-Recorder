@@ -1,35 +1,27 @@
 package com.hihi.recorder.ui
 
-import android.content.Context
-import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.os.SystemClock
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,76 +29,55 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.hihi.recorder.BuildConfig
 import com.hihi.recorder.R
 import com.hihi.recorder.data.AudioSource
-import com.hihi.recorder.data.AutoStop
 import com.hihi.recorder.data.CaptureMode
-import com.hihi.recorder.data.Countdown
 import com.hihi.recorder.data.RecorderSettings
-import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingState
 import com.hihi.recorder.data.SavedRecording
-import com.hihi.recorder.data.VideoBitrate
-import com.hihi.recorder.data.VideoFrameRate
-import com.hihi.recorder.data.VideoResolution
-import com.hihi.recorder.media.resolveCaptureSize
+import com.hihi.recorder.net.UpdateChecker
+import com.hihi.recorder.net.UpdateFailure
+import com.hihi.recorder.net.UpdateResult
 import com.hihi.recorder.root.RootChecker
 import com.hihi.recorder.root.RootStatus
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CardDefaults
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.ProgressIndicatorDefaults
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTitle
-import top.yukonga.miuix.kmp.basic.SmallTopAppBar
-import top.yukonga.miuix.kmp.basic.SnackbarHost
+import kotlinx.coroutines.launch
+import top.yukonga.miuix.kmp.blur.layerBackdrop
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
+import top.yukonga.miuix.kmp.basic.FloatingToolbar
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Folder
-import top.yukonga.miuix.kmp.icon.extended.Help
-import top.yukonga.miuix.kmp.icon.extended.Info
-import top.yukonga.miuix.kmp.icon.extended.Refresh
+import top.yukonga.miuix.kmp.icon.extended.Album
 import top.yukonga.miuix.kmp.icon.extended.ScreenCapture
-import top.yukonga.miuix.kmp.icon.extended.Share
-import top.yukonga.miuix.kmp.overlay.OverlayDialog
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.preference.OverlayDropdownPreference
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.icon.extended.Settings
+
+private enum class AppTab {
+    RECORD,
+    VIDEOS,
+    SETTINGS,
+}
 
 @Composable
 fun RecorderApp(
     settings: RecorderSettings,
     recordingState: RecordingState,
     lastRecording: SavedRecording?,
+    recordings: List<SavedRecording>,
+    recordingsLoading: Boolean,
     snackbarHostState: SnackbarHostState,
     checkingRoot: Boolean,
     autoStartToken: Int,
@@ -120,13 +91,36 @@ fun RecorderApp(
     onDismissRootUnavailableDialog: () -> Unit,
     onOpenRecording: (Uri) -> Unit,
     onShareRecording: (Uri) -> Unit,
+    onRefreshRecordings: () -> Unit,
+    onRenameRecording: (SavedRecording, String) -> Unit,
+    onDeleteRecording: (SavedRecording) -> Unit,
+    onOpenUrl: (String) -> Unit,
 ) {
     val context = LocalContext.current
-    var showHelp by remember { mutableStateOf(false) }
-    var showRootModeDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val palette = appPalette()
+    val updateUpToDate = stringResource(R.string.update_up_to_date)
+    val rootMicSwitched = stringResource(R.string.root_mic_switched)
+    val updateFailureMessages = mapOf(
+        UpdateFailure.NO_RELEASES to stringResource(R.string.update_no_releases),
+        UpdateFailure.NETWORK to stringResource(R.string.update_network_error),
+        UpdateFailure.RATE_LIMIT to stringResource(R.string.update_rate_limited),
+        UpdateFailure.SERVER to stringResource(R.string.update_server_error),
+        UpdateFailure.INVALID_RESPONSE to stringResource(R.string.update_invalid_response),
+    )
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    var showHelp by rememberSaveable { mutableStateOf(false) }
+    var updateInfo by remember { mutableStateOf<com.hihi.recorder.net.UpdateInfo?>(null) }
+    var updateChecking by remember { mutableStateOf(false) }
     var rootStatus by remember { mutableStateOf<RootStatus>(RootStatus.Unknown) }
     var rootCheckRequest by remember { mutableIntStateOf(0) }
     var timerMs by remember { mutableLongStateOf(0L) }
+
+    val tab = AppTab.entries[selectedTab.coerceIn(AppTab.entries.indices)]
+    val canBlur = settings.navigationBlur && Build.VERSION.SDK_INT >= 33
+    // The blur library needs RuntimeShader (API 33+). Do not even allocate the
+    // backdrop on older devices; the nav bar uses its translucent fallback.
+    val backdrop = if (Build.VERSION.SDK_INT >= 33) rememberLayerBackdrop() else null
 
     LaunchedEffect(autoStartToken) {
         if (autoStartToken > 0) onStart()
@@ -141,7 +135,10 @@ fun RecorderApp(
         }
     }
 
-    LaunchedEffect(recordingState.phase, recordingState.startedAtElapsedRealtime) {
+    LaunchedEffect(
+        recordingState.phase,
+        recordingState.startedAtElapsedRealtime,
+    ) {
         if (recordingState.phase == RecordingPhase.RECORDING) {
             while (true) {
                 timerMs = (SystemClock.elapsedRealtime() - recordingState.startedAtElapsedRealtime)
@@ -153,459 +150,230 @@ fun RecorderApp(
         }
     }
 
-    val locked = recordingState.isActive
-    val isRoot = settings.captureMode == CaptureMode.ROOT
-    val audioOptions = if (isRoot) {
-        listOf(AudioSource.NONE, AudioSource.MICROPHONE)
-    } else {
-        AudioSource.entries
+    LaunchedEffect(Unit) {
+        if (!UpdateChecker.shouldCheckAutomatically(context)) return@LaunchedEffect
+        when (val result = UpdateChecker.check()) {
+            is UpdateResult.Available -> updateInfo = result.info
+            else -> Unit
+        }
     }
-    val effectiveAudio = if (isRoot && settings.audioSource.usesDeviceAudio) {
-        AudioSource.MICROPHONE
-    } else {
-        settings.audioSource
-    }
-    val audioIndex = audioOptions.indexOf(effectiveAudio).coerceAtLeast(0)
-    val captureSize = resolveCaptureSize(context, settings.resolution)
 
-    Scaffold(
-        topBar = {
-            SmallTopAppBar(
-                title = stringResource(R.string.app_name),
-                subtitle = stringResource(R.string.app_subtitle),
-                actions = {
-                    IconButton(onClick = { showHelp = true }) {
-                        Icon(
-                            imageVector = MiuixIcons.Help,
-                            contentDescription = stringResource(R.string.pref_help),
+    val checkForUpdates: () -> Unit = {
+        if (!updateChecking) {
+            updateChecking = true
+            scope.launch {
+                when (val result = UpdateChecker.check()) {
+                    is UpdateResult.Available -> updateInfo = result.info
+                    UpdateResult.UpToDate -> {
+                        snackbarHostState.showSnackbar(updateUpToDate)
+                    }
+
+                    is UpdateResult.Failed -> {
+                        snackbarHostState.showSnackbar(
+                            updateFailureMessages.getValue(result.reason),
                         )
                     }
-                },
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = 12.dp,
-                end = 12.dp,
-                top = padding.calculateTopPadding() + 8.dp,
-                bottom = padding.calculateBottomPadding() + 28.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            item {
-                HeroCard(
-                    settings = settings,
-                    state = recordingState,
-                    lastRecording = lastRecording,
-                    timerMs = timerMs,
-                    checkingRoot = checkingRoot,
-                    onStart = onStart,
-                    onStop = onStop,
-                )
-            }
-
-            item {
-                LastRecordingCard(
-                    recording = lastRecording,
-                    onOpen = onOpenRecording,
-                    onShare = onShareRecording,
-                )
-            }
-
-            item { SectionTitle(stringResource(R.string.section_recording)) }
-            item {
-                PreferenceCard {
-                    OverlayDropdownPreference(
-                        items = listOf(
-                            stringResource(R.string.capture_standard),
-                            stringResource(R.string.capture_root),
-                        ),
-                        selectedIndex = if (isRoot) 1 else 0,
-                        title = stringResource(R.string.pref_capture_mode),
-                        summary = settings.captureMode.summary(),
-                        enabled = !locked,
-                        onSelectedIndexChange = { index ->
-                            val mode = if (index == 1) CaptureMode.ROOT else CaptureMode.STANDARD
-                            if (mode == settings.captureMode) return@OverlayDropdownPreference
-                            if (mode == CaptureMode.ROOT && settings.audioSource.usesDeviceAudio) {
-                                showRootModeDialog = true
-                            } else {
-                                onSettingsChange(settings.copy(captureMode = mode))
-                            }
-                        },
-                    )
                 }
-            }
-
-            if (isRoot) {
-                item { SectionTitle(stringResource(R.string.section_root)) }
-                item {
-                    PreferenceCard {
-                        ArrowPreference(
-                            title = stringResource(R.string.pref_root_status),
-                            summary = rootStatus.summary(),
-                            enabled = !locked && rootStatus != RootStatus.Checking,
-                            endActions = {
-                                if (rootStatus == RootStatus.Checking) {
-                                    CircularProgressIndicator(
-                                        size = 18.dp,
-                                        strokeWidth = 2.dp,
-                                    )
-                                }
-                            },
-                            onClick = { rootCheckRequest++ },
-                        )
-                        PreferenceDivider()
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 14.dp),
-                            verticalAlignment = Alignment.Top,
-                        ) {
-                            Icon(
-                                imageVector = MiuixIcons.Info,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(top = 1.dp)
-                                    .size(18.dp),
-                                tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.root_note_title),
-                                    style = MiuixTheme.textStyles.title4,
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = stringResource(R.string.root_note),
-                                    style = MiuixTheme.textStyles.footnote1,
-                                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.section_audio)) }
-            item {
-                PreferenceCard {
-                    OverlayDropdownPreference(
-                        items = audioOptions.map { it.label() },
-                        selectedIndex = audioIndex,
-                        title = stringResource(R.string.pref_audio_source),
-                        summary = effectiveAudio.summary(),
-                        enabled = !locked,
-                        onSelectedIndexChange = { index ->
-                            val source = audioOptions.getOrNull(index) ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(audioSource = source))
-                        },
-                    )
-                    if (effectiveAudio.usesDeviceAudio) {
-                        PreferenceDivider()
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.Top,
-                        ) {
-                            Icon(
-                                imageVector = MiuixIcons.Info,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(top = 1.dp)
-                                    .size(18.dp),
-                                tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            Text(
-                                text = stringResource(R.string.audio_device_warning),
-                                style = MiuixTheme.textStyles.footnote1,
-                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                            )
-                        }
-                    } else if (isRoot && effectiveAudio != AudioSource.NONE) {
-                        PreferenceDivider()
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.Top,
-                        ) {
-                            Icon(
-                                imageVector = MiuixIcons.Info,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(top = 1.dp)
-                                    .size(18.dp),
-                                tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            Text(
-                                text = stringResource(R.string.audio_root_warning),
-                                style = MiuixTheme.textStyles.footnote1,
-                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                            )
-                        }
-                    }
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.section_video)) }
-            item {
-                PreferenceCard {
-                    OverlayDropdownPreference(
-                        items = VideoResolution.entries.map { it.label() },
-                        selectedIndex = VideoResolution.entries.indexOf(settings.resolution),
-                        title = stringResource(R.string.pref_resolution),
-                        summary = "${settings.resolution.label()} · ${captureSize.spec}",
-                        enabled = !locked,
-                        onSelectedIndexChange = { index ->
-                            val value = VideoResolution.entries.getOrNull(index)
-                                ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(resolution = value))
-                        },
-                    )
-                    PreferenceDivider()
-                    OverlayDropdownPreference(
-                        items = VideoFrameRate.entries.map { it.label() },
-                        selectedIndex = VideoFrameRate.entries.indexOf(settings.frameRate),
-                        title = stringResource(R.string.pref_frame_rate),
-                        summary = if (isRoot) {
-                            stringResource(R.string.fps_root_summary)
-                        } else {
-                            settings.frameRate.label()
-                        },
-                        enabled = !locked && !isRoot,
-                        onSelectedIndexChange = { index ->
-                            val value = VideoFrameRate.entries.getOrNull(index)
-                                ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(frameRate = value))
-                        },
-                    )
-                    PreferenceDivider()
-                    OverlayDropdownPreference(
-                        items = VideoBitrate.entries.map { it.label() },
-                        selectedIndex = VideoBitrate.entries.indexOf(settings.bitrate),
-                        title = stringResource(R.string.pref_bitrate),
-                        summary = settings.bitrate.label(),
-                        enabled = !locked,
-                        onSelectedIndexChange = { index ->
-                            val value = VideoBitrate.entries.getOrNull(index)
-                                ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(bitrate = value))
-                        },
-                    )
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.section_timing)) }
-            item {
-                PreferenceCard {
-                    OverlayDropdownPreference(
-                        items = Countdown.entries.map { it.label() },
-                        selectedIndex = Countdown.entries.indexOf(settings.countdown),
-                        title = stringResource(R.string.pref_countdown),
-                        summary = settings.countdown.label(),
-                        enabled = !locked,
-                        onSelectedIndexChange = { index ->
-                            val value = Countdown.entries.getOrNull(index)
-                                ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(countdown = value))
-                        },
-                    )
-                    PreferenceDivider()
-                    OverlayDropdownPreference(
-                        items = AutoStop.entries.map { it.label() },
-                        selectedIndex = AutoStop.entries.indexOf(settings.autoStop),
-                        title = stringResource(R.string.pref_auto_stop),
-                        summary = settings.autoStop.label(),
-                        enabled = !locked,
-                        onSelectedIndexChange = { index ->
-                            val value = AutoStop.entries.getOrNull(index)
-                                ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(autoStop = value))
-                        },
-                    )
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.section_behavior)) }
-            item {
-                PreferenceCard {
-                    SwitchPreference(
-                        checked = settings.hapticFeedback,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(hapticFeedback = it))
-                        },
-                        title = stringResource(R.string.pref_haptics),
-                        enabled = !locked,
-                    )
-                    PreferenceDivider()
-                    SwitchPreference(
-                        checked = settings.stopOnScreenOff,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(stopOnScreenOff = it))
-                        },
-                        title = stringResource(R.string.pref_stop_screen_off),
-                        enabled = !locked,
-                    )
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.section_appearance)) }
-            item {
-                PreferenceCard {
-                    OverlayDropdownPreference(
-                        items = RecorderTheme.entries.map { it.label() },
-                        selectedIndex = RecorderTheme.entries.indexOf(settings.theme),
-                        title = stringResource(R.string.pref_theme),
-                        summary = settings.theme.label(),
-                        enabled = true,
-                        onSelectedIndexChange = { index ->
-                            val value = RecorderTheme.entries.getOrNull(index)
-                                ?: return@OverlayDropdownPreference
-                            onSettingsChange(settings.copy(theme = value))
-                        },
-                    )
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.section_help)) }
-            item {
-                PreferenceCard {
-                    ArrowPreference(
-                        title = stringResource(R.string.pref_help),
-                        summary = stringResource(R.string.help_title),
-                        onClick = { showHelp = true },
-                    )
-                    PreferenceDivider()
-                    InfoRow(
-                        icon = MiuixIcons.Folder,
-                        title = stringResource(R.string.pref_storage),
-                        summary = stringResource(R.string.pref_storage_summary),
-                    )
-                    PreferenceDivider()
-                    InfoRow(
-                        icon = MiuixIcons.Info,
-                        title = stringResource(R.string.pref_version),
-                        summary = BuildConfig.VERSION_NAME,
-                    )
-                }
+                updateChecking = false
             }
         }
     }
 
-    if (showRootModeDialog) {
-        OverlayDialog(
-            show = true,
-            title = stringResource(R.string.root_mode_dialog_title),
-            summary = stringResource(R.string.root_mode_dialog_message),
-            onDismissRequest = { showRootModeDialog = false },
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                TextButton(
-                    text = stringResource(R.string.action_cancel),
-                    onClick = { showRootModeDialog = false },
-                    modifier = Modifier.weight(1f),
-                    minWidth = 0.dp,
-                    minHeight = 40.dp,
-                )
-                TextButton(
-                    text = stringResource(R.string.action_enable_root),
-                    onClick = {
-                        showRootModeDialog = false
-                        onSettingsChange(
-                            settings.copy(
-                                captureMode = CaptureMode.ROOT,
-                                audioSource = AudioSource.MICROPHONE,
-                            ),
-                        )
+    val changeCaptureMode: (CaptureMode) -> Unit = { mode ->
+        if (mode != settings.captureMode) {
+            var next = settings.copy(captureMode = mode)
+            if (mode == CaptureMode.ROOT && settings.audioSource.usesDeviceAudio) {
+                next = next.copy(audioSource = AudioSource.MICROPHONE)
+                scope.launch {
+                    snackbarHostState.showSnackbar(rootMicSwitched)
+                }
+            }
+            onSettingsChange(next)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(palette.background),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (canBlur) {
+                        Modifier.layerBackdrop(requireNotNull(backdrop))
+                    } else {
+                        Modifier
                     },
-                    modifier = Modifier.weight(1f),
-                    minWidth = 0.dp,
-                    minHeight = 40.dp,
-                    colors = ButtonDefaults.textButtonColorsPrimary(),
+                ),
+        ) {
+            // layerBackdrop only captures this subtree, so paint an opaque base
+            // here. Without it the blur samples transparency and creates halos.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(palette.background),
+            )
+            AmbientGlow(palette = palette)
+            when (tab) {
+                AppTab.RECORD -> RecordScreen(
+                    settings = settings,
+                    recordingState = recordingState,
+                    lastRecording = lastRecording,
+                    timerMs = timerMs,
+                    rootStatus = rootStatus,
+                    checkingRoot = checkingRoot || rootStatus == RootStatus.Checking,
+                    snackbarHostState = snackbarHostState,
+                    onSettingsChange = onSettingsChange,
+                    onCaptureModeChange = changeCaptureMode,
+                    onCheckRoot = {
+                        rootCheckRequest++
+                        if (settings.captureMode != CaptureMode.ROOT) {
+                            changeCaptureMode(CaptureMode.ROOT)
+                        }
+                    },
+                    onStart = onStart,
+                    onStop = onStop,
+                    onOpenRecording = onOpenRecording,
+                    onShareRecording = onShareRecording,
                 )
+
+                AppTab.VIDEOS -> VideosScreen(
+                    recordings = recordings,
+                    isLoading = recordingsLoading,
+                    snackbarHostState = snackbarHostState,
+                    onRefresh = onRefreshRecordings,
+                    onOpen = onOpenRecording,
+                    onShare = onShareRecording,
+                    onRename = onRenameRecording,
+                    onDelete = onDeleteRecording,
+                )
+
+                AppTab.SETTINGS -> SettingsScreen(
+                    settings = settings,
+                    snackbarHostState = snackbarHostState,
+                    updateChecking = updateChecking,
+                    onSettingsChange = onSettingsChange,
+                    onCheckForUpdates = checkForUpdates,
+                    onOpenUrl = onOpenUrl,
+                    onShowHelp = { showHelp = true },
+                )
+            }
+        }
+
+        GlassNavigationBar(
+            items = listOf(
+                GlassNavItem(
+                    label = stringResource(R.string.nav_record),
+                    icon = MiuixIcons.ScreenCapture,
+                ),
+                GlassNavItem(
+                    label = stringResource(R.string.nav_videos),
+                    icon = MiuixIcons.Album,
+                    badgeCount = recordings.size,
+                ),
+                GlassNavItem(
+                    label = stringResource(R.string.nav_settings),
+                    icon = MiuixIcons.Settings,
+                ),
+            ),
+            selectedIndex = selectedTab,
+            onSelect = { selectedTab = it },
+            blurEnabled = settings.navigationBlur,
+            backdrop = if (canBlur) backdrop else null,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+
+        if (recordingState.phase == RecordingPhase.RECORDING && tab != AppTab.RECORD) {
+            FloatingToolbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(start = 20.dp, end = 20.dp, bottom = 94.dp)
+                    .fillMaxWidth(),
+                color = palette.surfaceContainerHigh,
+                cornerRadius = 26.dp,
+                outSidePadding = PaddingValues(0.dp),
+                shadowElevation = 6.dp,
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .background(palette.error, CircleShape),
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        AppText(
+                            text = stringResource(R.string.status_recording_title),
+                            style = AppTextStyle.Subtitle,
+                            color = palette.onSurface,
+                        )
+                        AppText(
+                            text = formatDuration(timerMs),
+                            style = AppTextStyle.Footnote,
+                            color = palette.onSurfaceVariant,
+                        )
+                    }
+                    Spacer(Modifier.width(6.dp))
+                    AppTextButton(
+                        text = stringResource(R.string.action_stop),
+                        onClick = onStop,
+                        destructive = true,
+                    )
+                }
             }
         }
     }
 
     if (showMicPermissionDialog) {
-        OverlayDialog(
-            show = true,
+        AppConfirmDialog(
             title = stringResource(R.string.permission_mic_title),
-            summary = stringResource(R.string.permission_mic_message),
+            message = stringResource(R.string.permission_mic_message),
+            confirmLabel = stringResource(R.string.action_open_settings),
+            onConfirm = {
+                onDismissMicPermissionDialog()
+                onOpenAppSettings()
+            },
             onDismissRequest = onDismissMicPermissionDialog,
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                TextButton(
-                    text = stringResource(R.string.action_close),
-                    onClick = onDismissMicPermissionDialog,
-                    modifier = Modifier.weight(1f),
-                    minWidth = 0.dp,
-                    minHeight = 40.dp,
-                )
-                TextButton(
-                    text = stringResource(R.string.action_open_settings),
-                    onClick = onOpenAppSettings,
-                    modifier = Modifier.weight(1f),
-                    minWidth = 0.dp,
-                    minHeight = 40.dp,
-                    colors = ButtonDefaults.textButtonColorsPrimary(),
-                )
-            }
-        }
+            dismissLabel = stringResource(R.string.action_close),
+        )
     }
 
     if (showRootUnavailableDialog) {
-        OverlayDialog(
-            show = true,
+        AppDialog(
             title = stringResource(R.string.root_required_title),
-            summary = stringResource(R.string.root_required_message),
+            message = stringResource(R.string.root_required_message),
             onDismissRequest = onDismissRootUnavailableDialog,
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                TextButton(
+            buttons = {
+                AppTextButton(
                     text = stringResource(R.string.action_close),
                     onClick = onDismissRootUnavailableDialog,
-                    minWidth = 0.dp,
-                    minHeight = 40.dp,
-                    colors = ButtonDefaults.textButtonColorsPrimary(),
                 )
-            }
-        }
+            },
+        )
     }
 
     if (showHelp) {
-        OverlayDialog(
-            show = true,
+        AppDialog(
             title = stringResource(R.string.help_title),
             onDismissRequest = { showHelp = false },
+            buttons = {
+                AppTextButton(
+                    text = stringResource(R.string.action_close),
+                    onClick = { showHelp = false },
+                )
+            },
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 480.dp)
+                    .heightIn(max = 400.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
                 HelpEntry(
@@ -622,475 +390,101 @@ fun RecorderApp(
                 )
                 HelpEntry(
                     title = stringResource(R.string.help_storage_title),
-                    body = stringResource(R.string.help_storage_body),
-                )
-                TextButton(
-                    text = stringResource(R.string.action_close),
-                    onClick = { showHelp = false },
-                    modifier = Modifier.fillMaxWidth(),
-                    minWidth = 0.dp,
-                    minHeight = 40.dp,
-                    colors = ButtonDefaults.textButtonColorsPrimary(),
+                    body = stringResource(
+                        R.string.help_storage_body,
+                        settings.storagePath,
+                    ),
                 )
             }
         }
     }
-}
 
-@Composable
-private fun HeroCard(
-    settings: RecorderSettings,
-    state: RecordingState,
-    lastRecording: SavedRecording?,
-    timerMs: Long,
-    checkingRoot: Boolean,
-    onStart: () -> Unit,
-    onStop: () -> Unit,
-) {
-    val scheme = MiuixTheme.colorScheme
-    val phase = state.phase
-    val isError = phase == RecordingPhase.ERROR
-    val container = if (isError) scheme.errorContainer else scheme.primaryVariant
-    val content = if (isError) scheme.onErrorContainer else scheme.onPrimaryVariant
-    val timerText = when (phase) {
-        RecordingPhase.IDLE -> "00:00"
-        RecordingPhase.PREPARING -> if (state.countdownSeconds > 0) {
-            state.countdownSeconds.toString()
-        } else {
-            "…"
-        }
-        RecordingPhase.RECORDING -> formatDuration(timerMs)
-        RecordingPhase.STOPPING -> if (timerMs > 0L) formatDuration(timerMs) else "…"
-        RecordingPhase.SAVED -> lastRecording?.let { formatDuration(it.durationMs) } ?: "—"
-        RecordingPhase.ERROR -> "!"
-    }
-    val title = stringResource(
-        when (phase) {
-            RecordingPhase.IDLE -> R.string.status_idle_title
-            RecordingPhase.PREPARING -> if (state.countdownSeconds > 0) {
-                R.string.status_countdown_title
-            } else {
-                R.string.status_preparing_title
-            }
-            RecordingPhase.RECORDING -> R.string.status_recording_title
-            RecordingPhase.STOPPING -> R.string.status_stopping_title
-            RecordingPhase.SAVED -> R.string.status_saved_title
-            RecordingPhase.ERROR -> R.string.status_error_title
-        },
-    )
-    val summary = when (phase) {
-        RecordingPhase.IDLE, RecordingPhase.RECORDING -> recordingSummary(settings)
-        RecordingPhase.PREPARING -> stringResource(R.string.status_preparing_summary)
-        RecordingPhase.STOPPING -> stringResource(R.string.status_stopping_summary)
-        RecordingPhase.SAVED -> lastRecording?.displayName
-            ?: stringResource(R.string.status_saved_summary)
-        RecordingPhase.ERROR -> state.errorMessage
-            ?: stringResource(R.string.status_error_summary)
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        insideMargin = PaddingValues(20.dp),
-        colors = CardDefaults.defaultColors(color = container, contentColor = content),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
+    updateInfo?.let { info ->
+        AppDialog(
+            title = stringResource(R.string.update_available_title, info.versionName),
+            message = stringResource(R.string.update_available_message),
+            onDismissRequest = { updateInfo = null },
+            buttons = {
+                AppTextButton(
+                    text = stringResource(R.string.action_later),
+                    onClick = { updateInfo = null },
+                )
+                Spacer(Modifier.padding(start = 4.dp))
+                AppTextButton(
+                    text = stringResource(R.string.action_download),
+                    onClick = {
+                        updateInfo = null
+                        onOpenUrl(info.releaseUrl)
+                    },
+                    primary = true,
+                )
+            },
         ) {
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .background(content.copy(alpha = 0.13f), CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = MiuixIcons.ScreenCapture,
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp),
-                    tint = content,
-                )
-            }
-            Spacer(Modifier.width(11.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = content,
-                )
-                Text(
-                    text = stringResource(R.string.app_subtitle),
-                    style = MiuixTheme.textStyles.footnote2,
-                    color = content.copy(alpha = 0.68f),
-                )
-            }
-            if (phase == RecordingPhase.RECORDING) {
-                PulsingDot(color = Color(0xFFFF4D5A))
-            }
-        }
-
-        Spacer(Modifier.height(18.dp))
-        Text(
-            text = timerText,
-            fontSize = 46.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-1).sp,
-            color = content,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = title,
-            fontSize = 21.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = content,
-        )
-        Spacer(Modifier.height(5.dp))
-        Text(
-            text = summary,
-            style = MiuixTheme.textStyles.footnote1,
-            color = content.copy(alpha = 0.74f),
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-        )
-
-        state.warningMessage?.takeIf { it.isNotBlank() }?.let { warning ->
-            Spacer(Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-            ) {
-                Icon(
-                    imageVector = MiuixIcons.Info,
-                    contentDescription = null,
+            if (info.notes.isNotBlank()) {
+                Column(
                     modifier = Modifier
-                        .padding(top = 1.dp)
-                        .size(17.dp),
-                    tint = content.copy(alpha = 0.82f),
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = warning,
-                    style = MiuixTheme.textStyles.footnote2,
-                    color = content.copy(alpha = 0.82f),
-                )
-            }
-        }
-
-        Spacer(Modifier.height(18.dp))
-        if (state.isActive) {
-            Button(
-                onClick = onStop,
-                enabled = phase != RecordingPhase.STOPPING,
-                modifier = Modifier.fillMaxWidth(),
-                minHeight = 50.dp,
-                colors = ButtonDefaults.buttonColors(
-                    color = scheme.error,
-                    contentColor = scheme.onError,
-                ),
-            ) {
-                Text(
-                    text = stringResource(
-                        if (phase == RecordingPhase.RECORDING) {
-                            R.string.action_stop
-                        } else {
-                            R.string.action_cancel
-                        },
-                    ),
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-        } else {
-            Button(
-                onClick = onStart,
-                enabled = !checkingRoot,
-                modifier = Modifier.fillMaxWidth(),
-                minHeight = 50.dp,
-                colors = ButtonDefaults.buttonColorsPrimary(),
-            ) {
-                if (checkingRoot) {
-                    CircularProgressIndicator(
-                        size = 18.dp,
-                        strokeWidth = 2.dp,
-                        colors = ProgressIndicatorDefaults.progressIndicatorColors(
-                            foregroundColor = scheme.onPrimary,
-                            backgroundColor = scheme.onPrimary.copy(alpha = 0.25f),
-                        ),
+                        .heightIn(max = 240.dp)
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    AppText(
+                        text = info.notes.take(2_000),
+                        style = AppTextStyle.SmallBody,
+                        color = palette.onSurfaceVariant,
                     )
-                    Spacer(Modifier.width(9.dp))
                 }
-                Text(
-                    text = stringResource(
-                        if (phase == RecordingPhase.ERROR) {
-                            R.string.action_retry
-                        } else {
-                            R.string.action_start
-                        },
-                    ),
-                    fontWeight = FontWeight.SemiBold,
-                )
             }
         }
     }
 }
 
 @Composable
-private fun LastRecordingCard(
-    recording: SavedRecording?,
-    onOpen: (Uri) -> Unit,
-    onShare: (Uri) -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        insideMargin = PaddingValues(14.dp),
-        colors = CardDefaults.defaultColors(
-            color = MiuixTheme.colorScheme.surfaceContainer,
-            contentColor = MiuixTheme.colorScheme.onSurfaceContainer,
-        ),
-    ) {
-        if (recording == null) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(54.dp)
-                        .background(
-                            MiuixTheme.colorScheme.surfaceContainerHigh,
-                            RoundedCornerShape(13.dp),
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = MiuixIcons.ScreenCapture,
-                        contentDescription = null,
-                        modifier = Modifier.size(26.dp),
-                        tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                    )
-                }
-                Spacer(Modifier.width(13.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.last_none_title),
-                        style = MiuixTheme.textStyles.title4,
-                    )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        text = stringResource(R.string.last_none_summary),
-                        style = MiuixTheme.textStyles.footnote2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                    )
-                }
-            }
-        } else {
-            val thumbnail by rememberThumbnail(recording.uri)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable { onOpen(recording.uri) },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(112.dp)
-                        .height(64.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MiuixTheme.colorScheme.surfaceContainerHigh),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    val image = thumbnail
-                    if (image != null) {
-                        Image(
-                            bitmap = image,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop,
-                        )
-                    } else {
-                        Icon(
-                            imageVector = MiuixIcons.ScreenCapture,
-                            contentDescription = null,
-                            modifier = Modifier.size(26.dp),
-                            tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                        )
-                    }
-                }
-                Spacer(Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = recording.displayName,
-                        style = MiuixTheme.textStyles.title4,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(Modifier.height(3.dp))
-                    Text(
-                        text = stringResource(
-                            R.string.last_saved_at,
-                            formatSavedAt(recording.savedAtEpochMs),
-                        ),
-                        style = MiuixTheme.textStyles.footnote2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        text = stringResource(
-                            R.string.last_meta,
-                            formatDuration(recording.durationMs),
-                            formatBytes(recording.sizeBytes),
-                        ),
-                        style = MiuixTheme.textStyles.footnote2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                    )
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 2.dp),
-                color = MiuixTheme.colorScheme.dividerLine,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                TextButton(
-                    text = stringResource(R.string.action_open),
-                    onClick = { onOpen(recording.uri) },
-                    minWidth = 0.dp,
-                    minHeight = 34.dp,
-                    insideMargin = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                )
-                TextButton(
-                    text = stringResource(R.string.action_share),
-                    onClick = { onShare(recording.uri) },
-                    minWidth = 0.dp,
-                    minHeight = 34.dp,
-                    insideMargin = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun PreferenceCard(content: @Composable ColumnScope.() -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        insideMargin = PaddingValues(0.dp),
-        content = content,
-    )
-}
-
-@Composable
-private fun PreferenceDivider() {
-    HorizontalDivider(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        color = MiuixTheme.colorScheme.dividerLine,
-    )
-}
-
-@Composable
-private fun SectionTitle(text: String) {
-    SmallTitle(
-        text = text,
-        modifier = Modifier.padding(start = 4.dp, top = 4.dp),
-    )
-}
-
-@Composable
-private fun InfoRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    summary: String,
-) {
-    Row(
+private fun AmbientGlow(palette: AppPalette) {
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 13.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MiuixTheme.textStyles.title4,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = summary,
-                style = MiuixTheme.textStyles.footnote2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-            )
-        }
-    }
+            .fillMaxSize()
+            .drawBehind {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            palette.primary.copy(alpha = if (palette.isDark) 0.16f else 0.12f),
+                            Color.Transparent,
+                        ),
+                        center = Offset(size.width * 0.88f, size.height * 0.08f),
+                        radius = size.minDimension * 0.7f,
+                    ),
+                    radius = size.minDimension * 0.7f,
+                    center = Offset(size.width * 0.88f, size.height * 0.08f),
+                )
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            palette.primary.copy(
+                                alpha = if (palette.isDark) 0.09f else 0.07f,
+                            ),
+                            Color.Transparent,
+                        ),
+                        center = Offset(size.width * 0.05f, size.height * 0.82f),
+                        radius = size.minDimension * 0.55f,
+                    ),
+                    radius = size.minDimension * 0.55f,
+                    center = Offset(size.width * 0.05f, size.height * 0.82f),
+                )
+            },
+    )
 }
 
 @Composable
 private fun HelpEntry(title: String, body: String) {
     Column(modifier = Modifier.padding(bottom = 16.dp)) {
-        Text(
+        AppText(
             text = title,
-            style = MiuixTheme.textStyles.title4,
+            style = AppTextStyle.Subtitle,
         )
         Spacer(Modifier.height(4.dp))
-        Text(
+        AppText(
             text = body,
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = AppTextStyle.SmallBody,
+            color = appPalette().onSurfaceVariant,
         )
     }
 }
-
-@Composable
-private fun PulsingDot(color: Color) {
-    val transition = androidx.compose.animation.core.rememberInfiniteTransition(label = "pulse")
-    val alpha by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = 0.35f,
-        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
-            animation = androidx.compose.animation.core.tween(850),
-            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse,
-        ),
-        label = "pulseAlpha",
-    )
-    Box(
-        modifier = Modifier
-            .size(11.dp)
-            .background(color.copy(alpha = alpha), CircleShape),
-    )
-}
-
-@Composable
-private fun rememberThumbnail(uri: Uri): androidx.compose.runtime.State<ImageBitmap?> {
-    val context = LocalContext.current
-    return produceState<ImageBitmap?>(initialValue = null, uri) {
-        value = withContext(Dispatchers.IO) { loadThumbnail(context, uri) }
-    }
-}
-
-private fun loadThumbnail(context: Context, uri: Uri): ImageBitmap? = runCatching {
-    val retriever = MediaMetadataRetriever()
-    try {
-        retriever.setDataSource(context, uri)
-        val bitmap = retriever.getScaledFrameAtTime(
-            0L,
-            MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
-            320,
-            180,
-        )
-        bitmap?.asImageBitmap()
-    } finally {
-        runCatching { retriever.release() }
-    }
-}.getOrNull()

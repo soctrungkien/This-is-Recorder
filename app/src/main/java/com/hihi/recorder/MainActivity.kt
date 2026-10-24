@@ -17,12 +17,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.RecordingStateStore
+import com.hihi.recorder.data.SavedRecording
 import com.hihi.recorder.root.RootChecker
 import com.hihi.recorder.root.RootStatus
 import com.hihi.recorder.service.RecordingService
@@ -33,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.woheller69.freeDroidWarn.FreeDroidWarn
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var projectionManager: MediaProjectionManager
     private var pendingStart: PendingStart? = null
 
-    private var autoStartToken by mutableStateOf(0)
+    private var autoStartToken by mutableIntStateOf(0)
     private var checkingRoot by mutableStateOf(false)
     private var showMicPermissionDialog by mutableStateOf(false)
     private var showRootUnavailableDialog by mutableStateOf(false)
@@ -91,6 +94,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FreeDroidWarn.showWarningOnUpgrade(this, BuildConfig.VERSION_CODE)
         enableEdgeToEdge()
         projectionManager = getSystemService(MediaProjectionManager::class.java)
             ?: error("MediaProjectionManager is unavailable")
@@ -108,12 +112,16 @@ class MainActivity : ComponentActivity() {
             val settings by repository.settings.collectAsState()
             val recordingState by RecordingStateStore.state.collectAsState()
             val lastRecording by library.lastRecording.collectAsState()
+            val recordings by library.recordings.collectAsState()
+            val recordingsLoading by library.isLoading.collectAsState()
 
-            RecorderTheme(theme = settings.theme) {
+            RecorderTheme(settings = settings) {
                 RecorderApp(
                     settings = settings,
                     recordingState = recordingState,
                     lastRecording = lastRecording,
+                    recordings = recordings,
+                    recordingsLoading = recordingsLoading,
                     snackbarHostState = snackbarHostState,
                     checkingRoot = checkingRoot,
                     autoStartToken = autoStartToken,
@@ -127,6 +135,10 @@ class MainActivity : ComponentActivity() {
                     onDismissRootUnavailableDialog = { showRootUnavailableDialog = false },
                     onOpenRecording = ::openRecording,
                     onShareRecording = ::shareRecording,
+                    onRefreshRecordings = ::refreshRecordings,
+                    onRenameRecording = ::renameRecording,
+                    onDeleteRecording = ::deleteRecording,
+                    onOpenUrl = ::openUrl,
                 )
             }
         }
@@ -250,6 +262,50 @@ class MainActivity : ComponentActivity() {
                 Intent(this, RecordingService::class.java)
                     .setAction(RecordingService.ACTION_STOP),
             )
+        }
+    }
+
+    private fun refreshRecordings() {
+        activityScope.launch {
+            recordingLibrary.refresh().onFailure {
+                snackbarHostState.showSnackbar(getString(R.string.error_refresh_videos))
+            }
+        }
+    }
+
+    private fun renameRecording(recording: SavedRecording, newName: String) {
+        activityScope.launch {
+            recordingLibrary.rename(recording, newName)
+                .onSuccess {
+                    snackbarHostState.showSnackbar(getString(R.string.rename_success))
+                }
+                .onFailure {
+                    snackbarHostState.showSnackbar(getString(R.string.error_rename_video))
+                }
+        }
+    }
+
+    private fun deleteRecording(recording: SavedRecording) {
+        activityScope.launch {
+            recordingLibrary.delete(recording)
+                .onSuccess {
+                    snackbarHostState.showSnackbar(getString(R.string.delete_success))
+                }
+                .onFailure {
+                    snackbarHostState.showSnackbar(getString(R.string.error_delete_video))
+                }
+        }
+    }
+
+    private fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            showMessage(getString(R.string.error_open_link))
+        } catch (_: SecurityException) {
+            showMessage(getString(R.string.error_open_link))
         }
     }
 

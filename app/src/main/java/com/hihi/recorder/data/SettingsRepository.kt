@@ -17,7 +17,9 @@ class SettingsRepository(context: Context) {
     val settings: StateFlow<RecorderSettings> = _settings.asStateFlow()
 
     @Synchronized
-    fun replace(settings: RecorderSettings) = update { settings }
+    fun replace(settings: RecorderSettings) = update {
+        settings.copy(saveFolder = normalizeSaveFolder(settings.saveFolder))
+    }
 
     @Synchronized
     fun setCaptureMode(value: CaptureMode) = update { it.copy(captureMode = value) }
@@ -48,6 +50,21 @@ class SettingsRepository(context: Context) {
 
     @Synchronized
     fun setTheme(value: RecorderTheme) = update { it.copy(theme = value) }
+
+    @Synchronized
+    fun setUiStyle(value: UiStyle) = update { it.copy(uiStyle = value) }
+
+    @Synchronized
+    fun setMaterialSpec(value: MaterialSpec) = update { it.copy(materialSpec = value) }
+
+    @Synchronized
+    fun setMonetColor(value: Boolean) = update { it.copy(monetColor = value) }
+
+    @Synchronized
+    fun setNavigationBlur(value: Boolean) = update { it.copy(navigationBlur = value) }
+
+    @Synchronized
+    fun setSaveFolder(value: String) = update { it.copy(saveFolder = normalizeSaveFolder(value)) }
 
     /**
      * Android 13+ notification permission is optional. Remember that we asked
@@ -80,6 +97,13 @@ class SettingsRepository(context: Context) {
             hapticFeedback = preferences.getBoolean(KEY_HAPTIC, defaults.hapticFeedback),
             stopOnScreenOff = preferences.getBoolean(KEY_STOP_ON_SCREEN_OFF, defaults.stopOnScreenOff),
             theme = preferences.enumValue(KEY_THEME, defaults.theme),
+            uiStyle = preferences.enumValue(KEY_UI_STYLE, defaults.uiStyle),
+            materialSpec = preferences.enumValue(KEY_MATERIAL_SPEC, defaults.materialSpec),
+            monetColor = preferences.getBoolean(KEY_MONET, defaults.monetColor),
+            navigationBlur = preferences.getBoolean(KEY_NAVIGATION_BLUR, defaults.navigationBlur),
+            saveFolder = preferences.getString(KEY_SAVE_FOLDER, defaults.saveFolder)
+                ?.let(::normalizeSaveFolder)
+                ?: defaults.saveFolder,
         )
     }
 
@@ -95,6 +119,11 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_HAPTIC, settings.hapticFeedback)
             .putBoolean(KEY_STOP_ON_SCREEN_OFF, settings.stopOnScreenOff)
             .putString(KEY_THEME, settings.theme.name)
+            .putString(KEY_UI_STYLE, settings.uiStyle.name)
+            .putString(KEY_MATERIAL_SPEC, settings.materialSpec.name)
+            .putBoolean(KEY_MONET, settings.monetColor)
+            .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
+            .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .apply()
     }
 
@@ -118,6 +147,11 @@ class SettingsRepository(context: Context) {
         const val KEY_HAPTIC = "haptic_feedback"
         const val KEY_STOP_ON_SCREEN_OFF = "stop_on_screen_off"
         const val KEY_THEME = "theme"
+        const val KEY_UI_STYLE = "ui_style"
+        const val KEY_MATERIAL_SPEC = "material_spec"
+        const val KEY_MONET = "monet_color"
+        const val KEY_NAVIGATION_BLUR = "navigation_blur"
+        const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
     }
 }

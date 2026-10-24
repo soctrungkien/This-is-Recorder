@@ -2,6 +2,7 @@ package com.hihi.recorder.root
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /**
@@ -18,18 +19,47 @@ object RootShell {
         val isSuccess: Boolean get() = !timedOut && exitCode == 0
     }
 
+    private val suCandidates = listOf(
+        "/system/bin/su",
+        "/system/xbin/su",
+        "/sbin/su",
+        "/su/bin/su",
+        "/debug_ramdisk/su",
+    )
+
+    private fun resolveSu(): String =
+        suCandidates.firstOrNull { File(it).exists() } ?: "su"
+
     suspend fun run(command: String, timeoutMs: Long = 15_000L): Result =
         withContext(Dispatchers.IO) {
+            val su = resolveSu()
             val process = runCatching {
-                ProcessBuilder("su", "-c", command)
+                ProcessBuilder(su, "-c", command)
                     .redirectErrorStream(true)
                     .start()
-            }.getOrElse {
-                return@withContext Result(
-                    exitCode = -1,
-                    output = it.message.orEmpty(),
-                    timedOut = false,
-                )
+            }.getOrElse { firstError ->
+                // Some root managers only expose `su` through $PATH rather than
+                // one of the well-known absolute locations. Try the plain name
+                // once before giving up.
+                if (su != "su") {
+                    runCatching {
+                        ProcessBuilder("su", "-c", command)
+                            .redirectErrorStream(true)
+                            .start()
+                    }.getOrElse {
+                        return@withContext Result(
+                            exitCode = -1,
+                            output = firstError.message.orEmpty(),
+                            timedOut = false,
+                        )
+                    }
+                } else {
+                    return@withContext Result(
+                        exitCode = -1,
+                        output = firstError.message.orEmpty(),
+                        timedOut = false,
+                    )
+                }
             }
 
             val finished = runCatching {

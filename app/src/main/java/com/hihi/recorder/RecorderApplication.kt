@@ -5,8 +5,14 @@ import com.hihi.recorder.data.RecordingLibrary
 import com.hihi.recorder.data.RecordingStorage
 import com.hihi.recorder.data.SettingsRepository
 import com.hihi.recorder.service.NotificationHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class RecorderApplication : Application() {
+
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     lateinit var settingsRepository: SettingsRepository
         private set
@@ -19,8 +25,9 @@ class RecorderApplication : Application() {
         settingsRepository = SettingsRepository(this)
         recordingLibrary = RecordingLibrary(this)
         NotificationHelper.ensureChannels(this)
-        Thread {
-            runCatching { RecordingStorage.cleanOldTempFiles(this) }
-        }.start()
+        appScope.launch {
+            runCatching { RecordingStorage.cleanOldTempFiles(this@RecorderApplication) }
+            recordingLibrary.refresh()
+        }
     }
 }

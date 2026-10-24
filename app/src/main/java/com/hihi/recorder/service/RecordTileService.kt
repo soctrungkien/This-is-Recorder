@@ -1,5 +1,6 @@
 package com.hihi.recorder.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
@@ -45,6 +46,9 @@ class RecordTileService : TileService() {
         requestListeningState(this, ComponentName(this, RecordTileService::class.java))
     }
 
+    // The Intent overload is only reached below Android 14; newer systems use
+    // the PendingIntent overload above. Lint cannot see through that guard.
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
         val state = RecordingStateStore.state.value

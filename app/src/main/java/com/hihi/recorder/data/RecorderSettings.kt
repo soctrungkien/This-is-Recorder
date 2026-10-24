@@ -79,6 +79,18 @@ enum class RecorderTheme {
     DARK,
 }
 
+/** Selects which design language the app uses for its chrome. */
+enum class UiStyle {
+    MIUIX,
+    MATERIAL,
+}
+
+/** Material 3 color/token generation used for Monet and Material components. */
+enum class MaterialSpec {
+    SPEC_2021,
+    SPEC_2025,
+}
+
 /**
  * Immutable snapshot of all user preferences. The recording service takes a
  * snapshot when a session starts, so changing a switch while recording cannot
@@ -95,6 +107,48 @@ data class RecorderSettings(
     val hapticFeedback: Boolean = true,
     val stopOnScreenOff: Boolean = false,
     val theme: RecorderTheme = RecorderTheme.SYSTEM,
+    val uiStyle: UiStyle = UiStyle.MIUIX,
+    val materialSpec: MaterialSpec = MaterialSpec.SPEC_2025,
+    val monetColor: Boolean = false,
+    val navigationBlur: Boolean = true,
+    val saveFolder: String = DEFAULT_SAVE_FOLDER,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
+
+    val effectiveAudio: AudioSource
+        get() = if (captureMode == CaptureMode.ROOT && audioSource.usesDeviceAudio) {
+            AudioSource.MICROPHONE
+        } else {
+            audioSource
+        }
+
+    val storagePath: String get() = "Movies/${normalizeSaveFolder(saveFolder)}"
+
+    companion object {
+        const val DEFAULT_SAVE_FOLDER = "ThisIsRecorder"
+    }
+}
+
+/**
+ * Keeps custom storage paths inside the public Movies collection. MediaStore
+ * creates nested folders as needed, so no broad storage permission is needed.
+ */
+fun normalizeSaveFolder(raw: String): String {
+    val stripped = raw
+        .trim()
+        .replace('\\', '/')
+        .removePrefix("content://")
+        .trim('/')
+        .removePrefix("Movies/")
+        .removePrefix("Movies")
+        .trim('/')
+
+    val pieces = stripped.split('/').map { piece ->
+        piece
+            .trim()
+            .replace(Regex("[\\u0000-\\u001f:*?\"<>|]"), "_")
+            .trim('.', ' ')
+    }.filter { it.isNotEmpty() && it != "." && it != ".." }
+
+    return pieces.joinToString("/").ifBlank { RecorderSettings.DEFAULT_SAVE_FOLDER }.take(120)
 }

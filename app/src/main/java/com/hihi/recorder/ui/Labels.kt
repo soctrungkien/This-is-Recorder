@@ -7,8 +7,10 @@ import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.AutoStop
 import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.Countdown
+import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
+import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.data.VideoBitrate
 import com.hihi.recorder.data.VideoFrameRate
 import com.hihi.recorder.data.VideoResolution
@@ -95,6 +97,22 @@ fun RecorderTheme.label(): String = stringResource(
 )
 
 @Composable
+fun UiStyle.label(): String = stringResource(
+    when (this) {
+        UiStyle.MIUIX -> R.string.ui_style_miuix
+        UiStyle.MATERIAL -> R.string.ui_style_material
+    },
+)
+
+@Composable
+fun MaterialSpec.label(): String = stringResource(
+    when (this) {
+        MaterialSpec.SPEC_2021 -> R.string.material_spec_2021
+        MaterialSpec.SPEC_2025 -> R.string.material_spec_2025
+    },
+)
+
+@Composable
 fun RootStatus.summary(): String = when (this) {
     RootStatus.Unknown -> stringResource(R.string.root_status_unknown)
     RootStatus.Checking -> stringResource(R.string.root_status_checking)
@@ -115,14 +133,7 @@ fun RootStatus.summary(): String = when (this) {
 @Composable
 fun recordingSummary(settings: RecorderSettings): String {
     val mode = settings.captureMode.label()
-    val effectiveAudio = if (settings.captureMode == CaptureMode.ROOT &&
-        settings.audioSource.usesDeviceAudio
-    ) {
-        AudioSource.MICROPHONE
-    } else {
-        settings.audioSource
-    }
-    val audio = effectiveAudio.label()
+    val audio = settings.effectiveAudio.label()
     val resolution = settings.resolution.label()
     return if (settings.captureMode == CaptureMode.ROOT) {
         stringResource(R.string.recording_summary_root, mode, audio, resolution)

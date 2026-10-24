@@ -41,7 +41,8 @@ object RootChecker {
             }
 
             val binary = RootShell.run(
-                "command -v screenrecord || which screenrecord",
+                "command -v screenrecord 2>/dev/null || which screenrecord 2>/dev/null || " +
+                    "ls /system/bin/screenrecord /system/xbin/screenrecord 2>/dev/null",
                 timeoutMs = 10_000L,
             )
             if (!binary.isSuccess || !binary.output.contains("screenrecord")) {

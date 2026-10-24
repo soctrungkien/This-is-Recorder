@@ -12,7 +12,7 @@
     <string name="status_stopping_title">Đang lưu…</string>
     <string name="status_saved_title">Đã lưu</string>
     <string name="status_error_title">Quay thất bại</string>
-    <string name="status_saved_summary">Video đã được lưu trong Movies/ThisIsRecorder.</string>
+    <string name="status_saved_summary">Video đã được lưu trong %1$s.</string>
     <string name="status_preparing_summary">Đang chờ khung hình đầu tiên…</string>
     <string name="status_stopping_summary">Đang hoàn tất tệp MP4. Vui lòng giữ ứng dụng mở một chút.</string>
     <string name="status_error_summary">Xem thông báo bên dưới rồi thử lại.</string>
@@ -28,6 +28,14 @@
     <string name="action_enable_root">Bật chế độ Root</string>
     <string name="action_open_settings">Mở cài đặt</string>
     <string name="action_switch_mic">Dùng micrô</string>
+    <string name="action_refresh">Làm mới</string>
+    <string name="action_rename">Đổi tên</string>
+    <string name="action_delete">Xóa</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_later">Để sau</string>
+    <string name="action_download">Tải xuống</string>
+    <string name="action_check">Kiểm tra</string>
+    <string name="action_learn_more">Tìm hiểu thêm</string>
 
     <string name="section_recording">Ghi hình</string>
     <string name="section_audio">Âm thanh</string>
@@ -38,6 +46,33 @@
     <string name="section_help">Trợ giúp</string>
     <string name="section_last_recording">Bản ghi gần đây</string>
     <string name="section_root">Chế độ Root</string>
+    <string name="section_capture_mode">Chế độ ghi</string>
+    <string name="section_storage">Lưu trữ</string>
+    <string name="section_updates">Cập nhật</string>
+    <string name="section_about">Giới thiệu</string>
+
+    <string name="nav_record">Quay</string>
+    <string name="nav_videos">Video</string>
+    <string name="nav_settings">Cài đặt</string>
+
+    <string name="videos_title">Video đã lưu</string>
+    <string name="videos_count">%1$d video</string>
+    <string name="videos_empty_title">Chưa có video nào</string>
+    <string name="videos_empty_message">Video sau khi quay xong sẽ xuất hiện ở đây. Mọi thư mục lưu của ứng dụng đều được hiển thị.</string>
+    <string name="videos_loading">Đang tải video…</string>
+    <string name="videos_unknown_folder">Do This is Recorder lưu</string>
+    <string name="pull_to_refresh">Kéo xuống để làm mới</string>
+    <string name="release_to_refresh">Thả để làm mới</string>
+    <string name="refreshing">Đang làm mới…</string>
+    <string name="refresh_complete">Đã cập nhật video</string>
+
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_subtitle">Giao diện, lưu trữ và cập nhật</string>
+
+    <string name="mode_standard_short">Chuẩn</string>
+    <string name="mode_root_short">Root</string>
+    <string name="recording_locked_hint">Dừng quay để thay đổi các tùy chọn này.</string>
+    <string name="root_mic_switched">Chế độ Root dùng micrô nên âm thanh điện thoại đã được tắt.</string>
 
     <string name="pref_capture_mode">Chế độ ghi</string>
     <string name="pref_capture_mode_summary_standard">MediaProjection + MediaCodec. Hỗ trợ âm thanh của điện thoại.</string>
@@ -56,6 +91,53 @@
     <string name="pref_version">Phiên bản</string>
     <string name="pref_storage">Thư mục lưu</string>
     <string name="pref_storage_summary">Movies/ThisIsRecorder</string>
+    <string name="pref_ui_style">Kiểu giao diện</string>
+    <string name="pref_ui_style_summary">Chọn Miuix cho phong cách HyperOS hoặc Material 3 cho Android gốc.</string>
+    <string name="ui_style_miuix">Miuix</string>
+    <string name="ui_style_material">Material 3</string>
+    <string name="pref_material_spec">Chuẩn màu</string>
+    <string name="pref_material_spec_summary">2021 dùng Material You cổ điển. 2025 dùng bảng màu mới hơn.</string>
+    <string name="material_spec_2021">2021</string>
+    <string name="material_spec_2025">2025</string>
+    <string name="material_spec_2021_summary">Bảng màu Material 3 cổ điển</string>
+    <string name="material_spec_2025_summary">Bảng màu Material 3 Expressive mới</string>
+    <string name="pref_monet">Màu động Monet</string>
+    <string name="pref_monet_summary">Dùng màu từ hình nền cho toàn bộ ứng dụng.</string>
+    <string name="pref_monet_unavailable">Màu động cần Android 12 trở lên.</string>
+    <string name="pref_navigation_blur">Hiệu ứng kính lỏng</string>
+    <string name="pref_navigation_blur_summary">Làm mờ nội dung phía sau thanh điều hướng nổi.</string>
+    <string name="pref_navigation_blur_unavailable">Hiệu ứng mờ cần Android 13 trở lên. Thanh bán trong suốt sẽ được dùng thay thế.</string>
+    <string name="pref_save_folder">Vị trí lưu</string>
+    <string name="pref_save_folder_summary">Thư mục trong Movies. Dùng / để tạo thư mục lồng nhau.</string>
+    <string name="save_folder_title">Vị trí lưu tùy chỉnh</string>
+    <string name="save_folder_message">Video được lưu trong thư mục Movies. Nhập tên thư mục hoặc đường dẫn lồng nhau, ví dụ Recordings/Screen.</string>
+    <string name="save_folder_placeholder">ThisIsRecorder</string>
+    <string name="pref_check_updates">Kiểm tra cập nhật</string>
+    <string name="pref_check_updates_summary">Tự kiểm tra khi mở ứng dụng. Kết nối đi qua gh-proxy.</string>
+    <string name="pref_github">GitHub</string>
+    <string name="pref_github_summary">github.com/soctrungkien</string>
+    <string name="pref_telegram">Telegram</string>
+    <string name="pref_telegram_summary">@realknoname</string>
+    <string name="pref_verification">Xác minh nhà phát triển Android</string>
+    <string name="pref_verification_summary">Vì sao ứng dụng có thể ngừng hoạt động trên máy chứng nhận</string>
+
+    <string name="rename_title">Đổi tên video</string>
+    <string name="rename_message">Nhập tên mới. Phần mở rộng .mp4 sẽ được thêm tự động.</string>
+    <string name="rename_placeholder">Tên video</string>
+    <string name="delete_title">Xóa video?</string>
+    <string name="delete_message">“%1$s” sẽ bị xóa vĩnh viễn khỏi điện thoại này.</string>
+
+    <string name="verification_title">Giữ Android mở</string>
+    <string name="verification_message">Google sắp yêu cầu mọi ứng dụng trên thiết bị Android được chứng nhận phải đăng ký danh tính cá nhân của nhà phát triển. Ứng dụng này miễn phí và mã nguồn mở, không cam kết cung cấp danh tính đã xác minh. Khi quy định có hiệu lực, bản cài ngoài cửa hàng ứng dụng có thể ngừng chạy trên thiết bị được chứng nhận. Bạn vẫn có thể cài bản mới qua ADB hoặc dùng hệ thống không có Google Play Services. Truy cập keepandroidopen.org để tìm hiểu và ủng hộ chiến dịch.</string>
+
+    <string name="update_available_title">Có bản cập nhật %1$s</string>
+    <string name="update_available_message">Đã có phiên bản mới trên GitHub. Tải xuống qua máy chủ gh-proxy.</string>
+    <string name="update_up_to_date">Bạn đang dùng phiên bản mới nhất.</string>
+    <string name="update_no_releases">Chưa tìm thấy bản phát hành nào trên GitHub.</string>
+    <string name="update_network_error">Không kết nối được GitHub qua gh-proxy. Hãy kiểm tra mạng.</string>
+    <string name="update_rate_limited">Đã chạm giới hạn truy cập GitHub. Hãy thử lại sau.</string>
+    <string name="update_server_error">GitHub trả về lỗi. Hãy thử lại sau.</string>
+    <string name="update_invalid_response">GitHub trả về dữ liệu không hợp lệ.</string>
 
     <string name="capture_standard">Chuẩn (MediaProjection)</string>
     <string name="capture_root">Root (screenrecord)</string>
@@ -119,9 +201,15 @@
     <string name="notification_permission_hint">Thông báo đang tắt. Bạn vẫn quay được, nhưng nút dừng sẽ không hiện trong thanh thông báo.</string>
     <string name="error_open_recording">Không có ứng dụng nào mở được video này.</string>
     <string name="error_share_recording">Không có ứng dụng nào chia sẻ được video này.</string>
+    <string name="error_refresh_videos">Không tải được danh sách video.</string>
+    <string name="error_rename_video">Không đổi tên được video này.</string>
+    <string name="error_delete_video">Không xóa được video này.</string>
+    <string name="error_open_link">Không có ứng dụng nào mở được liên kết này.</string>
+    <string name="rename_success">Đã đổi tên video.</string>
+    <string name="delete_success">Đã xóa video.</string>
 
     <string name="last_none_title">Chưa có bản ghi</string>
-    <string name="last_none_summary">Video đã quay sẽ xuất hiện ở đây và trong Movies/ThisIsRecorder.</string>
+    <string name="last_none_summary">Video đã quay sẽ xuất hiện ở đây và trong %1$s.</string>
     <string name="last_saved_at">Đã lưu %1$s</string>
     <string name="last_meta">%1$s • %2$s</string>
     <string name="duration_unknown">Không rõ thời lượng</string>
@@ -135,7 +223,7 @@
     <string name="help_root_title">Chế độ Root</string>
     <string name="help_root_body">Chế độ Root chạy screenrecord với quyền root và không cần cấp quyền MediaProjection. Video được ghi thành các đoạn 180 giây và ghép lại khi bạn dừng. Chỉ hỗ trợ âm thanh micrô. Cửa sổ bảo mật vẫn hiển thị màu đen.</string>
     <string name="help_storage_title">Nơi lưu video</string>
-    <string name="help_storage_body">Video được lưu trong Movies/ThisIsRecorder. Ứng dụng giữ một lối tắt đến bản ghi mới nhất ở màn hình chính.</string>
+    <string name="help_storage_body">Video được lưu trong %1$s. Bạn có thể đổi thư mục trong Cài đặt → Lưu trữ; mọi thư mục ứng dụng từng dùng đều hiện trong trang Video.</string>
 
     <string name="notification_channel_recording">Quay màn hình</string>
     <string name="notification_channel_recording_desc">Trạng thái đang quay và nút dừng</string>
