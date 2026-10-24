@@ -280,7 +280,7 @@ private fun VideoCard(
             }
         }
         Spacer(Modifier.height(10.dp))
-        AppDivider()
+        AppDivider(horizontalPadding = 0.dp)
         Spacer(Modifier.height(4.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),

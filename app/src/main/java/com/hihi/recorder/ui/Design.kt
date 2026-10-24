@@ -32,6 +32,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Badge as MaterialBadge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults as MaterialCardDefaults
 import androidx.compose.material3.CircularProgressIndicator as MaterialProgress
@@ -55,10 +57,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -86,6 +90,7 @@ import top.yukonga.miuix.kmp.basic.Icon as MiuixIcon
 import top.yukonga.miuix.kmp.basic.IconButton as MiuixIconButton
 import top.yukonga.miuix.kmp.basic.NavigationBar as MiuixNavigationBar
 import top.yukonga.miuix.kmp.basic.NavigationBarDefaults as MiuixNavigationBarDefaults
+import top.yukonga.miuix.kmp.basic.NavigationBarDisplayMode
 import top.yukonga.miuix.kmp.basic.NavigationBarItem as MiuixNavigationBarItem
 import top.yukonga.miuix.kmp.basic.RadioButton as MiuixRadioButton
 import top.yukonga.miuix.kmp.basic.Scaffold as MiuixScaffold
@@ -188,13 +193,20 @@ fun appPalette(): AppPalette {
     }
 }
 
-/** Bottom content padding that clears the floating navigation bar and system bar. */
+/**
+ * Extra space reserved above the navigation bar while the floating recording
+ * toolbar is visible. Kept as a composition local so every scrolling screen
+ * clears the toolbar without threading a parameter through each one.
+ */
+val LocalExtraBottomPadding = staticCompositionLocalOf { 0.dp }
+
+/** Bottom content padding that clears the floating bars and system navigation area. */
 @Composable
 fun appBottomContentPadding(): Dp {
     val navigationBarInset = WindowInsets.navigationBars
         .asPaddingValues()
         .calculateBottomPadding()
-    return navigationBarInset + 118.dp
+    return navigationBarInset + 118.dp + LocalExtraBottomPadding.current
 }
 
 enum class AppTextStyle {
@@ -340,11 +352,14 @@ fun AppSectionTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AppDivider(modifier: Modifier = Modifier) {
+fun AppDivider(
+    modifier: Modifier = Modifier,
+    horizontalPadding: Dp = 16.dp,
+) {
     val palette = appPalette()
     val dividerModifier = modifier
         .fillMaxWidth()
-        .padding(horizontal = 16.dp)
+        .padding(horizontal = horizontalPadding)
     if (LocalUiStyle.current == UiStyle.MIUIX) {
         MiuixHorizontalDivider(
             modifier = dividerModifier,
@@ -743,6 +758,7 @@ fun AppIconButton(
         if (!contentDescription.isNullOrBlank()) {
             MiuixTooltipBox(
                 text = contentDescription,
+                enabled = enabled,
                 containerColor = palette.surfaceContainerHigh,
                 contentColor = palette.onSurface,
                 content = button,
@@ -1167,12 +1183,13 @@ fun AppScaffold(
     val navigationBarInset = WindowInsets.navigationBars
         .asPaddingValues()
         .calculateBottomPadding()
+    val extraBottomPadding = LocalExtraBottomPadding.current
     val snackbarHost: @Composable () -> Unit = {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)
-                .padding(bottom = 108.dp + navigationBarInset),
+                .padding(bottom = 108.dp + navigationBarInset + extraBottomPadding),
         ) {
             SnackbarHost(state = snackbarHostState)
         }
@@ -1185,6 +1202,9 @@ fun AppScaffold(
                 top.yukonga.miuix.kmp.basic.SmallTopAppBar(
                     title = title,
                     subtitle = subtitle,
+                    color = palette.surface,
+                    titleColor = palette.onSurface,
+                    subtitleColor = palette.onSurfaceVariant,
                     actions = actions,
                 )
             },
@@ -1218,8 +1238,10 @@ fun AppScaffold(
                     },
                     actions = actions,
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
+                        containerColor = palette.surface,
                         scrolledContainerColor = palette.surfaceContainer,
+                        titleContentColor = palette.onSurface,
+                        actionIconContentColor = palette.onSurface,
                     ),
                 )
             },
@@ -1243,12 +1265,22 @@ fun GlassNavigationBar(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
     blurEnabled: Boolean,
+    iosLabels: Boolean,
     backdrop: LayerBackdrop?,
     modifier: Modifier = Modifier,
 ) {
     val palette = appPalette()
     val shape = RoundedCornerShape(28.dp)
     val canBlur = blurEnabled && backdrop != null && Build.VERSION.SDK_INT >= 33
+    // A light top sheen and a darker lower edge give the flat glass panel the
+    // curved, refractive depth of an iOS 26 liquid glass bar.
+    val sheen = Brush.verticalGradient(
+        colors = listOf(
+            Color.White.copy(alpha = if (palette.isDark) 0.07f else 0.24f),
+            Color.Transparent,
+            Color.Black.copy(alpha = if (palette.isDark) 0.10f else 0.035f),
+        ),
+    )
 
     val glassModifier = if (canBlur) {
         // BlurDefaults.blurColors is composable because the effect resolves
@@ -1286,7 +1318,9 @@ fun GlassNavigationBar(
 
     val navContent: @Composable () -> Unit = {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(sheen),
             contentAlignment = Alignment.Center,
         ) {
             if (LocalUiStyle.current == UiStyle.MIUIX) {
@@ -1295,6 +1329,11 @@ fun GlassNavigationBar(
                     color = Color.Transparent,
                     showDivider = false,
                     defaultWindowInsetsPadding = false,
+                    mode = if (iosLabels) {
+                        NavigationBarDisplayMode.IconWithSelectedLabel
+                    } else {
+                        NavigationBarDisplayMode.IconAndText
+                    },
                 ) {
                     items.forEachIndexed { index, item ->
                         MiuixNavigationBarItem(
@@ -1358,21 +1397,52 @@ fun GlassNavigationBar(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {
-                            AppIcon(
-                                icon = item.icon,
-                                contentDescription = item.label,
-                                modifier = Modifier.size(21.dp),
-                                tint = if (selected) palette.primary else palette.onSurfaceVariant,
-                            )
-                            Spacer(Modifier.height(2.dp))
-                            AppText(
-                                text = item.label,
-                                style = AppTextStyle.Footnote,
-                                color = if (selected) palette.primary else palette.onSurfaceVariant,
-                                fontWeight = if (selected) FontWeight.SemiBold else null,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
+                            BadgedBox(
+                                badge = {
+                                    if (item.badgeCount > 0) {
+                                        MaterialBadge(
+                                            containerColor = palette.primary,
+                                            contentColor = palette.onPrimary,
+                                        ) {
+                                            MaterialText(
+                                                text = if (item.badgeCount > 99) {
+                                                    "99+"
+                                                } else {
+                                                    item.badgeCount.toString()
+                                                },
+                                                style = MaterialTheme.typography.labelSmall,
+                                                maxLines = 1,
+                                            )
+                                        }
+                                    }
+                                },
+                            ) {
+                                AppIcon(
+                                    icon = item.icon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(21.dp),
+                                    tint = if (selected) {
+                                        palette.primary
+                                    } else {
+                                        palette.onSurfaceVariant
+                                    },
+                                )
+                            }
+                            if (!iosLabels || selected) {
+                                Spacer(Modifier.height(2.dp))
+                                AppText(
+                                    text = item.label,
+                                    style = AppTextStyle.Footnote,
+                                    color = if (selected) {
+                                        palette.primary
+                                    } else {
+                                        palette.onSurfaceVariant
+                                    },
+                                    fontWeight = if (selected) FontWeight.SemiBold else null,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
                         }
                     }
                 }

@@ -66,7 +66,8 @@ object RecordingStorage {
             put(MediaStore.Video.Media.RELATIVE_PATH, relativePath)
             put(MediaStore.Video.Media.DATE_TAKEN, now)
             put(MediaStore.Video.Media.IS_PENDING, 1)
-            put(MediaStore.Video.Media.OWNER_PACKAGE_NAME, context.packageName)
+            // OWNER_PACKAGE_NAME is read-only; MediaProvider stamps the calling
+            // package automatically and RecordingLibrary queries it by owner.
         }
 
         val uri = resolver.insert(collection, values)

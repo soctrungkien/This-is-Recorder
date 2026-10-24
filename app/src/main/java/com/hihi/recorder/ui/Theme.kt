@@ -3,6 +3,7 @@ package com.hihi.recorder.ui
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
@@ -46,27 +47,30 @@ fun RecorderTheme(
         RecorderTheme.LIGHT -> false
         RecorderTheme.DARK -> true
     }
+    // Dynamic color is only available on Android 12+. A restored preference
+    // from a newer device must not force a Monet controller on older systems.
+    val useMonet = settings.monetColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val controller = remember(
         settings.theme,
-        settings.monetColor,
+        useMonet,
         settings.materialSpec,
         dark,
     ) {
         ThemeController(
             colorSchemeMode = when (settings.theme) {
-                RecorderTheme.SYSTEM -> if (settings.monetColor) {
+                RecorderTheme.SYSTEM -> if (useMonet) {
                     ColorSchemeMode.MonetSystem
                 } else {
                     ColorSchemeMode.System
                 }
 
-                RecorderTheme.LIGHT -> if (settings.monetColor) {
+                RecorderTheme.LIGHT -> if (useMonet) {
                     ColorSchemeMode.MonetLight
                 } else {
                     ColorSchemeMode.Light
                 }
 
-                RecorderTheme.DARK -> if (settings.monetColor) {
+                RecorderTheme.DARK -> if (useMonet) {
                     ColorSchemeMode.MonetDark
                 } else {
                     ColorSchemeMode.Dark

@@ -64,6 +64,9 @@ class SettingsRepository(context: Context) {
     fun setNavigationBlur(value: Boolean) = update { it.copy(navigationBlur = value) }
 
     @Synchronized
+    fun setNavigationIosLabels(value: Boolean) = update { it.copy(navigationIosLabels = value) }
+
+    @Synchronized
     fun setSaveFolder(value: String) = update { it.copy(saveFolder = normalizeSaveFolder(value)) }
 
     /**
@@ -101,6 +104,10 @@ class SettingsRepository(context: Context) {
             materialSpec = preferences.enumValue(KEY_MATERIAL_SPEC, defaults.materialSpec),
             monetColor = preferences.getBoolean(KEY_MONET, defaults.monetColor),
             navigationBlur = preferences.getBoolean(KEY_NAVIGATION_BLUR, defaults.navigationBlur),
+            navigationIosLabels = preferences.getBoolean(
+                KEY_NAVIGATION_IOS_LABELS,
+                defaults.navigationIosLabels,
+            ),
             saveFolder = preferences.getString(KEY_SAVE_FOLDER, defaults.saveFolder)
                 ?.let(::normalizeSaveFolder)
                 ?: defaults.saveFolder,
@@ -123,6 +130,7 @@ class SettingsRepository(context: Context) {
             .putString(KEY_MATERIAL_SPEC, settings.materialSpec.name)
             .putBoolean(KEY_MONET, settings.monetColor)
             .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
+            .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .apply()
     }
@@ -151,6 +159,7 @@ class SettingsRepository(context: Context) {
         const val KEY_MATERIAL_SPEC = "material_spec"
         const val KEY_MONET = "monet_color"
         const val KEY_NAVIGATION_BLUR = "navigation_blur"
+        const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
     }

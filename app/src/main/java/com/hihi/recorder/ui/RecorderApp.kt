@@ -24,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -117,6 +118,8 @@ fun RecorderApp(
     var timerMs by remember { mutableLongStateOf(0L) }
 
     val tab = AppTab.entries[selectedTab.coerceIn(AppTab.entries.indices)]
+    val showRecordingToolbar =
+        recordingState.phase == RecordingPhase.RECORDING && tab != AppTab.RECORD
     val canBlur = settings.navigationBlur && Build.VERSION.SDK_INT >= 33
     // The blur library needs RuntimeShader (API 33+). Do not even allocate the
     // backdrop on older devices; the nav bar uses its translucent fallback.
@@ -216,49 +219,53 @@ fun RecorderApp(
                     .background(palette.background),
             )
             AmbientGlow(palette = palette)
-            when (tab) {
-                AppTab.RECORD -> RecordScreen(
-                    settings = settings,
-                    recordingState = recordingState,
-                    lastRecording = lastRecording,
-                    timerMs = timerMs,
-                    rootStatus = rootStatus,
-                    checkingRoot = checkingRoot || rootStatus == RootStatus.Checking,
-                    snackbarHostState = snackbarHostState,
-                    onSettingsChange = onSettingsChange,
-                    onCaptureModeChange = changeCaptureMode,
-                    onCheckRoot = {
-                        rootCheckRequest++
-                        if (settings.captureMode != CaptureMode.ROOT) {
-                            changeCaptureMode(CaptureMode.ROOT)
-                        }
-                    },
-                    onStart = onStart,
-                    onStop = onStop,
-                    onOpenRecording = onOpenRecording,
-                    onShareRecording = onShareRecording,
-                )
+            CompositionLocalProvider(
+                LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
+            ) {
+                when (tab) {
+                    AppTab.RECORD -> RecordScreen(
+                        settings = settings,
+                        recordingState = recordingState,
+                        lastRecording = lastRecording,
+                        timerMs = timerMs,
+                        rootStatus = rootStatus,
+                        checkingRoot = checkingRoot || rootStatus == RootStatus.Checking,
+                        snackbarHostState = snackbarHostState,
+                        onSettingsChange = onSettingsChange,
+                        onCaptureModeChange = changeCaptureMode,
+                        onCheckRoot = {
+                            rootCheckRequest++
+                            if (settings.captureMode != CaptureMode.ROOT) {
+                                changeCaptureMode(CaptureMode.ROOT)
+                            }
+                        },
+                        onStart = onStart,
+                        onStop = onStop,
+                        onOpenRecording = onOpenRecording,
+                        onShareRecording = onShareRecording,
+                    )
 
-                AppTab.VIDEOS -> VideosScreen(
-                    recordings = recordings,
-                    isLoading = recordingsLoading,
-                    snackbarHostState = snackbarHostState,
-                    onRefresh = onRefreshRecordings,
-                    onOpen = onOpenRecording,
-                    onShare = onShareRecording,
-                    onRename = onRenameRecording,
-                    onDelete = onDeleteRecording,
-                )
+                    AppTab.VIDEOS -> VideosScreen(
+                        recordings = recordings,
+                        isLoading = recordingsLoading,
+                        snackbarHostState = snackbarHostState,
+                        onRefresh = onRefreshRecordings,
+                        onOpen = onOpenRecording,
+                        onShare = onShareRecording,
+                        onRename = onRenameRecording,
+                        onDelete = onDeleteRecording,
+                    )
 
-                AppTab.SETTINGS -> SettingsScreen(
-                    settings = settings,
-                    snackbarHostState = snackbarHostState,
-                    updateChecking = updateChecking,
-                    onSettingsChange = onSettingsChange,
-                    onCheckForUpdates = checkForUpdates,
-                    onOpenUrl = onOpenUrl,
-                    onShowHelp = { showHelp = true },
-                )
+                    AppTab.SETTINGS -> SettingsScreen(
+                        settings = settings,
+                        snackbarHostState = snackbarHostState,
+                        updateChecking = updateChecking,
+                        onSettingsChange = onSettingsChange,
+                        onCheckForUpdates = checkForUpdates,
+                        onOpenUrl = onOpenUrl,
+                        onShowHelp = { showHelp = true },
+                    )
+                }
             }
         }
 
@@ -281,11 +288,12 @@ fun RecorderApp(
             selectedIndex = selectedTab,
             onSelect = { selectedTab = it },
             blurEnabled = settings.navigationBlur,
+            iosLabels = settings.navigationIosLabels,
             backdrop = if (canBlur) backdrop else null,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
 
-        if (recordingState.phase == RecordingPhase.RECORDING && tab != AppTab.RECORD) {
+        if (showRecordingToolbar) {
             FloatingToolbar(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

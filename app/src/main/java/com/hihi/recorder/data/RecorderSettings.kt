@@ -109,8 +109,9 @@ data class RecorderSettings(
     val theme: RecorderTheme = RecorderTheme.SYSTEM,
     val uiStyle: UiStyle = UiStyle.MIUIX,
     val materialSpec: MaterialSpec = MaterialSpec.SPEC_2025,
-    val monetColor: Boolean = false,
+    val monetColor: Boolean = true,
     val navigationBlur: Boolean = true,
+    val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE

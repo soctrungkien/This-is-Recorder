@@ -240,7 +240,7 @@ fun RecordScreen(
                         summary = if (isRoot) {
                             stringResource(R.string.fps_root_summary)
                         } else {
-                            settings.frameRate.label()
+                            null
                         },
                         value = settings.frameRate.label(),
                         enabled = !locked && !isRoot,
@@ -249,7 +249,6 @@ fun RecordScreen(
                     AppDivider()
                     AppSelectRow(
                         title = stringResource(R.string.pref_bitrate),
-                        summary = settings.bitrate.label(),
                         value = settings.bitrate.label(),
                         enabled = !locked,
                         onClick = { picker = RecordPicker.BITRATE },
@@ -302,11 +301,7 @@ fun RecordScreen(
         RecordPicker.RESOLUTION -> AppSelectDialog(
             title = stringResource(R.string.pref_resolution),
             options = VideoResolution.entries.map { value ->
-                SelectOption(
-                    value = value,
-                    label = value.label(),
-                    summary = value.label(),
-                )
+                SelectOption(value, value.label())
             },
             selected = settings.resolution,
             onSelect = { value -> onSettingsChange(settings.copy(resolution = value)) },
@@ -617,7 +612,7 @@ private fun LastRecordingCard(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            AppDivider()
+            AppDivider(horizontalPadding = 0.dp)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,

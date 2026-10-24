@@ -139,7 +139,7 @@ fun SettingsScreen(
                         } else {
                             stringResource(R.string.pref_monet_unavailable)
                         },
-                        checked = settings.monetColor,
+                        checked = settings.monetColor && dynamicColorAvailable,
                         onCheckedChange = {
                             onSettingsChange(settings.copy(monetColor = it))
                         },
@@ -153,11 +153,20 @@ fun SettingsScreen(
                         } else {
                             stringResource(R.string.pref_navigation_blur_unavailable)
                         },
-                        checked = settings.navigationBlur,
+                        checked = settings.navigationBlur && Build.VERSION.SDK_INT >= 33,
                         onCheckedChange = {
                             onSettingsChange(settings.copy(navigationBlur = it))
                         },
                         enabled = Build.VERSION.SDK_INT >= 33,
+                    )
+                    AppDivider()
+                    AppSwitchRow(
+                        title = stringResource(R.string.pref_navigation_ios_labels),
+                        summary = stringResource(R.string.pref_navigation_ios_labels_summary),
+                        checked = settings.navigationIosLabels,
+                        onCheckedChange = {
+                            onSettingsChange(settings.copy(navigationIosLabels = it))
+                        },
                     )
                 }
             }
