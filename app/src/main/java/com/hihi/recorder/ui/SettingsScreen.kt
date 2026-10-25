@@ -132,44 +132,7 @@ fun SettingsScreen(
                 }
             }
             item {
-                AppCard(contentPadding = PaddingValues(14.dp)) {
-                    AppText(
-                        text = stringResource(R.string.pref_material_spec),
-                        style = AppTextStyle.Subtitle,
-                    )
-                    Spacer(Modifier.height(3.dp))
-                    AppText(
-                        text = stringResource(R.string.pref_material_spec_summary),
-                        style = AppTextStyle.Footnote,
-                        color = palette.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    AppSegmentedControl(
-                        options = listOf(
-                            MaterialSpec.SPEC_2021 to stringResource(R.string.material_spec_2021),
-                            MaterialSpec.SPEC_2025 to stringResource(R.string.material_spec_2025),
-                        ),
-                        selected = settings.materialSpec,
-                        onSelect = { onSettingsChange(settings.copy(materialSpec = it)) },
-                    )
-                }
-            }
-            item {
                 AppCard(contentPadding = PaddingValues(0.dp)) {
-                    AppSwitchRow(
-                        title = stringResource(R.string.pref_monet),
-                        summary = if (dynamicColorAvailable) {
-                            stringResource(R.string.pref_monet_summary)
-                        } else {
-                            stringResource(R.string.pref_monet_unavailable)
-                        },
-                        checked = settings.monetColor && dynamicColorAvailable,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(monetColor = it))
-                        },
-                        enabled = dynamicColorAvailable,
-                    )
-                    AppDivider()
                     AppSwitchRow(
                         title = stringResource(R.string.pref_navigation_ios_labels),
                         summary = stringResource(R.string.pref_navigation_ios_labels_summary),
