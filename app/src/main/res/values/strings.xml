@@ -104,11 +104,8 @@
     <string name="pref_monet">Monet dynamic color</string>
     <string name="pref_monet_summary">Use wallpaper colors throughout the app.</string>
     <string name="pref_monet_unavailable">Dynamic color requires Android 12 or newer.</string>
-    <string name="pref_navigation_blur">Liquid glass blur</string>
-    <string name="pref_navigation_blur_summary">Blur the content behind the floating navigation bar.</string>
-    <string name="pref_navigation_blur_unavailable">Blur requires Android 13 or newer. A translucent bar is used instead.</string>
-    <string name="pref_navigation_ios_labels">iOS-style labels</string>
-    <string name="pref_navigation_ios_labels_summary">Show labels only for the selected tab, like an iOS liquid glass bar.</string>
+    <string name="pref_navigation_ios_labels">Selected tab labels</string>
+    <string name="pref_navigation_ios_labels_summary">Show labels only for the selected tab.</string>
     <string name="pref_save_folder">Save location</string>
     <string name="pref_save_folder_summary">Folder inside Movies. Use / for nested folders.</string>
     <string name="save_folder_title">Custom save location</string>

@@ -147,20 +147,6 @@ fun SettingsScreen(
                     )
                     AppDivider()
                     AppSwitchRow(
-                        title = stringResource(R.string.pref_navigation_blur),
-                        summary = if (Build.VERSION.SDK_INT >= 33) {
-                            stringResource(R.string.pref_navigation_blur_summary)
-                        } else {
-                            stringResource(R.string.pref_navigation_blur_unavailable)
-                        },
-                        checked = settings.navigationBlur && Build.VERSION.SDK_INT >= 33,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(navigationBlur = it))
-                        },
-                        enabled = Build.VERSION.SDK_INT >= 33,
-                    )
-                    AppDivider()
-                    AppSwitchRow(
                         title = stringResource(R.string.pref_navigation_ios_labels),
                         summary = stringResource(R.string.pref_navigation_ios_labels_summary),
                         checked = settings.navigationIosLabels,

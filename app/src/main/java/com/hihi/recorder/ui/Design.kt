@@ -1,23 +1,11 @@
 package com.hihi.recorder.ui
 
-import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,32 +14,32 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Badge as MaterialBadge
+import androidx.compose.material3.BadgedBox as MaterialBadgedBox
 import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults as MaterialCardDefaults
 import androidx.compose.material3.CircularProgressIndicator as MaterialProgress
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider as MaterialHorizontalDivider
+import androidx.compose.material3.Icon as MaterialIcon
 import androidx.compose.material3.IconButton as MaterialIconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar as MaterialNavigationBar
+import androidx.compose.material3.NavigationBarItem as MaterialNavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults as MaterialNavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton as MaterialRadioButton
@@ -73,29 +61,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.hihi.recorder.R
 import com.hihi.recorder.data.UiStyle
 import top.yukonga.miuix.kmp.basic.Badge as MiuixBadge
-import top.yukonga.miuix.kmp.basic.BadgedBox as MiuixBadgedBox
 import top.yukonga.miuix.kmp.basic.BasicComponent as MiuixBasicComponent
 import top.yukonga.miuix.kmp.basic.Button as MiuixButton
 import top.yukonga.miuix.kmp.basic.ButtonDefaults as MiuixButtonDefaults
@@ -105,6 +86,10 @@ import top.yukonga.miuix.kmp.basic.CircularProgressIndicator as MiuixProgress
 import top.yukonga.miuix.kmp.basic.HorizontalDivider as MiuixHorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon as MiuixIcon
 import top.yukonga.miuix.kmp.basic.IconButton as MiuixIconButton
+import top.yukonga.miuix.kmp.basic.NavigationBar as MiuixNavigationBar
+import top.yukonga.miuix.kmp.basic.NavigationBarDefaults as MiuixNavigationBarDefaults
+import top.yukonga.miuix.kmp.basic.NavigationBarDisplayMode
+import top.yukonga.miuix.kmp.basic.NavigationBarItem as MiuixNavigationBarItem
 import top.yukonga.miuix.kmp.basic.RadioButton as MiuixRadioButton
 import top.yukonga.miuix.kmp.basic.Scaffold as MiuixScaffold
 import top.yukonga.miuix.kmp.basic.SmallTitle
@@ -124,15 +109,6 @@ import top.yukonga.miuix.kmp.preference.ArrowPreference
 import top.yukonga.miuix.kmp.preference.SwitchPreference
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.window.WindowDialog
-import top.yukonga.miuix.kmp.blur.BlendColorEntry
-import top.yukonga.miuix.kmp.blur.BlurBlendMode
-import top.yukonga.miuix.kmp.blur.BlurDefaults
-import top.yukonga.miuix.kmp.blur.LayerBackdrop
-import top.yukonga.miuix.kmp.blur.highlight.Highlight
-import top.yukonga.miuix.kmp.blur.textureBlur
-import top.yukonga.miuix.kmp.squircle.squircleBorder
-import top.yukonga.miuix.kmp.squircle.squircleClip
-import top.yukonga.miuix.kmp.squircle.squircleSurface
 
 @Immutable
 data class AppPalette(
@@ -155,14 +131,6 @@ data class AppPalette(
 ) {
     val heroContainer: Color get() = primaryContainer
     val onHeroContainer: Color get() = onPrimaryContainer
-    val glassTint: Color
-        get() = if (isDark) {
-            // Lift the frost above the page background so the floating bar keeps
-            // its edge-defined glass look instead of dissolving into dark scenes.
-            surfaceContainer.copy(alpha = 0.62f)
-        } else {
-            surface.copy(alpha = 0.72f)
-        }
 }
 
 @Composable
@@ -1270,260 +1238,118 @@ fun AppScaffold(
     }
 }
 
-data class GlassNavItem(
+data class AppNavItem(
     val label: String,
     val icon: ImageVector,
     val badgeCount: Int = 0,
 )
 
+private fun navBadgeText(count: Int): String = if (count > 99) "99+" else count.toString()
+
+/**
+ * Bottom navigation assembled from the official Miuix and Material 3 components.
+ *
+ * Miuix owns the selected-label behaviour through [NavigationBarDisplayMode], so
+ * there is no custom sliding indicator, blur layer, or hand-built tab layout.
+ */
 @Composable
-fun GlassNavigationBar(
-    items: List<GlassNavItem>,
+fun AppNavigationBar(
+    items: List<AppNavItem>,
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
-    blurEnabled: Boolean,
-    iosLabels: Boolean,
-    backdrop: LayerBackdrop?,
+    selectedLabelsOnly: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val palette = appPalette()
-    val cornerRadius = 28.dp
-    val shape = RoundedCornerShape(cornerRadius)
-    val canBlur = blurEnabled && backdrop != null && Build.VERSION.SDK_INT >= 33
-    // A light top sheen and a darker lower edge give the flat glass panel the
-    // curved, refractive depth of an iOS 26 liquid glass bar.
-    val sheen = Brush.verticalGradient(
-        colors = listOf(
-            Color.White.copy(alpha = if (palette.isDark) 0.07f else 0.24f),
-            Color.Transparent,
-            Color.Black.copy(alpha = if (palette.isDark) 0.10f else 0.035f),
-        ),
-    )
-
-    val glassModifier = if (canBlur) {
-        // BlurDefaults.blurColors is composable because the effect resolves
-        // theme-aware colors at composition time. Keep every blur API call
-        // behind the API 33 check so Android 10-12 never loads them.
-        val glassColors = BlurDefaults.blurColors(
-            blendColors = listOf(
-                BlendColorEntry(palette.glassTint, BlurBlendMode.SrcOver),
-                BlendColorEntry(palette.primary.copy(alpha = 0.04f), BlurBlendMode.SrcOver),
-            ),
-            saturation = 1.08f,
-            contrast = 1.02f,
+    if (LocalUiStyle.current == UiStyle.MIUIX) {
+        // Documented Miuix colour recipe: on-surface content for unselected
+        // items (the component applies its own secondary opacity) and the theme
+        // primary for the selected item. Both resolve correctly in dark mode.
+        val itemColors = MiuixNavigationBarDefaults.navigationBarItemColors(
+            unselectedContentColor = MiuixTheme.colorScheme.onSurfaceContainer,
+            selectedContentColor = MiuixTheme.colorScheme.primary,
         )
-        Modifier.textureBlur(
-            backdrop = requireNotNull(backdrop),
-            shape = shape,
-            blurRadius = 30f,
-            noiseCoefficient = 0.012f,
-            colors = glassColors,
-            highlight = if (palette.isDark) {
-                Highlight.GlassStrokeMiddleDark
+        MiuixNavigationBar(
+            modifier = modifier.fillMaxWidth(),
+            mode = if (selectedLabelsOnly) {
+                NavigationBarDisplayMode.IconWithSelectedLabel
             } else {
-                Highlight.GlassStrokeMiddleLight
+                NavigationBarDisplayMode.IconAndText
             },
-        )
-    } else {
-        Modifier
-    }
-
-    val containerModifier = modifier
-        .fillMaxWidth()
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .padding(horizontal = 20.dp, vertical = 10.dp)
-        .height(66.dp)
-
-    val navContent: @Composable () -> Unit = {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(sheen),
         ) {
-            BoxWithConstraints(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp, vertical = 7.dp),
-            ) {
-                val slotWidth = maxWidth / items.size.toFloat()
-                val pillOffset by animateDpAsState(
-                    targetValue = slotWidth * selectedIndex,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessMediumLow,
-                    ),
-                    label = "navSelectionPill",
+            items.forEachIndexed { index, item ->
+                MiuixNavigationBarItem(
+                    selected = index == selectedIndex,
+                    onClick = { onSelect(index) },
+                    icon = item.icon,
+                    label = item.label,
+                    colors = itemColors,
+                    badge = if (item.badgeCount > 0) {
+                        {
+                            MiuixBadge {
+                                MiuixText(text = navBadgeText(item.badgeCount))
+                            }
+                        }
+                    } else {
+                        null
+                    },
                 )
-                val pillFill = if (palette.isDark) {
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.16f),
-                            Color.White.copy(alpha = 0.06f),
-                        ),
-                    )
-                } else {
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.80f),
-                            Color.White.copy(alpha = 0.44f),
-                        ),
-                    )
-                }
-                val pillBorder = if (palette.isDark) {
-                    Color.White.copy(alpha = 0.14f)
-                } else {
-                    Color.White.copy(alpha = 0.88f)
-                }
-
-                // The selection pill is the only moving part of the bar. Keeping
-                // it in one composable means the spring animates a single offset
-                // instead of cross-fading per-item backgrounds, which is what
-                // gives the bar its iOS-like glide when tabs change.
-                Box(
-                    modifier = Modifier
-                        // Deferred offset: the spring animates the pill without
-                        // recomposing the bar on every frame.
-                        .offset { IntOffset(pillOffset.roundToPx(), 0) }
-                        .width(slotWidth)
-                        .fillMaxHeight()
-                        .padding(horizontal = 3.dp)
-                        .squircleClip(19.dp)
-                        .background(pillFill)
-                        .squircleBorder(0.75.dp, pillBorder, 19.dp),
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .selectableGroup(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    items.forEachIndexed { index, item ->
-                        val selected = index == selectedIndex
-                        val showLabel = !iosLabels || selected
-                        val tint by animateColorAsState(
-                            targetValue = if (selected) {
-                                palette.primary
-                            } else {
-                                palette.onSurfaceVariant
-                            },
-                            animationSpec = tween(durationMillis = 220),
-                            label = "navItemTint$index",
-                        )
-                        val iconScale by animateFloatAsState(
-                            targetValue = if (selected) 1.08f else 1f,
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessMedium,
-                            ),
-                            label = "navIconScale$index",
-                        )
-
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .squircleClip(19.dp)
-                                .selectable(
-                                    selected = selected,
-                                    role = Role.Tab,
-                                    onClick = { onSelect(index) },
-                                )
-                                .padding(vertical = 2.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            MiuixBadgedBox(
+            }
+        }
+    } else {
+        // Material 3's defaults map selected content onto secondaryContainer,
+        // which is too low-contrast after the Miuix-to-Material colour mapping.
+        // Use the high-contrast on-surface token plus a light primary tint so
+        // both themes stay legible.
+        val itemColors = MaterialNavigationBarItemDefaults.colors(
+            selectedIconColor = palette.onSurface,
+            selectedTextColor = palette.onSurface,
+            indicatorColor = palette.primary.copy(alpha = if (palette.isDark) 0.24f else 0.12f),
+            unselectedIconColor = palette.onSurfaceVariant,
+            unselectedTextColor = palette.onSurfaceVariant,
+        )
+        MaterialNavigationBar(
+            modifier = modifier.fillMaxWidth(),
+            containerColor = palette.surface,
+            contentColor = palette.onSurface,
+            tonalElevation = 0.dp,
+        ) {
+            items.forEachIndexed { index, item ->
+                MaterialNavigationBarItem(
+                    selected = index == selectedIndex,
+                    onClick = { onSelect(index) },
+                    icon = {
+                        if (item.badgeCount > 0) {
+                            MaterialBadgedBox(
                                 badge = {
-                                    if (item.badgeCount > 0) {
-                                        MiuixBadge(
-                                            containerColor = palette.primary,
-                                            contentColor = palette.onPrimary,
-                                        ) {
-                                            MiuixText(
-                                                text = if (item.badgeCount > 99) {
-                                                    "99+"
-                                                } else {
-                                                    item.badgeCount.toString()
-                                                },
-                                                style = MiuixTheme.textStyles.footnote2,
-                                                maxLines = 1,
-                                            )
-                                        }
+                                    MaterialBadge {
+                                        MaterialText(text = navBadgeText(item.badgeCount))
                                     }
                                 },
                             ) {
-                                AppIcon(
-                                    icon = item.icon,
-                                    // The icon always carries the accessible
-                                    // name so collapsing the label never makes
-                                    // an unselected tab nameless.
-                                    contentDescription = item.label,
-                                    modifier = Modifier
-                                        .size(22.dp)
-                                        .scale(iconScale),
-                                    tint = tint,
+                                MaterialIcon(
+                                    imageVector = item.icon,
+                                    contentDescription = null,
                                 )
                             }
-                            AnimatedVisibility(
-                                visible = showLabel,
-                                enter = fadeIn(tween(220)) +
-                                    expandVertically(tween(220)),
-                                exit = fadeOut(tween(140)) +
-                                    shrinkVertically(tween(180)),
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Spacer(Modifier.height(2.dp))
-                                    AppText(
-                                        text = item.label,
-                                        // The visual label duplicates the icon's
-                                        // content description; keep TalkBack
-                                        // reading the tab name exactly once.
-                                        modifier = Modifier.clearAndSetSemantics { },
-                                        style = AppTextStyle.Footnote,
-                                        color = tint,
-                                        fontWeight = if (selected) {
-                                            FontWeight.SemiBold
-                                        } else {
-                                            FontWeight.Normal
-                                        },
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                            }
+                        } else {
+                            MaterialIcon(
+                                imageVector = item.icon,
+                                contentDescription = null,
+                            )
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    if (canBlur) {
-        Box(
-            modifier = containerModifier
-                .then(glassModifier)
-                .squircleClip(cornerRadius),
-        ) {
-            navContent()
-        }
-    } else {
-        // The glass uses continuous corners; match that silhouette in the
-        // non-blur fallback instead of mixing a circular rounded rect with it.
-        Box(
-            modifier = containerModifier
-                .shadow(4.dp, shape, clip = false)
-                .squircleSurface(
-                    color = palette.surfaceContainerHigh.copy(alpha = 0.97f),
-                    cornerRadius = cornerRadius,
+                    },
+                    label = {
+                        MaterialText(
+                            text = item.label,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    alwaysShowLabel = !selectedLabelsOnly,
+                    colors = itemColors,
                 )
-                .squircleBorder(
-                    width = 1.dp,
-                    color = palette.outline.copy(alpha = 0.35f),
-                    cornerRadius = cornerRadius,
-                ),
-        ) {
-            navContent()
+            }
         }
     }
 }

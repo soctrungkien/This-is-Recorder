@@ -1,7 +1,6 @@
 package com.hihi.recorder.ui
 
 import android.net.Uri
-import android.os.Build
 import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -60,8 +59,6 @@ import com.hihi.recorder.root.RootStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import top.yukonga.miuix.kmp.blur.layerBackdrop
-import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.basic.FloatingToolbar
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 import top.yukonga.miuix.kmp.icon.MiuixIcons
@@ -162,10 +159,6 @@ fun RecorderApp(
 
     val showRecordingToolbar =
         recordingState.phase == RecordingPhase.RECORDING && currentRoute != AppRoute.Record
-    val canBlur = settings.navigationBlur && Build.VERSION.SDK_INT >= 33
-    // The blur library needs RuntimeShader (API 33+). Do not even allocate the
-    // backdrop on older devices; the nav bar uses its translucent fallback.
-    val backdrop = if (Build.VERSION.SDK_INT >= 33) rememberLayerBackdrop() else null
 
     LaunchedEffect(autoStartToken) {
         if (autoStartToken > 0) onStart()
@@ -242,24 +235,7 @@ fun RecorderApp(
             .fillMaxSize()
             .background(palette.background),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .then(
-                    if (canBlur) {
-                        Modifier.layerBackdrop(requireNotNull(backdrop))
-                    } else {
-                        Modifier
-                    },
-                ),
-        ) {
-            // layerBackdrop only captures this subtree, so paint an opaque base
-            // here. Without it the blur samples transparency and creates halos.
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(palette.background),
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
             AmbientGlow(palette = palette)
             CompositionLocalProvider(
                 LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
@@ -335,18 +311,18 @@ fun RecorderApp(
             }
         }
 
-        GlassNavigationBar(
+        AppNavigationBar(
             items = listOf(
-                GlassNavItem(
+                AppNavItem(
                     label = stringResource(R.string.nav_record),
                     icon = MiuixIcons.ScreenCapture,
                 ),
-                GlassNavItem(
+                AppNavItem(
                     label = stringResource(R.string.nav_videos),
                     icon = MiuixIcons.Album,
                     badgeCount = recordings.size,
                 ),
-                GlassNavItem(
+                AppNavItem(
                     label = stringResource(R.string.nav_settings),
                     icon = MiuixIcons.Settings,
                 ),
@@ -366,9 +342,7 @@ fun RecorderApp(
                     backStack.add(target)
                 }
             },
-            blurEnabled = settings.navigationBlur,
-            iosLabels = settings.navigationIosLabels,
-            backdrop = if (canBlur) backdrop else null,
+            selectedLabelsOnly = settings.navigationIosLabels,
             modifier = Modifier.align(Alignment.BottomCenter),
         )
 

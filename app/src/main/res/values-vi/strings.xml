@@ -104,11 +104,8 @@
     <string name="pref_monet">Màu động Monet</string>
     <string name="pref_monet_summary">Dùng màu từ hình nền cho toàn bộ ứng dụng.</string>
     <string name="pref_monet_unavailable">Màu động cần Android 12 trở lên.</string>
-    <string name="pref_navigation_blur">Hiệu ứng kính lỏng</string>
-    <string name="pref_navigation_blur_summary">Làm mờ nội dung phía sau thanh điều hướng nổi.</string>
-    <string name="pref_navigation_blur_unavailable">Hiệu ứng mờ cần Android 13 trở lên. Thanh bán trong suốt sẽ được dùng thay thế.</string>
-    <string name="pref_navigation_ios_labels">Nhãn kiểu iOS</string>
-    <string name="pref_navigation_ios_labels_summary">Chỉ hiện nhãn ở tab đang chọn, giống thanh kính lỏng iOS.</string>
+    <string name="pref_navigation_ios_labels">Nhãn tab đang chọn</string>
+    <string name="pref_navigation_ios_labels_summary">Chỉ hiện nhãn ở tab đang chọn.</string>
     <string name="pref_save_folder">Vị trí lưu</string>
     <string name="pref_save_folder_summary">Thư mục trong Movies. Dùng / để tạo thư mục lồng nhau.</string>
     <string name="save_folder_title">Vị trí lưu tùy chỉnh</string>

@@ -110,7 +110,6 @@ data class RecorderSettings(
     val uiStyle: UiStyle = UiStyle.MIUIX,
     val materialSpec: MaterialSpec = MaterialSpec.SPEC_2025,
     val monetColor: Boolean = true,
-    val navigationBlur: Boolean = true,
     val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
 ) {
