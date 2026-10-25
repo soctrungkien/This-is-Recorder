@@ -1244,7 +1244,7 @@ data class AppNavItem(
     val badgeCount: Int = 0,
 )
 
-private fun navBadgeText(count: Int): String = if (count > 99) "99+" else count.toString()
+internal fun navBadgeText(count: Int): String = if (count > 99) "99+" else count.toString()
 
 /**
  * Bottom navigation assembled from the official Miuix and Material 3 components.

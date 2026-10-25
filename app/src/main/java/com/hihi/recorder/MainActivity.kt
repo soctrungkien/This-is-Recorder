@@ -35,7 +35,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.woheller69.freeDroidWarn.FreeDroidWarn
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 
 class MainActivity : ComponentActivity() {
@@ -94,7 +93,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FreeDroidWarn.showWarningOnUpgrade(this, BuildConfig.VERSION_CODE)
         enableEdgeToEdge()
         projectionManager = getSystemService(MediaProjectionManager::class.java)
             ?: error("MediaProjectionManager is unavailable")

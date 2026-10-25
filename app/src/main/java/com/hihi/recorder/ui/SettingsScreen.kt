@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
 import com.hihi.recorder.R
 import com.hihi.recorder.data.MaterialSpec
+import com.hihi.recorder.data.NavigationBarStyle
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
@@ -104,6 +105,29 @@ fun SettingsScreen(
                         ),
                         selected = settings.uiStyle,
                         onSelect = { onSettingsChange(settings.copy(uiStyle = it)) },
+                    )
+                }
+            }
+            item {
+                AppCard(contentPadding = PaddingValues(14.dp)) {
+                    AppText(
+                        text = stringResource(R.string.pref_navigation_bar),
+                        style = AppTextStyle.Subtitle,
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    AppText(
+                        text = stringResource(R.string.pref_navigation_bar_summary),
+                        style = AppTextStyle.Footnote,
+                        color = palette.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    AppSegmentedControl(
+                        options = listOf(
+                            NavigationBarStyle.MONET to stringResource(R.string.navigation_bar_monet),
+                            NavigationBarStyle.LIQUID_IOS to stringResource(R.string.navigation_bar_liquid),
+                        ),
+                        selected = settings.navigationBarStyle,
+                        onSelect = { onSettingsChange(settings.copy(navigationBarStyle = it)) },
                     )
                 }
             }

@@ -10,6 +10,7 @@
 ## Tính năng
 
 - Giao diện Miuix, sáng/tối/theo hệ thống, có bản dịch tiếng Việt.
+- Thanh điều hướng Monet tiêu chuẩn hoặc Liquid iOS (kính lỏng, làm mờ trên Android 13+).
 - Quay màn hình bằng MediaProjection + MediaCodec + MediaMuxer.
 - Nguồn âm thanh:
   - Không âm thanh

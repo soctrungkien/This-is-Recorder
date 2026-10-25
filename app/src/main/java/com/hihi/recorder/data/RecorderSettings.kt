@@ -92,6 +92,18 @@ enum class MaterialSpec {
 }
 
 /**
+ * Which bottom navigation bar to render.
+ *
+ * [MONET] is the standard Miuix/Material component bar. [LIQUID_IOS] is the
+ * upstream Miuix `IosLiquidGlassNavigationBar` example (blur, refraction, and
+ * drag-driven selection) adapted for this app.
+ */
+enum class NavigationBarStyle {
+    MONET,
+    LIQUID_IOS,
+}
+
+/**
  * Immutable snapshot of all user preferences. The recording service takes a
  * snapshot when a session starts, so changing a switch while recording cannot
  * affect the current encoder.
@@ -110,6 +122,7 @@ data class RecorderSettings(
     val uiStyle: UiStyle = UiStyle.MIUIX,
     val materialSpec: MaterialSpec = MaterialSpec.SPEC_2025,
     val monetColor: Boolean = true,
+    val navigationBarStyle: NavigationBarStyle = NavigationBarStyle.LIQUID_IOS,
     val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
 ) {

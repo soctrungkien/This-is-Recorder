@@ -104,8 +104,12 @@
     <string name="pref_monet">Màu động Monet</string>
     <string name="pref_monet_summary">Dùng màu từ hình nền cho toàn bộ ứng dụng.</string>
     <string name="pref_monet_unavailable">Màu động cần Android 12 trở lên.</string>
+    <string name="pref_navigation_bar">Thanh điều hướng</string>
+    <string name="pref_navigation_bar_summary">Chọn thanh Monet tiêu chuẩn hoặc thanh kính lỏng kiểu iOS. Liquid dùng làm mờ trên Android 13+.</string>
+    <string name="navigation_bar_monet">Monet</string>
+    <string name="navigation_bar_liquid">Liquid iOS</string>
     <string name="pref_navigation_ios_labels">Nhãn tab đang chọn</string>
-    <string name="pref_navigation_ios_labels_summary">Chỉ hiện nhãn ở tab đang chọn.</string>
+    <string name="pref_navigation_ios_labels_summary">Thanh Monet: chỉ hiện nhãn ở tab đang chọn.</string>
     <string name="pref_save_folder">Vị trí lưu</string>
     <string name="pref_save_folder_summary">Thư mục trong Movies. Dùng / để tạo thư mục lồng nhau.</string>
     <string name="save_folder_title">Vị trí lưu tùy chỉnh</string>

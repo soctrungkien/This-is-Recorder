@@ -61,6 +61,11 @@ class SettingsRepository(context: Context) {
     fun setMonetColor(value: Boolean) = update { it.copy(monetColor = value) }
 
     @Synchronized
+    fun setNavigationBarStyle(value: NavigationBarStyle) = update {
+        it.copy(navigationBarStyle = value)
+    }
+
+    @Synchronized
     fun setNavigationIosLabels(value: Boolean) = update { it.copy(navigationIosLabels = value) }
 
     @Synchronized
@@ -100,6 +105,10 @@ class SettingsRepository(context: Context) {
             uiStyle = preferences.enumValue(KEY_UI_STYLE, defaults.uiStyle),
             materialSpec = preferences.enumValue(KEY_MATERIAL_SPEC, defaults.materialSpec),
             monetColor = preferences.getBoolean(KEY_MONET, defaults.monetColor),
+            navigationBarStyle = preferences.enumValue(
+                KEY_NAVIGATION_BAR_STYLE,
+                defaults.navigationBarStyle,
+            ),
             navigationIosLabels = preferences.getBoolean(
                 KEY_NAVIGATION_IOS_LABELS,
                 defaults.navigationIosLabels,
@@ -125,6 +134,7 @@ class SettingsRepository(context: Context) {
             .putString(KEY_UI_STYLE, settings.uiStyle.name)
             .putString(KEY_MATERIAL_SPEC, settings.materialSpec.name)
             .putBoolean(KEY_MONET, settings.monetColor)
+            .putString(KEY_NAVIGATION_BAR_STYLE, settings.navigationBarStyle.name)
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .apply()
@@ -153,6 +163,7 @@ class SettingsRepository(context: Context) {
         const val KEY_UI_STYLE = "ui_style"
         const val KEY_MATERIAL_SPEC = "material_spec"
         const val KEY_MONET = "monet_color"
+        const val KEY_NAVIGATION_BAR_STYLE = "navigation_bar_style"
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"

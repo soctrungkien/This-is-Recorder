@@ -1,6 +1,7 @@
 package com.hihi.recorder.ui
 
 import android.net.Uri
+import android.os.Build
 import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
 import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.CaptureMode
+import com.hihi.recorder.data.NavigationBarStyle
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingState
@@ -56,11 +58,17 @@ import com.hihi.recorder.net.UpdateFailure
 import com.hihi.recorder.net.UpdateResult
 import com.hihi.recorder.root.RootChecker
 import com.hihi.recorder.root.RootStatus
+import com.hihi.recorder.ui.liquid.IosLiquidGlassNavigationBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import top.yukonga.miuix.kmp.basic.Badge as MiuixBadge
 import top.yukonga.miuix.kmp.basic.FloatingToolbar
+import top.yukonga.miuix.kmp.basic.NavigationItem
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
+import top.yukonga.miuix.kmp.basic.Text as MiuixText
+import top.yukonga.miuix.kmp.blur.layerBackdrop
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Album
 import top.yukonga.miuix.kmp.icon.extended.ScreenCapture
@@ -160,6 +168,49 @@ fun RecorderApp(
     val showRecordingToolbar =
         recordingState.phase == RecordingPhase.RECORDING && currentRoute != AppRoute.Record
 
+    // The liquid bar samples the page content behind it. Only allocate the
+    // backdrop for the liquid style and only where RuntimeShader exists (33+).
+    val useLiquidNavigation = settings.navigationBarStyle == NavigationBarStyle.LIQUID_IOS
+    val canBlur = useLiquidNavigation && Build.VERSION.SDK_INT >= 33
+    val backdrop = if (canBlur) {
+        rememberLayerBackdrop {
+            drawRect(palette.background)
+            drawContent()
+        }
+    } else {
+        null
+    }
+
+    val navItems = listOf(
+        AppNavItem(
+            label = stringResource(R.string.nav_record),
+            icon = MiuixIcons.ScreenCapture,
+        ),
+        AppNavItem(
+            label = stringResource(R.string.nav_videos),
+            icon = MiuixIcons.Album,
+            badgeCount = recordings.size,
+        ),
+        AppNavItem(
+            label = stringResource(R.string.nav_settings),
+            icon = MiuixIcons.Settings,
+        ),
+    )
+    val selectTab: (Int) -> Unit = { index ->
+        val target = appRouteAt(index)
+        val existing = backStack.indexOf(target)
+        if (existing >= 0) {
+            // Re-selecting a tab that is already below the top is a
+            // multi-pop: miuix-nav sweeps the whole depth range in one
+            // continuous reverse motion instead of cross-fading.
+            while (backStack.size > existing + 1) {
+                backStack.removeAt(backStack.lastIndex)
+            }
+        } else {
+            backStack.add(target)
+        }
+    }
+
     LaunchedEffect(autoStartToken) {
         if (autoStartToken > 0) onStart()
     }
@@ -235,7 +286,17 @@ fun RecorderApp(
             .fillMaxSize()
             .background(palette.background),
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (backdrop != null) {
+                        Modifier.layerBackdrop(backdrop)
+                    } else {
+                        Modifier
+                    },
+                ),
+        ) {
             AmbientGlow(palette = palette)
             CompositionLocalProvider(
                 LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
@@ -311,40 +372,39 @@ fun RecorderApp(
             }
         }
 
-        AppNavigationBar(
-            items = listOf(
-                AppNavItem(
-                    label = stringResource(R.string.nav_record),
-                    icon = MiuixIcons.ScreenCapture,
-                ),
-                AppNavItem(
-                    label = stringResource(R.string.nav_videos),
-                    icon = MiuixIcons.Album,
-                    badgeCount = recordings.size,
-                ),
-                AppNavItem(
-                    label = stringResource(R.string.nav_settings),
-                    icon = MiuixIcons.Settings,
-                ),
-            ),
-            selectedIndex = selectedTab,
-            onSelect = { index ->
-                val target = appRouteAt(index)
-                val existing = backStack.indexOf(target)
-                if (existing >= 0) {
-                    // Re-selecting a tab that is already below the top is a
-                    // multi-pop: miuix-nav sweeps the whole depth range in one
-                    // continuous reverse motion instead of cross-fading.
-                    while (backStack.size > existing + 1) {
-                        backStack.removeAt(backStack.lastIndex)
+        if (useLiquidNavigation) {
+            IosLiquidGlassNavigationBar(
+                items = navItems.map { item ->
+                    NavigationItem(label = item.label, icon = item.icon)
+                },
+                selectedIndex = selectedTab,
+                onItemClick = selectTab,
+                backdrop = backdrop,
+                isBlurActive = canBlur,
+                isDark = palette.isDark,
+                badge = { index ->
+                    val count = navItems[index].badgeCount
+                    if (count > 0) {
+                        {
+                            MiuixBadge {
+                                MiuixText(text = navBadgeText(count))
+                            }
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    backStack.add(target)
-                }
-            },
-            selectedLabelsOnly = settings.navigationIosLabels,
-            modifier = Modifier.align(Alignment.BottomCenter),
-        )
+                },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
+        } else {
+            AppNavigationBar(
+                items = navItems,
+                selectedIndex = selectedTab,
+                onSelect = selectTab,
+                selectedLabelsOnly = settings.navigationIosLabels,
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
+        }
 
         if (showRecordingToolbar) {
             FloatingToolbar(
