@@ -106,10 +106,10 @@
     <string name="pref_monet_unavailable">Màu động cần Android 12 trở lên.</string>
     <string name="pref_navigation_bar">Thanh điều hướng</string>
     <string name="pref_navigation_bar_summary">Chọn thanh Monet tiêu chuẩn hoặc thanh kính lỏng kiểu iOS. Liquid dùng làm mờ trên Android 13+.</string>
-    <string name="navigation_bar_monet">Monet</string>
-    <string name="navigation_bar_liquid">Liquid iOS</string>
+    <string name="navigation_bar_monet">Kiểu UI</string>
+    <string name="navigation_bar_liquid">Liquid Glass</string>
     <string name="pref_navigation_ios_labels">Nhãn tab đang chọn</string>
-    <string name="pref_navigation_ios_labels_summary">Thanh Monet: chỉ hiện nhãn ở tab đang chọn.</string>
+    <string name="pref_navigation_ios_labels_summary">Thanh Kiểu UI: chỉ hiện nhãn ở tab đang chọn.</string>
     <string name="pref_save_folder">Vị trí lưu</string>
     <string name="pref_save_folder_summary">Thư mục trong Movies. Dùng / để tạo thư mục lồng nhau.</string>
     <string name="save_folder_title">Vị trí lưu tùy chỉnh</string>
@@ -122,7 +122,7 @@
     <string name="pref_telegram">Telegram</string>
     <string name="pref_telegram_summary">@realknoname</string>
     <string name="pref_verification">Xác minh nhà phát triển Android</string>
-    <string name="pref_verification_summary">Vì sao ứng dụng có thể ngừng hoạt động trên máy chứng nhận</string>
+    <string name="pref_verification_summary">Vì sao ứng dụng cài qua apk có thể ngừng hoạt động trên máy của bạn</string>
 
     <string name="rename_title">Đổi tên video</string>
     <string name="rename_message">Nhập tên mới. Phần mở rộng .mp4 sẽ được thêm tự động.</string>
