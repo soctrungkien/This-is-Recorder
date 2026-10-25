@@ -106,10 +106,10 @@
     <string name="pref_monet_unavailable">Dynamic color requires Android 12 or newer.</string>
     <string name="pref_navigation_bar">Navigation bar</string>
     <string name="pref_navigation_bar_summary">Choose the standard Monet bar or the liquid glass iOS bar. Liquid uses blur on Android 13+.</string>
-    <string name="navigation_bar_monet">Monet</string>
-    <string name="navigation_bar_liquid">Liquid iOS</string>
+    <string name="navigation_bar_monet">UI Style</string>
+    <string name="navigation_bar_liquid">Liquid Glass</string>
     <string name="pref_navigation_ios_labels">Selected tab labels</string>
-    <string name="pref_navigation_ios_labels_summary">Monet bar: show labels only for the selected tab.</string>
+    <string name="pref_navigation_ios_labels_summary">UI Style bar: show labels only for the selected tab.</string>
     <string name="pref_save_folder">Save location</string>
     <string name="pref_save_folder_summary">Folder inside Movies. Use / for nested folders.</string>
     <string name="save_folder_title">Custom save location</string>
