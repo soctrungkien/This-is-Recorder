@@ -41,7 +41,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
 import com.hihi.recorder.data.AudioSource
@@ -57,6 +59,7 @@ import com.hihi.recorder.root.RootChecker
 import com.hihi.recorder.root.RootStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import top.yukonga.miuix.kmp.blur.layerBackdrop
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.basic.FloatingToolbar
@@ -65,11 +68,37 @@ import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Album
 import top.yukonga.miuix.kmp.icon.extended.ScreenCapture
 import top.yukonga.miuix.kmp.icon.extended.Settings
+import top.yukonga.miuix.kmp.nav.core.NavDisplay
+import top.yukonga.miuix.kmp.nav.core.NavDisplayEffects
+import top.yukonga.miuix.kmp.nav.core.NavKey
+import top.yukonga.miuix.kmp.nav.core.rememberNavBackStack
+import top.yukonga.miuix.kmp.nav.core.rememberNavSystemCornerRadius
+import top.yukonga.miuix.kmp.nav.transition.NavSwipeDirection
+import top.yukonga.miuix.kmp.nav.transition.NavTransitions
 
-private enum class AppTab {
-    RECORD,
-    VIDEOS,
-    SETTINGS,
+@Serializable
+private sealed interface AppRoute : NavKey {
+    @Serializable
+    data object Record : AppRoute
+
+    @Serializable
+    data object Videos : AppRoute
+
+    @Serializable
+    data object Settings : AppRoute
+}
+
+private val AppRoute.tabIndex: Int
+    get() = when (this) {
+        AppRoute.Record -> 0
+        AppRoute.Videos -> 1
+        AppRoute.Settings -> 2
+    }
+
+private fun appRouteAt(index: Int): AppRoute = when (index) {
+    0 -> AppRoute.Record
+    1 -> AppRoute.Videos
+    else -> AppRoute.Settings
 }
 
 @Composable
@@ -109,7 +138,21 @@ fun RecorderApp(
         UpdateFailure.SERVER to stringResource(R.string.update_server_error),
         UpdateFailure.INVALID_RESPONSE to stringResource(R.string.update_invalid_response),
     )
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    // The tab bar drives a real miuix-nav back stack: selecting a tab pushes
+    // it (or pops back to it when it is already below the top). That makes the
+    // bar honest about what back does, keeps every visited tab's state alive,
+    // and gives the page transition a continuous float to animate.
+    val backStack = rememberNavBackStack<AppRoute>(AppRoute.Record)
+    val currentRoute = backStack.last() as AppRoute
+    val selectedTab = currentRoute.tabIndex
+    val navCornerRadius = rememberNavSystemCornerRadius()
+    val swipeDismiss = if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
+        NavSwipeDirection.LeftToRight
+    } else {
+        // NavSwipeDirection values are physical finger directions, so the
+        // mirror is explicit instead of relying on layout direction.
+        NavSwipeDirection.RightToLeft
+    }
     var showHelp by rememberSaveable { mutableStateOf(false) }
     var updateInfo by remember { mutableStateOf<com.hihi.recorder.net.UpdateInfo?>(null) }
     var updateChecking by remember { mutableStateOf(false) }
@@ -117,9 +160,8 @@ fun RecorderApp(
     var rootCheckRequest by remember { mutableIntStateOf(0) }
     var timerMs by remember { mutableLongStateOf(0L) }
 
-    val tab = AppTab.entries[selectedTab.coerceIn(AppTab.entries.indices)]
     val showRecordingToolbar =
-        recordingState.phase == RecordingPhase.RECORDING && tab != AppTab.RECORD
+        recordingState.phase == RecordingPhase.RECORDING && currentRoute != AppRoute.Record
     val canBlur = settings.navigationBlur && Build.VERSION.SDK_INT >= 33
     // The blur library needs RuntimeShader (API 33+). Do not even allocate the
     // backdrop on older devices; the nav bar uses its translucent fallback.
@@ -222,49 +264,73 @@ fun RecorderApp(
             CompositionLocalProvider(
                 LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
             ) {
-                when (tab) {
-                    AppTab.RECORD -> RecordScreen(
-                        settings = settings,
-                        recordingState = recordingState,
-                        lastRecording = lastRecording,
-                        timerMs = timerMs,
-                        rootStatus = rootStatus,
-                        checkingRoot = checkingRoot || rootStatus == RootStatus.Checking,
-                        snackbarHostState = snackbarHostState,
-                        onSettingsChange = onSettingsChange,
-                        onCaptureModeChange = changeCaptureMode,
-                        onCheckRoot = {
-                            rootCheckRequest++
-                            if (settings.captureMode != CaptureMode.ROOT) {
-                                changeCaptureMode(CaptureMode.ROOT)
-                            }
-                        },
-                        onStart = onStart,
-                        onStop = onStop,
-                        onOpenRecording = onOpenRecording,
-                        onShareRecording = onShareRecording,
-                    )
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.fillMaxSize(),
+                    onBack = {
+                        // Never empty the stack: at the root the system back
+                        // gesture exits the app instead.
+                        if (backStack.size > 1) backStack.removeLastOrNull()
+                    },
+                    transition = NavTransitions.MiuixDefault,
+                    effects = NavDisplayEffects(
+                        // Follow the physical screen corner while the incoming
+                        // page slides over the covered one, and let the default
+                        // transition own the scrim curve along the motion.
+                        cornerClipRadius = navCornerRadius,
+                        dimAmount = 0.32f,
+                        blockInputDuringTransition = true,
+                        backdropColor = palette.background,
+                    ),
+                ) {
+                    entry<AppRoute.Record> {
+                        RecordScreen(
+                            settings = settings,
+                            recordingState = recordingState,
+                            lastRecording = lastRecording,
+                            timerMs = timerMs,
+                            rootStatus = rootStatus,
+                            checkingRoot = checkingRoot || rootStatus == RootStatus.Checking,
+                            snackbarHostState = snackbarHostState,
+                            onSettingsChange = onSettingsChange,
+                            onCaptureModeChange = changeCaptureMode,
+                            onCheckRoot = {
+                                rootCheckRequest++
+                                if (settings.captureMode != CaptureMode.ROOT) {
+                                    changeCaptureMode(CaptureMode.ROOT)
+                                }
+                            },
+                            onStart = onStart,
+                            onStop = onStop,
+                            onOpenRecording = onOpenRecording,
+                            onShareRecording = onShareRecording,
+                        )
+                    }
 
-                    AppTab.VIDEOS -> VideosScreen(
-                        recordings = recordings,
-                        isLoading = recordingsLoading,
-                        snackbarHostState = snackbarHostState,
-                        onRefresh = onRefreshRecordings,
-                        onOpen = onOpenRecording,
-                        onShare = onShareRecording,
-                        onRename = onRenameRecording,
-                        onDelete = onDeleteRecording,
-                    )
+                    entry<AppRoute.Videos>(swipeDismiss = swipeDismiss) {
+                        VideosScreen(
+                            recordings = recordings,
+                            isLoading = recordingsLoading,
+                            snackbarHostState = snackbarHostState,
+                            onRefresh = onRefreshRecordings,
+                            onOpen = onOpenRecording,
+                            onShare = onShareRecording,
+                            onRename = onRenameRecording,
+                            onDelete = onDeleteRecording,
+                        )
+                    }
 
-                    AppTab.SETTINGS -> SettingsScreen(
-                        settings = settings,
-                        snackbarHostState = snackbarHostState,
-                        updateChecking = updateChecking,
-                        onSettingsChange = onSettingsChange,
-                        onCheckForUpdates = checkForUpdates,
-                        onOpenUrl = onOpenUrl,
-                        onShowHelp = { showHelp = true },
-                    )
+                    entry<AppRoute.Settings>(swipeDismiss = swipeDismiss) {
+                        SettingsScreen(
+                            settings = settings,
+                            snackbarHostState = snackbarHostState,
+                            updateChecking = updateChecking,
+                            onSettingsChange = onSettingsChange,
+                            onCheckForUpdates = checkForUpdates,
+                            onOpenUrl = onOpenUrl,
+                            onShowHelp = { showHelp = true },
+                        )
+                    }
                 }
             }
         }
@@ -286,7 +352,20 @@ fun RecorderApp(
                 ),
             ),
             selectedIndex = selectedTab,
-            onSelect = { selectedTab = it },
+            onSelect = { index ->
+                val target = appRouteAt(index)
+                val existing = backStack.indexOf(target)
+                if (existing >= 0) {
+                    // Re-selecting a tab that is already below the top is a
+                    // multi-pop: miuix-nav sweeps the whole depth range in one
+                    // continuous reverse motion instead of cross-fading.
+                    while (backStack.size > existing + 1) {
+                        backStack.removeAt(backStack.lastIndex)
+                    }
+                } else {
+                    backStack.add(target)
+                }
+            },
             blurEnabled = settings.navigationBlur,
             iosLabels = settings.navigationIosLabels,
             backdrop = if (canBlur) backdrop else null,

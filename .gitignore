@@ -13,3 +13,4 @@ app/build
 /.signing/
 *.jks
 *.keystore
+/docs

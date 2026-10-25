@@ -18,6 +18,7 @@ val hasReleaseSigning = listOf(
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -112,6 +113,14 @@ dependencies {
     implementation("top.yukonga.miuix.kmp:miuix-preference-android:0.9.4")
     implementation("top.yukonga.miuix.kmp:miuix-icons-android:0.9.4")
     implementation("top.yukonga.miuix.kmp:miuix-blur-android:0.9.4")
+    // Continuous-corner (squircle) shapes for the floating glass navigation bar.
+    implementation("top.yukonga.miuix.kmp:miuix-squircle-android:0.9.4")
+
+    // Continuous-depth navigation runtime. The back stack is a single
+    // Animatable<Float>, so tab pushes/pops and the swipe-back gesture share the
+    // same transition and velocity handoff.
+    implementation("top.yukonga.miuix.kmp:miuix-nav-android:0.9.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     // Optional Material 3 presentation for people who prefer stock Android.
     implementation("androidx.compose.material3:material3:1.4.0")

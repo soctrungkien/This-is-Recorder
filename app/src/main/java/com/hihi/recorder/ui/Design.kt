@@ -1,13 +1,23 @@
 package com.hihi.recorder.ui
 
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,18 +32,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Badge as MaterialBadge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults as MaterialCardDefaults
 import androidx.compose.material3.CircularProgressIndicator as MaterialProgress
@@ -62,23 +73,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.hihi.recorder.R
 import com.hihi.recorder.data.UiStyle
 import top.yukonga.miuix.kmp.basic.Badge as MiuixBadge
+import top.yukonga.miuix.kmp.basic.BadgedBox as MiuixBadgedBox
 import top.yukonga.miuix.kmp.basic.BasicComponent as MiuixBasicComponent
 import top.yukonga.miuix.kmp.basic.Button as MiuixButton
 import top.yukonga.miuix.kmp.basic.ButtonDefaults as MiuixButtonDefaults
@@ -88,16 +105,11 @@ import top.yukonga.miuix.kmp.basic.CircularProgressIndicator as MiuixProgress
 import top.yukonga.miuix.kmp.basic.HorizontalDivider as MiuixHorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon as MiuixIcon
 import top.yukonga.miuix.kmp.basic.IconButton as MiuixIconButton
-import top.yukonga.miuix.kmp.basic.NavigationBar as MiuixNavigationBar
-import top.yukonga.miuix.kmp.basic.NavigationBarDefaults as MiuixNavigationBarDefaults
-import top.yukonga.miuix.kmp.basic.NavigationBarDisplayMode
-import top.yukonga.miuix.kmp.basic.NavigationBarItem as MiuixNavigationBarItem
 import top.yukonga.miuix.kmp.basic.RadioButton as MiuixRadioButton
 import top.yukonga.miuix.kmp.basic.Scaffold as MiuixScaffold
 import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.SnackbarHost
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
-import top.yukonga.miuix.kmp.basic.Surface as MiuixSurface
 import top.yukonga.miuix.kmp.basic.Switch as MiuixSwitch
 import top.yukonga.miuix.kmp.basic.TabRow as MiuixTabRow
 import top.yukonga.miuix.kmp.basic.TabRowDefaults as MiuixTabRowDefaults
@@ -118,6 +130,9 @@ import top.yukonga.miuix.kmp.blur.BlurDefaults
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.highlight.Highlight
 import top.yukonga.miuix.kmp.blur.textureBlur
+import top.yukonga.miuix.kmp.squircle.squircleBorder
+import top.yukonga.miuix.kmp.squircle.squircleClip
+import top.yukonga.miuix.kmp.squircle.squircleSurface
 
 @Immutable
 data class AppPalette(
@@ -142,9 +157,11 @@ data class AppPalette(
     val onHeroContainer: Color get() = onPrimaryContainer
     val glassTint: Color
         get() = if (isDark) {
-            surface.copy(alpha = 0.48f)
+            // Lift the frost above the page background so the floating bar keeps
+            // its edge-defined glass look instead of dissolving into dark scenes.
+            surfaceContainer.copy(alpha = 0.62f)
         } else {
-            surface.copy(alpha = 0.62f)
+            surface.copy(alpha = 0.72f)
         }
 }
 
@@ -1270,7 +1287,8 @@ fun GlassNavigationBar(
     modifier: Modifier = Modifier,
 ) {
     val palette = appPalette()
-    val shape = RoundedCornerShape(28.dp)
+    val cornerRadius = 28.dp
+    val shape = RoundedCornerShape(cornerRadius)
     val canBlur = blurEnabled && backdrop != null && Build.VERSION.SDK_INT >= 33
     // A light top sheen and a darker lower edge give the flat glass panel the
     // curved, refractive depth of an iOS 26 liquid glass bar.
@@ -1321,96 +1339,114 @@ fun GlassNavigationBar(
             modifier = Modifier
                 .fillMaxSize()
                 .background(sheen),
-            contentAlignment = Alignment.Center,
         ) {
-            if (LocalUiStyle.current == UiStyle.MIUIX) {
-                MiuixNavigationBar(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.Transparent,
-                    showDivider = false,
-                    defaultWindowInsetsPadding = false,
-                    mode = if (iosLabels) {
-                        NavigationBarDisplayMode.IconWithSelectedLabel
-                    } else {
-                        NavigationBarDisplayMode.IconAndText
-                    },
-                ) {
-                    items.forEachIndexed { index, item ->
-                        MiuixNavigationBarItem(
-                            selected = index == selectedIndex,
-                            onClick = { onSelect(index) },
-                            icon = item.icon,
-                            label = item.label,
-                            colors = MiuixNavigationBarDefaults.navigationBarItemColors(
-                                unselectedContentColor = palette.onSurface,
-                                selectedContentColor = palette.primary,
-                            ),
-                            badge = if (item.badgeCount > 0) {
-                                {
-                                    MiuixBadge(
-                                        containerColor = palette.primary,
-                                        contentColor = palette.onPrimary,
-                                    ) {
-                                        MiuixText(
-                                            text = if (item.badgeCount > 99) {
-                                                "99+"
-                                            } else {
-                                                item.badgeCount.toString()
-                                            },
-                                            style = MiuixTheme.textStyles.footnote2,
-                                            maxLines = 1,
-                                        )
-                                    }
-                                }
-                            } else {
-                                null
-                            },
-                        )
-                    }
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp, vertical = 7.dp),
+            ) {
+                val slotWidth = maxWidth / items.size.toFloat()
+                val pillOffset by animateDpAsState(
+                    targetValue = slotWidth * selectedIndex,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessMediumLow,
+                    ),
+                    label = "navSelectionPill",
+                )
+                val pillFill = if (palette.isDark) {
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.16f),
+                            Color.White.copy(alpha = 0.06f),
+                        ),
+                    )
+                } else {
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.80f),
+                            Color.White.copy(alpha = 0.44f),
+                        ),
+                    )
                 }
-            } else {
+                val pillBorder = if (palette.isDark) {
+                    Color.White.copy(alpha = 0.14f)
+                } else {
+                    Color.White.copy(alpha = 0.88f)
+                }
+
+                // The selection pill is the only moving part of the bar. Keeping
+                // it in one composable means the spring animates a single offset
+                // instead of cross-fading per-item backgrounds, which is what
+                // gives the bar its iOS-like glide when tabs change.
+                Box(
+                    modifier = Modifier
+                        // Deferred offset: the spring animates the pill without
+                        // recomposing the bar on every frame.
+                        .offset { IntOffset(pillOffset.roundToPx(), 0) }
+                        .width(slotWidth)
+                        .fillMaxHeight()
+                        .padding(horizontal = 3.dp)
+                        .squircleClip(19.dp)
+                        .background(pillFill)
+                        .squircleBorder(0.75.dp, pillBorder, 19.dp),
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        .selectableGroup(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     items.forEachIndexed { index, item ->
                         val selected = index == selectedIndex
-                        val fill by animateColorAsState(
+                        val showLabel = !iosLabels || selected
+                        val tint by animateColorAsState(
                             targetValue = if (selected) {
-                                palette.primary.copy(alpha = if (palette.isDark) 0.24f else 0.15f)
+                                palette.primary
                             } else {
-                                Color.Transparent
+                                palette.onSurfaceVariant
                             },
-                            label = "navItemFill",
+                            animationSpec = tween(durationMillis = 220),
+                            label = "navItemTint$index",
                         )
+                        val iconScale by animateFloatAsState(
+                            targetValue = if (selected) 1.08f else 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                            label = "navIconScale$index",
+                        )
+
                         Column(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .clip(RoundedCornerShape(22.dp))
-                                .background(fill)
-                                .clickable { onSelect(index) }
-                                .padding(vertical = 6.dp),
+                                .squircleClip(19.dp)
+                                .selectable(
+                                    selected = selected,
+                                    role = Role.Tab,
+                                    onClick = { onSelect(index) },
+                                )
+                                .padding(vertical = 2.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {
-                            BadgedBox(
+                            MiuixBadgedBox(
                                 badge = {
                                     if (item.badgeCount > 0) {
-                                        MaterialBadge(
+                                        MiuixBadge(
                                             containerColor = palette.primary,
                                             contentColor = palette.onPrimary,
                                         ) {
-                                            MaterialText(
+                                            MiuixText(
                                                 text = if (item.badgeCount > 99) {
                                                     "99+"
                                                 } else {
                                                     item.badgeCount.toString()
                                                 },
-                                                style = MaterialTheme.typography.labelSmall,
+                                                style = MiuixTheme.textStyles.footnote2,
                                                 maxLines = 1,
                                             )
                                         }
@@ -1419,29 +1455,42 @@ fun GlassNavigationBar(
                             ) {
                                 AppIcon(
                                     icon = item.icon,
+                                    // The icon always carries the accessible
+                                    // name so collapsing the label never makes
+                                    // an unselected tab nameless.
                                     contentDescription = item.label,
-                                    modifier = Modifier.size(21.dp),
-                                    tint = if (selected) {
-                                        palette.primary
-                                    } else {
-                                        palette.onSurfaceVariant
-                                    },
+                                    modifier = Modifier
+                                        .size(22.dp)
+                                        .scale(iconScale),
+                                    tint = tint,
                                 )
                             }
-                            if (!iosLabels || selected) {
-                                Spacer(Modifier.height(2.dp))
-                                AppText(
-                                    text = item.label,
-                                    style = AppTextStyle.Footnote,
-                                    color = if (selected) {
-                                        palette.primary
-                                    } else {
-                                        palette.onSurfaceVariant
-                                    },
-                                    fontWeight = if (selected) FontWeight.SemiBold else null,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
+                            AnimatedVisibility(
+                                visible = showLabel,
+                                enter = fadeIn(tween(220)) +
+                                    expandVertically(tween(220)),
+                                exit = fadeOut(tween(140)) +
+                                    shrinkVertically(tween(180)),
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Spacer(Modifier.height(2.dp))
+                                    AppText(
+                                        text = item.label,
+                                        // The visual label duplicates the icon's
+                                        // content description; keep TalkBack
+                                        // reading the tab name exactly once.
+                                        modifier = Modifier.clearAndSetSemantics { },
+                                        style = AppTextStyle.Footnote,
+                                        color = tint,
+                                        fontWeight = if (selected) {
+                                            FontWeight.SemiBold
+                                        } else {
+                                            FontWeight.Normal
+                                        },
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
                             }
                         }
                     }
@@ -1451,16 +1500,28 @@ fun GlassNavigationBar(
     }
 
     if (canBlur) {
-        Box(modifier = containerModifier.then(glassModifier)) {
+        Box(
+            modifier = containerModifier
+                .then(glassModifier)
+                .squircleClip(cornerRadius),
+        ) {
             navContent()
         }
     } else {
-        MiuixSurface(
-            modifier = containerModifier,
-            shape = shape,
-            color = palette.surface.copy(alpha = 0.96f),
-            border = BorderStroke(1.dp, palette.outline.copy(alpha = 0.45f)),
-            shadowElevation = 4.dp,
+        // The glass uses continuous corners; match that silhouette in the
+        // non-blur fallback instead of mixing a circular rounded rect with it.
+        Box(
+            modifier = containerModifier
+                .shadow(4.dp, shape, clip = false)
+                .squircleSurface(
+                    color = palette.surfaceContainerHigh.copy(alpha = 0.97f),
+                    cornerRadius = cornerRadius,
+                )
+                .squircleBorder(
+                    width = 1.dp,
+                    color = palette.outline.copy(alpha = 0.35f),
+                    cornerRadius = cornerRadius,
+                ),
         ) {
             navContent()
         }
