@@ -82,7 +82,8 @@ class ProjectMediaAppOp(context: Context) {
         val result = try {
             ShellSessions.withSession(appContext, backend) { session ->
                 session.exec(
-                    "appops get ${shellQuote(packageName)} android:project_media",
+                    // Sửa thành PROJECT_MEDIA chuẩn của appops
+                    "appops get ${shellQuote(packageName)} PROJECT_MEDIA",
                     timeoutMs = 15_000L,
                 )
             }
@@ -109,7 +110,8 @@ class ProjectMediaAppOp(context: Context) {
     ): Boolean = try {
         ShellSessions.withSession(appContext, backend) { session ->
             val result = session.exec(
-                "appops set ${shellQuote(packageName)} android:project_media " +
+                // Sửa thành PROJECT_MEDIA chuẩn của appops
+                "appops set ${shellQuote(packageName)} PROJECT_MEDIA " +
                     shellQuote(mode),
                 timeoutMs = 15_000L,
             )
@@ -153,8 +155,8 @@ class ProjectMediaAppOp(context: Context) {
         private const val MODE_FOREGROUND = "foreground"
 
         private val MODE_PATTERN = Regex(
-            // AOSP prints the public op name (PROJECT_MEDIA); some OEMs print
-            // the android:project_media spelling accepted by `appops`.
+            // Vẫn giữ bắt dạng `android:project_media` hoặc `PROJECT_MEDIA` ở kết quả trả về
+            // để tương thích với các OEM in ra định dạng đầy đủ.
             """(?:android:)?project_media:\s*([A-Za-z]+)""",
             RegexOption.IGNORE_CASE,
         )
