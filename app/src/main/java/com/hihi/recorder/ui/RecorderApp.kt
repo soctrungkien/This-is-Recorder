@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -214,12 +215,30 @@ fun RecorderApp(
         (navigationBarHeight - navigationBarInset).coerceAtLeast(0.dp)
 
     // Blur is a general capability: the liquid bar and the About page can both
-    // sample this backdrop. Allocate it whenever the user enabled blur and
+    // sample a backdrop. Allocate one whenever the user enabled blur and
     // RuntimeShader exists (Android 13+), regardless of the navbar style.
+    //
+    // Two layers are needed because a layer must never contain the surfaces
+    // that sample it: the recorded display list would reference its own
+    // RenderNode, and HWUI would recurse through prepareTreeImpl until the
+    // RenderThread stack overflows.
     val canBlur = settings.navigationBlur && Build.VERSION.SDK_INT >= 33
-    val backdrop = if (canBlur) {
+    // Sampled by glass surfaces that live inside the page tree (top app bars,
+    // About cards), so it may only record the ambient background behind them.
+    val surfaceBackdrop = if (canBlur) {
         rememberLayerBackdrop {
             drawRect(palette.background)
+            drawContent()
+        }
+    } else {
+        null
+    }
+    // Sampled by the floating navigation bar, which is a sibling overlay rather
+    // than a descendant of the page, so it can safely record the page content.
+    val navigationBackdrop = if (canBlur && useLiquidNavigation) {
+        rememberLayerBackdrop {
+            drawRect(palette.background)
+            drawAmbientGlow(palette)
             drawContent()
         }
     } else {
@@ -331,21 +350,38 @@ fun RecorderApp(
             .fillMaxSize()
             .background(palette.background),
     ) {
+        // Ambient background layer: recorded for the top bars and About cards.
+        // It deliberately contains no blur consumers.
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .then(
-                    if (backdrop != null) {
-                        Modifier.layerBackdrop(backdrop)
+                    if (surfaceBackdrop != null) {
+                        Modifier.layerBackdrop(surfaceBackdrop)
                     } else {
                         Modifier
                     },
                 ),
         ) {
             AmbientGlow(palette = palette)
+        }
+
+        // Page content layer: recorded for the floating navigation bar, which
+        // is drawn outside this subtree.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (navigationBackdrop != null) {
+                        Modifier.layerBackdrop(navigationBackdrop)
+                    } else {
+                        Modifier
+                    },
+                ),
+        ) {
             CompositionLocalProvider(
                 LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
-                LocalAppBackdrop provides backdrop,
+                LocalAppBackdrop provides surfaceBackdrop,
             ) {
                 NavDisplay(
                     backStack = backStack,
@@ -423,7 +459,7 @@ fun RecorderApp(
                     entry<AppRoute.About>(swipeDismiss = swipeDismiss) {
                         AboutPage(
                             snackbarHostState = snackbarHostState,
-                            backdrop = backdrop,
+                            backdrop = surfaceBackdrop,
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()
                             },
@@ -478,7 +514,7 @@ fun RecorderApp(
                     },
                     selectedIndex = selectedTab,
                     onItemClick = selectTab,
-                    backdrop = backdrop,
+                    backdrop = navigationBackdrop,
                     isBlurActive = canBlur,
                     isDark = palette.isDark,
                     badge = { index ->
@@ -667,34 +703,40 @@ private fun AmbientGlow(palette: AppPalette) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .drawBehind {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            palette.primary.copy(alpha = if (palette.isDark) 0.16f else 0.12f),
-                            Color.Transparent,
-                        ),
-                        center = Offset(size.width * 0.88f, size.height * 0.08f),
-                        radius = size.minDimension * 0.7f,
-                    ),
-                    radius = size.minDimension * 0.7f,
-                    center = Offset(size.width * 0.88f, size.height * 0.08f),
-                )
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            palette.primary.copy(
-                                alpha = if (palette.isDark) 0.09f else 0.07f,
-                            ),
-                            Color.Transparent,
-                        ),
-                        center = Offset(size.width * 0.05f, size.height * 0.82f),
-                        radius = size.minDimension * 0.55f,
-                    ),
-                    radius = size.minDimension * 0.55f,
-                    center = Offset(size.width * 0.05f, size.height * 0.82f),
-                )
-            },
+            .drawBehind { drawAmbientGlow(palette) },
+    )
+}
+
+/**
+ * Shared ambient gradient. It is drawn on screen and also recorded into the
+ * bar backdrops, so the glass bars keep the same tint as the page behind them.
+ */
+private fun DrawScope.drawAmbientGlow(palette: AppPalette) {
+    drawCircle(
+        brush = Brush.radialGradient(
+            colors = listOf(
+                palette.primary.copy(alpha = if (palette.isDark) 0.16f else 0.12f),
+                Color.Transparent,
+            ),
+            center = Offset(size.width * 0.88f, size.height * 0.08f),
+            radius = size.minDimension * 0.7f,
+        ),
+        radius = size.minDimension * 0.7f,
+        center = Offset(size.width * 0.88f, size.height * 0.08f),
+    )
+    drawCircle(
+        brush = Brush.radialGradient(
+            colors = listOf(
+                palette.primary.copy(
+                    alpha = if (palette.isDark) 0.09f else 0.07f,
+                ),
+                Color.Transparent,
+            ),
+            center = Offset(size.width * 0.05f, size.height * 0.82f),
+            radius = size.minDimension * 0.55f,
+        ),
+        radius = size.minDimension * 0.55f,
+        center = Offset(size.width * 0.05f, size.height * 0.82f),
     )
 }
 

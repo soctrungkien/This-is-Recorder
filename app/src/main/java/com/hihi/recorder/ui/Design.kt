@@ -191,9 +191,12 @@ fun appPalette(): AppPalette {
 val LocalExtraBottomPadding = staticCompositionLocalOf { 0.dp }
 
 /**
- * Shared backdrop recorded behind the navigation content. It lets the liquid
- * navigation bar, the top app bar, and About cards sample the same glass layer.
- * Null when blur is disabled or RuntimeShader is unavailable.
+ * Backdrop for glass surfaces that live inside the page tree (top app bars and
+ * About cards). It records only the ambient background, so a surface that
+ * samples it is never a descendant of the recorded layer. Recording a blur
+ * consumer into the backdrop it samples creates a self-referencing RenderNode,
+ * which HWUI walks recursively and crashes the RenderThread with a stack
+ * overflow.
  */
 val LocalAppBackdrop = staticCompositionLocalOf<LayerBackdrop?> { null }
 
@@ -1183,7 +1186,7 @@ fun AppScaffold(
         .calculateBottomPadding()
     val extraBottomPadding = LocalExtraBottomPadding.current
 
-    // The top bar uses the same backdrop as the navigation bar and About cards.
+    // The top bar samples the ambient backdrop shared with the About cards.
     // A null backdrop (blur off, or Android < 13) keeps the original solid bar.
     val backdrop = LocalAppBackdrop.current
     val topBarBlurColors = if (backdrop != null) {
