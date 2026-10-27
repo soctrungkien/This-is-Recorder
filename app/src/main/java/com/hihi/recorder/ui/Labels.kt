@@ -133,7 +133,7 @@ fun RootStatus.summary(): String = when (this) {
 @Composable
 fun recordingSummary(settings: RecorderSettings): String {
     val mode = settings.captureMode.label()
-    val audio = settings.effectiveAudio.label()
+    val audio = settings.audioSource.label()
     val resolution = settings.resolution.label()
     return if (settings.captureMode == CaptureMode.ROOT) {
         stringResource(R.string.recording_summary_root, mode, audio, resolution)

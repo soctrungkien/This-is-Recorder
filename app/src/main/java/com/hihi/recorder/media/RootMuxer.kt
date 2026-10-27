@@ -4,7 +4,6 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
-import android.os.SystemClock
 import com.hihi.recorder.root.RootShell
 import java.io.Closeable
 import java.io.File
@@ -13,12 +12,19 @@ import java.nio.ByteBuffer
 data class RootSegment(
     val file: File,
     val startElapsedMs: Long,
+    val endElapsedMs: Long,
 )
 
 /**
  * Joins the short screenrecord segments produced by root mode into one MP4 and
  * optionally adds the microphone track. Video gaps between segments are kept so
- * the continuous microphone audio stays in sync with wall-clock time.
+ * the continuous audio track stays in sync with wall-clock time.
+ *
+ * The start of a segment is derived from its end time and its encoded duration
+ * rather than from the moment the shell process was spawned. `su`, the shell
+ * script and MediaCodec initialization add a variable delay before
+ * `screenrecord` captures its first frame, and using the spawn time would make
+ * the picture lead the sound by that delay.
  */
 object RootMuxer {
 
@@ -64,11 +70,19 @@ object RootMuxer {
         val height: Int,
     )
 
+    private data class MeasuredSegment(
+        val segment: RootSegment,
+        val format: MediaFormat,
+        val startElapsedMs: Long,
+        val width: Int,
+        val height: Int,
+    )
+
     private fun validate(
         segments: List<RootSegment>,
         timelineStartElapsedMs: Long,
     ): List<ValidSegment> {
-        val result = mutableListOf<ValidSegment>()
+        val measured = mutableListOf<MeasuredSegment>()
         for (segment in segments) {
             if (!segment.file.isFile || segment.file.length() <= 0L) continue
             val extractor = MediaExtractor()
@@ -89,16 +103,29 @@ object RootMuxer {
                 val height = format.getInteger(MediaFormat.KEY_HEIGHT)
                 if (width <= 0 || height <= 0) continue
 
-                if (result.isNotEmpty()) {
-                    val first = result.first()
+                if (measured.isNotEmpty()) {
+                    val first = measured.first()
                     if (first.width != width || first.height != height) continue
                 }
 
-                result += ValidSegment(
+                // Prefer end-minus-duration: it ignores the process startup
+                // delay and therefore matches the first captured frame. Fall
+                // back to the spawn timestamp if the track has no duration.
+                val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) {
+                    format.getLong(MediaFormat.KEY_DURATION)
+                } else {
+                    0L
+                }
+                val startElapsedMs = if (durationUs > 0L) {
+                    segment.endElapsedMs - durationUs / 1_000L
+                } else {
+                    segment.startElapsedMs
+                }
+
+                measured += MeasuredSegment(
                     segment = segment,
                     format = format,
-                    offsetUs = ((segment.startElapsedMs - timelineStartElapsedMs) * 1000L)
-                        .coerceAtLeast(0L),
+                    startElapsedMs = startElapsedMs,
                     width = width,
                     height = height,
                 )
@@ -108,7 +135,27 @@ object RootMuxer {
                 runCatching { extractor.release() }
             }
         }
-        return result
+
+        if (measured.isEmpty()) return emptyList()
+        // With audio, the caller passes the first audio sample's wall-clock
+        // time. Without audio, the first segment defines the timeline origin,
+        // so the video starts at zero instead of after a black gap.
+        val originElapsedMs = if (timelineStartElapsedMs > 0L) {
+            timelineStartElapsedMs
+        } else {
+            measured.first().startElapsedMs
+        }
+
+        return measured.map { item ->
+            ValidSegment(
+                segment = item.segment,
+                format = item.format,
+                offsetUs = ((item.startElapsedMs - originElapsedMs) * 1_000L)
+                    .coerceAtLeast(0L),
+                width = item.width,
+                height = item.height,
+            )
+        }
     }
 
     private fun combineInternal(

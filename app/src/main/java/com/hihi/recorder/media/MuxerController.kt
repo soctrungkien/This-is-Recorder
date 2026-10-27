@@ -11,6 +11,7 @@ import java.io.File
  */
 class MuxerController(
     outputFile: File,
+    private val expectVideo: Boolean = true,
 ) {
     private val muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
     private val lock = Object()
@@ -52,6 +53,7 @@ class MuxerController(
     }
 
     fun writeVideo(info: MediaCodec.BufferInfo, buffer: java.nio.ByteBuffer) {
+        if (!expectVideo) return
         synchronized(lock) {
             awaitStartLocked()
             if (videoTrack < 0 || info.size <= 0) return
@@ -108,10 +110,15 @@ class MuxerController(
 
     private fun maybeStartLocked() {
         if (started || released) return
-        val video = videoFormat ?: return
+        if (expectVideo && videoFormat == null) return
         if (expectedAudio && audioFormat == null) return
+        // An audio-only muxer whose source failed has no tracks to start; it is
+        // simply released without ever starting.
+        if (!expectVideo && !expectedAudio) return
 
-        videoTrack = muxer.addTrack(video)
+        if (expectVideo) {
+            videoTrack = muxer.addTrack(videoFormat!!)
+        }
         if (expectedAudio) {
             audioTrack = muxer.addTrack(audioFormat!!)
         }

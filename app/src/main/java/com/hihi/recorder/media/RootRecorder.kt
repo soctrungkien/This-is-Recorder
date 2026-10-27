@@ -1,8 +1,9 @@
 package com.hihi.recorder.media
 
 import android.content.Context
-import android.media.MediaRecorder
-import android.os.Build
+import android.media.projection.MediaProjection
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import com.hihi.recorder.R
 import com.hihi.recorder.data.RecorderSettings
@@ -27,14 +28,18 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Root recording engine. `screenrecord` captures video in 180 second chunks
- * without MediaProjection consent, while a MediaRecorder captures the
- * microphone continuously. On stop the chunks and microphone track are remuxed
- * into a single MP4.
+ * without MediaProjection consent. Audio is captured through the same
+ * [PcmAudioSource] + [AacEncoder] pipeline as standard mode, so microphone,
+ * phone audio and the mix all work. The audio start timestamp is the timeline
+ * origin; every video segment is offset against it when the files are joined,
+ * keeping picture and sound aligned in wall-clock time.
  */
 class RootRecorder(
     private val context: Context,
     private val settings: RecorderSettings,
     private val outputFile: File,
+    private val projection: MediaProjection?,
+    private val onProjectionStopped: () -> Unit,
     private val onUnexpectedStop: () -> Unit,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -46,12 +51,14 @@ class RootRecorder(
     private val segmentLock = Any()
 
     private var sessionDir: File? = null
-    private var micFile: File? = null
-    private var recorder: MediaRecorder? = null
+    private var audioFile: File? = null
+    private var audioCapture: AudioCapture? = null
+    private var audioMuxer: MuxerController? = null
+    private var projectionCallback: MediaProjection.Callback? = null
     private var segmentJob: Job? = null
     private var timelineStartElapsedMs = 0L
     private var audioStartElapsedMs = 0L
-    private var recorderStarted = false
+    private var audioStarted = false
     private var failure: Throwable? = null
 
     @Volatile
@@ -87,9 +94,9 @@ class RootRecorder(
         }
 
         if (settings.usesAudio) {
-            startMicrophone(directory)
+            startAudio(directory)
         }
-        timelineStartElapsedMs = if (recorderStarted) audioStartElapsedMs else 0L
+        timelineStartElapsedMs = if (audioStarted) audioStartElapsedMs else 0L
 
         segmentJob = scope.launch {
             segmentLoop(
@@ -113,6 +120,11 @@ class RootRecorder(
         stopping.set(true)
         signalCurrentProcess()
 
+        // Stop the soundtrack as soon as the user stops. The video process may
+        // need a moment to finalize its moov atom; recording extra audio after
+        // the stop would only add an unrelated tail to the file.
+        stopAudio()
+
         segmentJob?.let { job ->
             withTimeoutOrNull(20_000L) { job.join() }
             if (job.isActive) {
@@ -125,8 +137,6 @@ class RootRecorder(
         }
         segmentJob = null
 
-        stopMicrophone()
-
         val recorded = synchronized(segmentLock) { segments.toList() }
         if (recorded.isEmpty()) {
             val error = failure
@@ -135,7 +145,7 @@ class RootRecorder(
             throw IllegalStateException(context.getString(R.string.error_root_no_video))
         }
 
-        val audio = micFile?.takeIf { it.isFile && it.length() > 0L }
+        val audio = audioFile?.takeIf { it.isFile && it.length() > 0L }
         try {
             RootMuxer.combine(
                 segments = recorded,
@@ -160,9 +170,123 @@ class RootRecorder(
         currentProcess.getAndSet(null)?.destroyForcibly()
         segmentJob?.cancel()
         segmentJob = null
-        stopMicrophone(deleteFile = true)
+        runCatching { audioCapture?.release() }
+        audioCapture = null
+        runCatching { audioMuxer?.abort() }
+        audioMuxer = null
+        stopProjection()
+        audioFile?.delete()
+        audioFile = null
+        audioStarted = false
         cleanup()
         runCatching { outputFile.delete() }
+    }
+
+    private fun startAudio(directory: File) {
+        try {
+            startAudioInternal(directory)
+        } catch (_: Throwable) {
+            // Audio is optional in root mode: the screenrecord video must still
+            // be recorded when the projector or encoder cannot be opened.
+            warning = context.getString(
+                if (settings.audioSource.usesDeviceAudio) {
+                    R.string.warning_internal_audio_unavailable
+                } else {
+                    R.string.warning_audio_unavailable
+                },
+            )
+            runCatching { audioCapture?.release() }
+            audioCapture = null
+            runCatching { audioMuxer?.abort() }
+            audioMuxer = null
+            stopProjection()
+            audioFile?.delete()
+            audioFile = null
+            audioStarted = false
+        }
+    }
+
+    private fun startAudioInternal(directory: File) {
+        val needsProjection = settings.audioSource.usesDeviceAudio
+        val activeProjection = projection
+        if (needsProjection) {
+            if (activeProjection == null) {
+                warning = context.getString(R.string.warning_internal_audio_unavailable)
+                return
+            }
+            val callback = object : MediaProjection.Callback() {
+                override fun onStop() {
+                    // Ignore the stop we initiate ourselves, either while
+                    // tearing down or when playback capture failed to start.
+                    if (stopping.get() || !audioStarted) return
+                    onProjectionStopped()
+                }
+            }
+            val registered = runCatching {
+                // Android 14 requires a callback before the projection is used.
+                activeProjection.registerCallback(callback, Handler(Looper.getMainLooper()))
+            }.isSuccess
+            if (!registered) {
+                warning = context.getString(R.string.warning_internal_audio_unavailable)
+                return
+            }
+            projectionCallback = callback
+        }
+
+        val file = File(directory, "audio.m4a")
+        val muxer = MuxerController(file, expectVideo = false)
+        muxer.setExpectAudio(true)
+        val capture = AudioCapture(
+            context = context,
+            audioSource = settings.audioSource,
+            projection = activeProjection,
+            muxer = muxer,
+        )
+        if (!capture.start()) {
+            warning = capture.warning
+            runCatching { muxer.abort() }
+            file.delete()
+            stopProjection()
+            return
+        }
+
+        audioCapture = capture
+        audioMuxer = muxer
+        audioFile = file
+        audioStarted = true
+        audioStartElapsedMs = capture.startedAtElapsedMs
+        warning = capture.warning
+    }
+
+    private fun stopAudio() {
+        val capture = audioCapture
+        val muxer = audioMuxer
+        audioCapture = null
+        audioMuxer = null
+
+        if (capture != null) {
+            val error = capture.stop()
+            if (error != null) {
+                warning = context.getString(R.string.warning_audio_stopped_video_saved)
+            }
+        }
+        if (muxer != null) {
+            runCatching { muxer.stop() }.onFailure {
+                warning = context.getString(R.string.warning_audio_stopped_video_saved)
+            }
+        }
+
+        audioStarted = false
+        stopProjection()
+    }
+
+    private fun stopProjection() {
+        val active = projection
+        projectionCallback?.let { callback ->
+            runCatching { active?.unregisterCallback(callback) }
+        }
+        projectionCallback = null
+        runCatching { active?.stop() }
     }
 
     private suspend fun segmentLoop(
@@ -180,9 +304,6 @@ class RootRecorder(
                 errorFile.delete()
 
                 val segmentStartedAt = SystemClock.elapsedRealtime()
-                if (timelineStartElapsedMs == 0L) {
-                    timelineStartElapsedMs = segmentStartedAt
-                }
 
                 val command = "sh ${RootShell.quote(script.absolutePath)} " +
                     "${RootShell.quote(file.absolutePath)} " +
@@ -231,6 +352,7 @@ class RootRecorder(
                 }
 
                 val exitCode = process.waitFor()
+                val segmentEndedAt = SystemClock.elapsedRealtime()
                 currentProcess.compareAndSet(process, null)
                 currentPid.set(0)
 
@@ -244,7 +366,7 @@ class RootRecorder(
                 val valid = file.isFile && file.length() > 0L
                 if (valid) {
                     synchronized(segmentLock) {
-                        segments += RootSegment(file, segmentStartedAt)
+                        segments += RootSegment(file, segmentStartedAt, segmentEndedAt)
                     }
                 }
 
@@ -284,54 +406,6 @@ class RootRecorder(
         }
     }
 
-    private fun startMicrophone(directory: File) {
-        if (settings.audioSource.usesDeviceAudio) {
-            warning = context.getString(R.string.warning_root_mic_only)
-        }
-        val file = File(directory, "microphone.m4a")
-        micFile = file
-        val created = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MediaRecorder(context)
-        } else {
-            @Suppress("DEPRECATION")
-            MediaRecorder()
-        }
-        recorder = created
-
-        try {
-            created.setAudioSource(MediaRecorder.AudioSource.MIC)
-            created.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            created.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            created.setAudioSamplingRate(AUDIO_SAMPLE_RATE)
-            created.setAudioEncodingBitRate(128_000)
-            created.setAudioChannels(1)
-            created.setOutputFile(file.absolutePath)
-            created.prepare()
-            created.start()
-            recorderStarted = true
-            audioStartElapsedMs = SystemClock.elapsedRealtime()
-        } catch (error: Throwable) {
-            runCatching { created.release() }
-            recorder = null
-            recorderStarted = false
-            file.delete()
-            warning = context.getString(R.string.warning_audio_unavailable)
-        }
-    }
-
-    private fun stopMicrophone(deleteFile: Boolean = false) {
-        val active = recorder
-        recorder = null
-        if (active != null) {
-            if (recorderStarted) {
-                runCatching { active.stop() }
-            }
-            runCatching { active.release() }
-        }
-        recorderStarted = false
-        if (deleteFile) micFile?.delete()
-    }
-
     private fun signalCurrentProcess() {
         val pid = currentPid.get()
         if (pid > 0) {
@@ -346,11 +420,18 @@ class RootRecorder(
     }
 
     private fun cleanup() {
+        runCatching { audioCapture?.release() }
+        audioCapture = null
+        runCatching { audioMuxer?.abort() }
+        audioMuxer = null
+        stopProjection()
+
         synchronized(segmentLock) { segments.clear() }
         sessionDir?.deleteRecursively()
         sessionDir = null
-        micFile = null
+        audioFile = null
         timelineStartElapsedMs = 0L
+        audioStarted = false
         scope.cancel()
     }
 

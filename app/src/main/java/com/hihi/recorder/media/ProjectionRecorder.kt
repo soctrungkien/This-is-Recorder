@@ -7,7 +7,6 @@ import android.media.projection.MediaProjection
 import android.os.Handler
 import android.os.Looper
 import com.hihi.recorder.R
-import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.RecorderSettings
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
@@ -27,8 +26,7 @@ class ProjectionRecorder(
     private var virtualDisplay: VirtualDisplay? = null
     private var muxer: MuxerController? = null
     private var videoEncoder: VideoEncoder? = null
-    private var audioSource: PcmAudioSource? = null
-    private var audioEncoder: AacEncoder? = null
+    private var audioCapture: AudioCapture? = null
     private var projectionCallback: MediaProjection.Callback? = null
     private val stopping = AtomicBoolean(false)
     private val started = AtomicBoolean(false)
@@ -89,68 +87,17 @@ class ProjectionRecorder(
     }
 
     private fun startAudio(createdMuxer: MuxerController) {
-        val candidates = audioCandidates()
-        for (candidate in candidates) {
-            val source = candidate.source
-            if (runCatching { source.start() }.isFailure) {
-                source.close()
-                continue
-            }
-
-            try {
-                val encoder = AacEncoder(source, createdMuxer)
-                encoder.start()
-                audioSource = source
-                audioEncoder = encoder
-                warning = candidate.warning
-                return
-            } catch (error: Throwable) {
-                runCatching { source.close() }
-            }
+        val capture = AudioCapture(
+            context = context,
+            audioSource = settings.audioSource,
+            projection = projection,
+            muxer = createdMuxer,
+        )
+        val started = capture.start()
+        if (started) {
+            audioCapture = capture
         }
-
-        warning = when {
-            settings.audioSource.usesDeviceAudio ->
-                context.getString(R.string.warning_internal_audio_unavailable)
-
-            else -> context.getString(R.string.warning_audio_unavailable)
-        }
-        createdMuxer.setExpectAudio(false)
-    }
-
-    private data class AudioCandidate(
-        val source: PcmAudioSource,
-        val warning: String?,
-    )
-
-    private fun audioCandidates(): List<AudioCandidate> {
-        val fallbackWarning = context.getString(R.string.warning_mixed_audio_fallback)
-        return when (settings.audioSource) {
-            AudioSource.NONE -> emptyList()
-
-            AudioSource.MICROPHONE -> listOf(
-                AudioCandidate(MicrophoneAudioSource(preferVoiceCommunication = false), null),
-            )
-
-            AudioSource.DEVICE -> listOf(
-                AudioCandidate(PlaybackAudioSource(projection), null),
-            )
-
-            AudioSource.MIC_AND_DEVICE -> listOf(
-                AudioCandidate(
-                    MixedAudioSource(
-                        MicrophoneAudioSource(preferVoiceCommunication = true),
-                        PlaybackAudioSource(projection),
-                    ),
-                    null,
-                ),
-                AudioCandidate(PlaybackAudioSource(projection), fallbackWarning),
-                AudioCandidate(
-                    MicrophoneAudioSource(preferVoiceCommunication = true),
-                    fallbackWarning,
-                ),
-            )
-        }
+        warning = capture.warning
     }
 
     /**
@@ -168,8 +115,9 @@ class ProjectionRecorder(
         runCatching { videoEncoder?.signalEndOfStream() }
             .onFailure { errors += it }
 
-        runCatching { audioEncoder?.stopAndAwait() }
-            .onFailure { errors += it }
+        val audioCapture = audioCapture
+        this.audioCapture = null
+        val audioError = audioCapture?.stop()
 
         val videoStopped = runCatching {
             videoEncoder?.awaitStopped(10_000L) ?: true
@@ -180,15 +128,12 @@ class ProjectionRecorder(
         videoEncoder?.error?.let { errors += it }
         // Losing the audio encoder must not throw away a healthy video file.
         // If the muxer itself was affected, its stop() below still reports it.
-        audioEncoder?.error?.let {
+        if (audioError != null) {
             warning = context.getString(R.string.warning_audio_stopped_video_saved)
         }
 
         runCatching { videoEncoder?.release() }
             .onFailure { errors += it }
-        audioEncoder?.release()
-        audioEncoder = null
-        audioSource = null
 
         val activeMuxer = muxer
         muxer = null
@@ -222,10 +167,8 @@ class ProjectionRecorder(
         runCatching { videoEncoder?.awaitStopped(2_000L) }
         runCatching { videoEncoder?.release() }
         videoEncoder = null
-        runCatching { audioEncoder?.release() }
-        audioEncoder = null
-        runCatching { audioSource?.close() }
-        audioSource = null
+        runCatching { audioCapture?.release() }
+        audioCapture = null
         projectionCallback?.let { callback ->
             runCatching { projection.unregisterCallback(callback) }
         }

@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
-import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.RecordingStateStore
 import com.hihi.recorder.data.SavedRecording
@@ -45,6 +44,7 @@ class MainActivity : ComponentActivity() {
     private val snackbarHostState = SnackbarHostState()
     private lateinit var projectionManager: MediaProjectionManager
     private var pendingStart: PendingStart? = null
+    private var projectionTarget: PendingStart? = null
 
     private var autoStartToken by mutableIntStateOf(0)
     private var checkingRoot by mutableStateOf(false)
@@ -54,9 +54,14 @@ class MainActivity : ComponentActivity() {
     private val projectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
+        val target = projectionTarget ?: PendingStart.STANDARD
+        projectionTarget = null
         val data = result.data
         if (result.resultCode == Activity.RESULT_OK && data != null) {
-            startStandardService(result.resultCode, data)
+            when (target) {
+                PendingStart.STANDARD -> startStandardService(result.resultCode, data)
+                PendingStart.ROOT -> startRootService(result.resultCode, data)
+            }
         } else {
             showMessage(getString(R.string.projection_denied))
         }
@@ -85,7 +90,7 @@ class MainActivity : ComponentActivity() {
             return@registerForActivityResult
         }
         when (pending) {
-            PendingStart.STANDARD -> requestProjection()
+            PendingStart.STANDARD -> requestProjection(PendingStart.STANDARD)
             PendingStart.ROOT -> beginRootStart()
             null -> Unit
         }
@@ -98,6 +103,9 @@ class MainActivity : ComponentActivity() {
             ?: error("MediaProjectionManager is unavailable")
         pendingStart = savedInstanceState
             ?.getString(KEY_PENDING_START)
+            ?.let { name -> runCatching { PendingStart.valueOf(name) }.getOrNull() }
+        projectionTarget = savedInstanceState
+            ?.getString(KEY_PROJECTION_TARGET)
             ?.let { name -> runCatching { PendingStart.valueOf(name) }.getOrNull() }
 
         if (savedInstanceState == null && intent?.getBooleanExtra(EXTRA_AUTO_START, false) == true) {
@@ -153,6 +161,7 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_PENDING_START, pendingStart?.name)
+        outState.putString(KEY_PROJECTION_TARGET, projectionTarget?.name)
     }
 
     override fun onDestroy() {
@@ -163,12 +172,6 @@ class MainActivity : ComponentActivity() {
     private fun beginStart() {
         if (RecordingStateStore.state.value.isActive) return
         val settings = settingsRepository.settings.value
-
-        // Root mode can only use the microphone. Downgrade a persisted internal
-        // audio choice instead of failing on a configuration the UI disallows.
-        if (settings.captureMode == CaptureMode.ROOT && settings.audioSource.usesDeviceAudio) {
-            settingsRepository.setAudioSource(AudioSource.MICROPHONE)
-        }
 
         val permissions = mutableListOf<String>()
         val needsAudio = settings.audioSource.requiresAudioPermission
@@ -194,9 +197,11 @@ class MainActivity : ComponentActivity() {
         }
 
         if (settings.captureMode == CaptureMode.ROOT) {
+            // Check root before asking for playback-capture consent: a device
+            // without su should show the root dialog, not a projection prompt.
             beginRootStart()
         } else {
-            requestProjection()
+            requestProjection(PendingStart.STANDARD)
         }
     }
 
@@ -207,14 +212,20 @@ class MainActivity : ComponentActivity() {
             val status = RootChecker.check(this@MainActivity, force = false)
             checkingRoot = false
             if (status == RootStatus.Available) {
-                startRootService()
+                if (settingsRepository.settings.value.audioSource.usesDeviceAudio) {
+                    // Root video needs no consent, but phone audio still goes
+                    // through MediaProjection's playback-capture API.
+                    requestProjection(PendingStart.ROOT)
+                } else {
+                    startRootService()
+                }
             } else {
                 showRootUnavailableDialog = true
             }
         }
     }
 
-    private fun requestProjection() {
+    private fun requestProjection(target: PendingStart) {
         val captureIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             projectionManager.createScreenCaptureIntent(
                 MediaProjectionConfig.createConfigForDefaultDisplay(),
@@ -222,11 +233,14 @@ class MainActivity : ComponentActivity() {
         } else {
             projectionManager.createScreenCaptureIntent()
         }
+        projectionTarget = target
         try {
             projectionLauncher.launch(captureIntent)
         } catch (_: ActivityNotFoundException) {
+            projectionTarget = null
             showMessage(getString(R.string.projection_unavailable))
         } catch (_: SecurityException) {
+            projectionTarget = null
             showMessage(getString(R.string.projection_unavailable))
         }
     }
@@ -243,9 +257,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startRootService() {
+    private fun startRootService(
+        resultCode: Int = Activity.RESULT_CANCELED,
+        data: Intent? = null,
+    ) {
         val intent = Intent(this, RecordingService::class.java)
             .setAction(RecordingService.ACTION_START)
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            intent
+                .putExtra(RecordingService.EXTRA_RESULT_CODE, resultCode)
+                .putExtra(RecordingService.EXTRA_RESULT_DATA, data)
+        }
         runCatching {
             ContextCompat.startForegroundService(this, intent)
         }.onFailure {
@@ -367,5 +389,6 @@ class MainActivity : ComponentActivity() {
         private const val UI_PREFS = "miuix_recorder_ui"
         private const val KEY_NOTIFICATION_ASKED = "notification_asked"
         private const val KEY_PENDING_START = "pending_start"
+        private const val KEY_PROJECTION_TARGET = "projection_target"
     }
 }

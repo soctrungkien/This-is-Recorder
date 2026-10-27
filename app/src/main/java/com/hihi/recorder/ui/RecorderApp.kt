@@ -3,6 +3,15 @@ package com.hihi.recorder.ui
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,7 +59,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
-import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.NavigationBarStyle
 import com.hihi.recorder.data.RecorderSettings
@@ -152,7 +160,6 @@ fun RecorderApp(
     val scope = rememberCoroutineScope()
     val palette = appPalette()
     val updateUpToDate = stringResource(R.string.update_up_to_date)
-    val rootMicSwitched = stringResource(R.string.root_mic_switched)
     val updateFailureMessages = mapOf(
         UpdateFailure.NO_RELEASES to stringResource(R.string.update_no_releases),
         UpdateFailure.NETWORK to stringResource(R.string.update_network_error),
@@ -189,6 +196,13 @@ fun RecorderApp(
 
     val showRecordingToolbar =
         recordingState.phase == RecordingPhase.RECORDING && currentRoute != AppRoute.Record
+    // Scroll views reserve room for the floating toolbar. Animate the reserved
+    // space together with the bar so it does not jump when the bar appears.
+    val extraBottomPadding by animateDpAsState(
+        targetValue = if (showRecordingToolbar) 72.dp else 0.dp,
+        animationSpec = tween(durationMillis = 260),
+        label = "recordingToolbarPadding",
+    )
 
     // Miuix's Scaffold normally places a FloatingToolbar above its bottomBar.
     // Here the bar is a standalone overlay, so measure it and reserve exactly
@@ -334,14 +348,7 @@ fun RecorderApp(
 
     val changeCaptureMode: (CaptureMode) -> Unit = { mode ->
         if (mode != settings.captureMode) {
-            var next = settings.copy(captureMode = mode)
-            if (mode == CaptureMode.ROOT && settings.audioSource.usesDeviceAudio) {
-                next = next.copy(audioSource = AudioSource.MICROPHONE)
-                scope.launch {
-                    snackbarHostState.showSnackbar(rootMicSwitched)
-                }
-            }
-            onSettingsChange(next)
+            onSettingsChange(settings.copy(captureMode = mode))
         }
     }
 
@@ -380,7 +387,7 @@ fun RecorderApp(
                 ),
         ) {
             CompositionLocalProvider(
-                LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
+                LocalExtraBottomPadding provides extraBottomPadding,
                 LocalAppBackdrop provides surfaceBackdrop,
             ) {
                 NavDisplay(
@@ -459,7 +466,7 @@ fun RecorderApp(
                     entry<AppRoute.About>(swipeDismiss = swipeDismiss) {
                         AboutPage(
                             snackbarHostState = snackbarHostState,
-                            backdrop = surfaceBackdrop,
+                            blurEnabled = canBlur,
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()
                             },
@@ -542,10 +549,30 @@ fun RecorderApp(
             }
         }
 
-        if (showRecordingToolbar) {
+        AnimatedVisibility(
+            visible = showRecordingToolbar,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
+            enter = fadeIn(animationSpec = tween(durationMillis = 180)) +
+                slideInVertically(
+                    animationSpec = tween(
+                        durationMillis = 280,
+                        easing = FastOutSlowInEasing,
+                    ),
+                    initialOffsetY = { height -> height },
+                ),
+            exit = fadeOut(animationSpec = tween(durationMillis = 140)) +
+                slideOutVertically(
+                    animationSpec = tween(
+                        durationMillis = 220,
+                        easing = FastOutLinearInEasing,
+                    ),
+                    targetOffsetY = { height -> height },
+                ),
+        ) {
             FloatingToolbar(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(
                         start = 20.dp,

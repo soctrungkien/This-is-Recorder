@@ -86,12 +86,7 @@ fun RecordScreen(
     val locked = recordingState.isActive
     var picker by remember { mutableStateOf<RecordPicker?>(null) }
     val isRoot = settings.captureMode == CaptureMode.ROOT
-    val effectiveAudio = settings.effectiveAudio
-    val audioOptions = if (isRoot) {
-        listOf(AudioSource.NONE, AudioSource.MICROPHONE)
-    } else {
-        AudioSource.entries
-    }
+    val audioSource = settings.audioSource
     val captureSize = remember(settings.resolution) {
         resolveCaptureSize(context, settings.resolution)
     }
@@ -206,20 +201,14 @@ fun RecordScreen(
                 AppCard(contentPadding = PaddingValues(0.dp)) {
                     AppSelectRow(
                         title = stringResource(R.string.pref_audio_source),
-                        summary = effectiveAudio.summary(),
-                        value = effectiveAudio.label(),
+                        summary = audioSource.summary(),
+                        value = audioSource.label(),
                         enabled = !locked,
                         onClick = { picker = RecordPicker.AUDIO },
                     )
-                    if (isRoot || effectiveAudio.usesDeviceAudio) {
+                    if (audioSource.usesDeviceAudio) {
                         AppDivider()
-                        AppHint(
-                            text = if (isRoot) {
-                                stringResource(R.string.audio_root_warning)
-                            } else {
-                                stringResource(R.string.audio_device_warning)
-                            },
-                        )
+                        AppHint(text = stringResource(R.string.audio_device_warning))
                     }
                 }
             }
@@ -280,20 +269,12 @@ fun RecordScreen(
     when (picker) {
         RecordPicker.AUDIO -> AppSelectDialog(
             title = stringResource(R.string.pref_audio_source),
-            options = audioOptions.map { source ->
+            options = AudioSource.entries.map { source ->
                 SelectOption(source, source.label(), source.summary())
             },
-            selected = effectiveAudio,
+            selected = audioSource,
             onSelect = { source ->
-                onSettingsChange(
-                    settings.copy(
-                        audioSource = if (isRoot && source.usesDeviceAudio) {
-                            AudioSource.MICROPHONE
-                        } else {
-                            source
-                        },
-                    ),
-                )
+                onSettingsChange(settings.copy(audioSource = source))
             },
             onDismissRequest = { picker = null },
         )

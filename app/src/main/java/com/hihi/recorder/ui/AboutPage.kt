@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults as MaterialCardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
 import com.hihi.recorder.R
 import com.hihi.recorder.data.UiStyle
+import com.hihi.recorder.ui.effect.BgEffectBackground
 import top.yukonga.miuix.kmp.basic.Card as MiuixCard
 import top.yukonga.miuix.kmp.basic.CardDefaults as MiuixCardDefaults
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
@@ -46,6 +49,9 @@ import top.yukonga.miuix.kmp.blur.BlendColorEntry
 import top.yukonga.miuix.kmp.blur.BlurColors
 import top.yukonga.miuix.kmp.blur.BlurDefaults
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
+import top.yukonga.miuix.kmp.blur.isRuntimeShaderSupported
+import top.yukonga.miuix.kmp.blur.layerBackdrop
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
@@ -61,14 +67,16 @@ import top.yukonga.miuix.kmp.interfaces.ExperimentalScrollBarApi
 
 /**
  * About screen modelled on the Miuix reference page in `miuix-readonly`:
- * a hero header followed by preference-style cards. When the device supports
- * RuntimeShader and the blur setting is on, the cards sample the app backdrop
- * with [textureBlur] and become translucent glass panels.
+ * a hero header over the HyperOS 3 animated gradient, followed by
+ * preference-style cards. When blur is enabled, the top bar and cards sample
+ * the shader layer with [textureBlur] and become translucent glass panels. The
+ * shader is recorded into its own backdrop, so the glass consumers are siblings
+ * of the recorded layer instead of descendants of it.
  */
 @Composable
 fun AboutPage(
     snackbarHostState: SnackbarHostState,
-    backdrop: LayerBackdrop?,
+    blurEnabled: Boolean,
     onBack: () -> Unit,
     onOpenUrl: (String) -> Unit,
     onShowHelp: () -> Unit,
@@ -76,12 +84,18 @@ fun AboutPage(
     onOpenApacheLicense: () -> Unit,
 ) {
     val palette = appPalette()
+    val effectSupported = remember { isRuntimeShaderSupported() }
+    val effectBackdrop = if (blurEnabled && effectSupported) {
+        rememberLayerBackdrop()
+    } else {
+        null
+    }
     val bottomContentPadding = appBottomContentPadding()
     val listState = rememberLazyListState()
     // Same 16 dp corners as the reference About page in `miuix-readonly`.
     val cardCornerRadius = 16.dp
     val cardShape = RoundedCornerShape(cardCornerRadius)
-    val cardBlurColors = if (backdrop != null) {
+    val cardBlurColors = if (effectBackdrop != null) {
         BlurDefaults.blurColors(
             blendColors = listOf(
                 BlendColorEntry(
@@ -93,18 +107,30 @@ fun AboutPage(
         null
     }
 
-    AppScaffold(
-        title = stringResource(R.string.section_about),
-        subtitle = stringResource(R.string.about_subtitle),
-        snackbarHostState = snackbarHostState,
-        navigationIcon = {
-            AppIconButton(
-                icon = MiuixIcons.Back,
-                contentDescription = stringResource(R.string.action_back),
-                onClick = onBack,
-            )
+    BgEffectBackground(
+        dynamicBackground = effectSupported,
+        modifier = Modifier.fillMaxSize(),
+        bgModifier = if (effectBackdrop != null) {
+            Modifier.layerBackdrop(effectBackdrop)
+        } else {
+            Modifier
         },
-    ) { padding ->
+        isFullSize = true,
+    ) {
+        CompositionLocalProvider(LocalAppBackdrop provides effectBackdrop) {
+            AppScaffold(
+                title = stringResource(R.string.section_about),
+                subtitle = stringResource(R.string.about_subtitle),
+                snackbarHostState = snackbarHostState,
+                containerColor = if (effectSupported) Color.Transparent else palette.background,
+                navigationIcon = {
+                    AppIconButton(
+                        icon = MiuixIcons.Back,
+                        contentDescription = stringResource(R.string.action_back),
+                        onClick = onBack,
+                    )
+                },
+            ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 state = listState,
@@ -121,7 +147,7 @@ fun AboutPage(
 
                 item {
                     AboutCard(
-                        backdrop = backdrop,
+                        backdrop = effectBackdrop,
                         shape = cardShape,
                         cornerRadius = cardCornerRadius,
                         blurColors = cardBlurColors,
@@ -148,7 +174,7 @@ fun AboutPage(
 
                 item {
                     AboutCard(
-                        backdrop = backdrop,
+                        backdrop = effectBackdrop,
                         shape = cardShape,
                         cornerRadius = cardCornerRadius,
                         blurColors = cardBlurColors,
@@ -180,7 +206,7 @@ fun AboutPage(
 
                 item {
                     AboutCard(
-                        backdrop = backdrop,
+                        backdrop = effectBackdrop,
                         shape = cardShape,
                         cornerRadius = cardCornerRadius,
                         blurColors = cardBlurColors,
@@ -204,7 +230,7 @@ fun AboutPage(
 
                 item {
                     AboutCard(
-                        backdrop = backdrop,
+                        backdrop = effectBackdrop,
                         shape = cardShape,
                         cornerRadius = cardCornerRadius,
                         blurColors = cardBlurColors,
@@ -294,6 +320,8 @@ fun AboutPage(
                         bottom = bottomContentPadding,
                     ),
                 )
+            }
+        }
             }
         }
     }

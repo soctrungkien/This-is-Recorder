@@ -1178,9 +1178,15 @@ fun AppScaffold(
     modifier: Modifier = Modifier,
     navigationIcon: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
+    containerColor: Color = Color.Unspecified,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val palette = appPalette()
+    val resolvedContainerColor = if (containerColor == Color.Unspecified) {
+        palette.background
+    } else {
+        containerColor
+    }
     val navigationBarInset = WindowInsets.navigationBars
         .asPaddingValues()
         .calculateBottomPadding()
@@ -1241,7 +1247,7 @@ fun AppScaffold(
                 }
             },
             snackbarHost = snackbarHost,
-            containerColor = palette.background,
+            containerColor = resolvedContainerColor,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             content = content,
         )
@@ -1281,7 +1287,7 @@ fun AppScaffold(
                 }
             },
             snackbarHost = snackbarHost,
-            containerColor = palette.background,
+            containerColor = resolvedContainerColor,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             content = content,
         )

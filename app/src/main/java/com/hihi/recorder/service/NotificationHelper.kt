@@ -13,7 +13,6 @@ import android.os.SystemClock
 import com.hihi.recorder.MainActivity
 import com.hihi.recorder.R
 import com.hihi.recorder.data.AudioSource
-import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.SavedRecording
 import com.hihi.recorder.data.VideoResolution
@@ -229,15 +228,10 @@ object NotificationHelper {
             VideoResolution.P1440 -> context.getString(R.string.resolution_1440)
             VideoResolution.NATIVE -> context.getString(R.string.resolution_native)
         }
-        val effectiveAudio = if (settings.captureMode == CaptureMode.ROOT) {
-            if (settings.audioSource == AudioSource.NONE) AudioSource.NONE else AudioSource.MICROPHONE
-        } else {
-            settings.audioSource
-        }
-        if (effectiveAudio == AudioSource.NONE) {
+        if (settings.audioSource == AudioSource.NONE) {
             return context.getString(R.string.notification_recording_text_no_audio, resolution)
         }
-        val audio = when (effectiveAudio) {
+        val audio = when (settings.audioSource) {
             AudioSource.NONE -> context.getString(R.string.audio_none)
             AudioSource.MICROPHONE -> context.getString(R.string.audio_mic)
             AudioSource.DEVICE -> context.getString(R.string.audio_device)

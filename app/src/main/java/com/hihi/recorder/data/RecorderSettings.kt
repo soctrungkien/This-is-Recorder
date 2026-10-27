@@ -130,13 +130,6 @@ data class RecorderSettings(
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
 
-    val effectiveAudio: AudioSource
-        get() = if (captureMode == CaptureMode.ROOT && audioSource.usesDeviceAudio) {
-            AudioSource.MICROPHONE
-        } else {
-            audioSource
-        }
-
     val storagePath: String get() = "Movies/${normalizeSaveFolder(saveFolder)}"
 
     companion object {

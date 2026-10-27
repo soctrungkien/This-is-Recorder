@@ -152,8 +152,15 @@ class RecordingService : Service() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && settings.usesAudio) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                settings.audioSource.usesMicrophone
+            ) {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            }
+            if (settings.audioSource.usesDeviceAudio) {
+                // Root video does not need MediaProjection, but phone audio
+                // capture does.
+                type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
             }
         }
         return type
@@ -280,10 +287,24 @@ class RecordingService : Service() {
         projectionData: Intent?,
     ): ActiveRecorder {
         if (settings.captureMode == CaptureMode.ROOT) {
+            val needsProjection = settings.audioSource.usesDeviceAudio
+            val projection = if (needsProjection) {
+                if (resultCode != Activity.RESULT_OK || projectionData == null) {
+                    throw IllegalStateException(getString(R.string.projection_denied))
+                }
+                val manager = getSystemService(MediaProjectionManager::class.java)
+                    ?: throw IllegalStateException(getString(R.string.projection_unavailable))
+                manager.getMediaProjection(resultCode, projectionData)
+                    ?: throw IllegalStateException(getString(R.string.projection_unavailable))
+            } else {
+                null
+            }
             return RootRecorder(
                 context = this,
                 settings = settings,
                 outputFile = file,
+                projection = projection,
+                onProjectionStopped = { requestStop() },
                 onUnexpectedStop = { requestStop() },
             ).asActive()
         }

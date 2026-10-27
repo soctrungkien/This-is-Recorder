@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Keep the launcher icon tinted with the wallpaper accent even when the
+        user has themed icons switched off. On Android 13+ the monochrome layer
+        lets the launcher recolor the glyph when themed icons are enabled.
+    -->
+    <color name="ic_launcher_background">@android:color/system_accent1_500</color>
+</resources>
