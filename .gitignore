@@ -15,3 +15,4 @@ app/build
 *.keystore
 /docs
 /liquid
+/miuix-readonly

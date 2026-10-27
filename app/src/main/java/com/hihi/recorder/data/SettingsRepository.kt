@@ -66,6 +66,9 @@ class SettingsRepository(context: Context) {
     }
 
     @Synchronized
+    fun setNavigationBlur(value: Boolean) = update { it.copy(navigationBlur = value) }
+
+    @Synchronized
     fun setNavigationIosLabels(value: Boolean) = update { it.copy(navigationIosLabels = value) }
 
     @Synchronized
@@ -109,6 +112,10 @@ class SettingsRepository(context: Context) {
                 KEY_NAVIGATION_BAR_STYLE,
                 defaults.navigationBarStyle,
             ),
+            navigationBlur = preferences.getBoolean(
+                KEY_NAVIGATION_BLUR,
+                defaults.navigationBlur,
+            ),
             navigationIosLabels = preferences.getBoolean(
                 KEY_NAVIGATION_IOS_LABELS,
                 defaults.navigationIosLabels,
@@ -135,6 +142,7 @@ class SettingsRepository(context: Context) {
             .putString(KEY_MATERIAL_SPEC, settings.materialSpec.name)
             .putBoolean(KEY_MONET, settings.monetColor)
             .putString(KEY_NAVIGATION_BAR_STYLE, settings.navigationBarStyle.name)
+            .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .apply()
@@ -164,6 +172,7 @@ class SettingsRepository(context: Context) {
         const val KEY_MATERIAL_SPEC = "material_spec"
         const val KEY_MONET = "monet_color"
         const val KEY_NAVIGATION_BAR_STYLE = "navigation_bar_style"
+        const val KEY_NAVIGATION_BLUR = "navigation_blur"
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"

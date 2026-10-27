@@ -62,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -103,6 +104,10 @@ import top.yukonga.miuix.kmp.basic.TextButton as MiuixTextButton
 import top.yukonga.miuix.kmp.basic.TextField as MiuixTextField
 import top.yukonga.miuix.kmp.basic.TextFieldDefaults as MiuixTextFieldDefaults
 import top.yukonga.miuix.kmp.basic.TooltipBox as MiuixTooltipBox
+import top.yukonga.miuix.kmp.blur.BlendColorEntry
+import top.yukonga.miuix.kmp.blur.BlurDefaults
+import top.yukonga.miuix.kmp.blur.LayerBackdrop
+import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.ChevronForward
 import top.yukonga.miuix.kmp.preference.ArrowPreference
@@ -184,6 +189,13 @@ fun appPalette(): AppPalette {
  * clears the toolbar without threading a parameter through each one.
  */
 val LocalExtraBottomPadding = staticCompositionLocalOf { 0.dp }
+
+/**
+ * Shared backdrop recorded behind the navigation content. It lets the liquid
+ * navigation bar, the top app bar, and About cards sample the same glass layer.
+ * Null when blur is disabled or RuntimeShader is unavailable.
+ */
+val LocalAppBackdrop = staticCompositionLocalOf<LayerBackdrop?> { null }
 
 /** Bottom content padding that clears the floating bars and system navigation area. */
 @Composable
@@ -1161,6 +1173,7 @@ fun AppScaffold(
     subtitle: String,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
+    navigationIcon: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
@@ -1169,6 +1182,34 @@ fun AppScaffold(
         .asPaddingValues()
         .calculateBottomPadding()
     val extraBottomPadding = LocalExtraBottomPadding.current
+
+    // The top bar uses the same backdrop as the navigation bar and About cards.
+    // A null backdrop (blur off, or Android < 13) keeps the original solid bar.
+    val backdrop = LocalAppBackdrop.current
+    val topBarBlurColors = if (backdrop != null) {
+        BlurDefaults.blurColors(
+            blendColors = listOf(
+                BlendColorEntry(
+                    palette.surface.copy(
+                        alpha = if (palette.isDark) 0.50f else 0.60f,
+                    ),
+                ),
+            ),
+        )
+    } else {
+        null
+    }
+    val topBarModifier = if (backdrop != null && topBarBlurColors != null) {
+        Modifier.textureBlur(
+            backdrop = backdrop,
+            shape = RectangleShape,
+            blurRadius = 60f,
+            colors = topBarBlurColors,
+        )
+    } else {
+        Modifier
+    }
+    val topBarColor = if (backdrop != null) Color.Transparent else palette.surface
     val snackbarHost: @Composable () -> Unit = {
         Box(
             modifier = Modifier
@@ -1184,14 +1225,17 @@ fun AppScaffold(
         MiuixScaffold(
             modifier = modifier,
             topBar = {
-                top.yukonga.miuix.kmp.basic.SmallTopAppBar(
-                    title = title,
-                    subtitle = subtitle,
-                    color = palette.surface,
-                    titleColor = palette.onSurface,
-                    subtitleColor = palette.onSurfaceVariant,
-                    actions = actions,
-                )
+                Box(modifier = topBarModifier.fillMaxWidth()) {
+                    top.yukonga.miuix.kmp.basic.SmallTopAppBar(
+                        title = title,
+                        subtitle = subtitle,
+                        color = topBarColor,
+                        titleColor = palette.onSurface,
+                        subtitleColor = palette.onSurfaceVariant,
+                        navigationIcon = navigationIcon ?: {},
+                        actions = actions,
+                    )
+                }
             },
             snackbarHost = snackbarHost,
             containerColor = palette.background,
@@ -1202,33 +1246,36 @@ fun AppScaffold(
         MaterialScaffold(
             modifier = modifier,
             topBar = {
-                TopAppBar(
-                    title = {
-                        Column {
-                            AppText(
-                                text = title,
-                                style = AppTextStyle.Title,
-                                color = palette.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            AppText(
-                                text = subtitle,
-                                style = AppTextStyle.Footnote,
-                                color = palette.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    },
-                    actions = actions,
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = palette.surface,
-                        scrolledContainerColor = palette.surfaceContainer,
-                        titleContentColor = palette.onSurface,
-                        actionIconContentColor = palette.onSurface,
-                    ),
-                )
+                Box(modifier = topBarModifier.fillMaxWidth()) {
+                    TopAppBar(
+                        title = {
+                            Column {
+                                AppText(
+                                    text = title,
+                                    style = AppTextStyle.Title,
+                                    color = palette.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                AppText(
+                                    text = subtitle,
+                                    style = AppTextStyle.Footnote,
+                                    color = palette.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        },
+                        navigationIcon = navigationIcon ?: {},
+                        actions = actions,
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = topBarColor,
+                            scrolledContainerColor = topBarColor,
+                            titleContentColor = palette.onSurface,
+                            actionIconContentColor = palette.onSurface,
+                        ),
+                    )
+                }
             },
             snackbarHost = snackbarHost,
             containerColor = palette.background,

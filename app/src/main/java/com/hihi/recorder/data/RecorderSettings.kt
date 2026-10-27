@@ -123,6 +123,8 @@ data class RecorderSettings(
     val materialSpec: MaterialSpec = MaterialSpec.SPEC_2025,
     val monetColor: Boolean = true,
     val navigationBarStyle: NavigationBarStyle = NavigationBarStyle.LIQUID_IOS,
+    /** Mirrors the upstream Miuix demo's `enableBlur` switch. */
+    val navigationBlur: Boolean = true,
     val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
 ) {

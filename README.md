@@ -5,12 +5,11 @@
 - **Chuẩn (MediaProjection)**: quay màn hình + âm thanh điện thoại / micrô / trộn cả hai.
 - **Root (screenrecord)**: quay bằng `su -c screenrecord`, không cần hộp thoại cấp quyền MediaProjection.
 
-> Đây là bản viết lại sạch từ mã JADX cũ. Thư mục `jadx/` chỉ được giữ làm tài liệu tham khảo, không được dùng làm mã nguồn của ứng dụng.
-
 ## Tính năng
 
 - Giao diện Miuix, sáng/tối/theo hệ thống, có bản dịch tiếng Việt.
-- Thanh điều hướng Monet tiêu chuẩn hoặc Liquid iOS (kính lỏng, làm mờ trên Android 13+).
+- Thanh tiêu đề kính mờ; thanh điều hướng theo UI Style tiêu chuẩn hoặc Liquid Glass (làm mờ trên Android 13+, có thể tắt trong cài đặt).
+- Trang **Giới thiệu** với logo, phiên bản, liên kết mã nguồn, xem toàn văn giấy phép MIT/Apache-2.0 ngay trong ứng dụng, ghi công đầy đủ và các thẻ kính mờ.
 - Quay màn hình bằng MediaProjection + MediaCodec + MediaMuxer.
 - Nguồn âm thanh:
   - Không âm thanh
@@ -129,6 +128,30 @@ app/src/main/java/com/hihi/recorder/
 ├── service/                  # foreground service, notification, QS tile
 └── ui/                       # giao diện Miuix
 ```
+
+## Ghi công
+
+### Tác giả
+
+- **Hihi** ([@soctrungkien](https://github.com/soctrungkien)) — phát triển ứng dụng.
+- **Thiết kế và biểu tượng ứng dụng**: Hihi.
+
+### Thư viện và nền tảng mã nguồn mở
+
+- **[Miuix for Compose](https://github.com/compose-miuix-ui/miuix)** — © compose-miuix-ui contributors, giấy phép Apache-2.0. Cung cấp UI, icon, blur, squircle và navigation.
+- **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa bởi compose-miuix-ui contributors.
+- **[Jetpack Compose](https://developer.android.com/compose)** (UI, Foundation, Animation) — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[AndroidX Core & Activity](https://developer.android.com/jetpack/androidx)** — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[Kotlin](https://kotlinlang.org)** — © JetBrains s.r.o. và cộng tác viên, giấy phép Apache-2.0.
+- **[kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines)** — © JetBrains s.r.o., giấy phép Apache-2.0.
+- **[kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)** — © JetBrains s.r.o., giấy phép Apache-2.0.
+
+### Giấy phép
+
+- Mã nguồn ứng dụng: [MIT](LICENSE), bản quyền © 2026 Hihi.
+- Các thư viện bên thứ ba: Apache-2.0; tác giả của từng thư viện được ghi ở trên.
+- Toàn văn MIT và Apache-2.0 có thể xem ngay trong ứng dụng tại **Giới thiệu → Giấy phép**.
 
 ## Ghi chú kỹ thuật
 

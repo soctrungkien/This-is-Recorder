@@ -52,6 +52,7 @@ fun SettingsScreen(
     onCheckForUpdates: () -> Unit,
     onOpenUrl: (String) -> Unit,
     onShowHelp: () -> Unit,
+    onOpenAbout: () -> Unit,
 ) {
     var picker by remember { mutableStateOf<SettingsPicker?>(null) }
     var showSaveFolderDialog by remember { mutableStateOf(false) }
@@ -133,6 +134,15 @@ fun SettingsScreen(
             }
             item {
                 AppCard(contentPadding = PaddingValues(0.dp)) {
+                    AppSwitchRow(
+                        title = stringResource(R.string.pref_navigation_blur),
+                        summary = stringResource(R.string.pref_navigation_blur_summary),
+                        checked = settings.navigationBlur,
+                        onCheckedChange = {
+                            onSettingsChange(settings.copy(navigationBlur = it))
+                        },
+                    )
+                    AppDivider()
                     AppSwitchRow(
                         title = stringResource(R.string.pref_navigation_ios_labels),
                         summary = stringResource(R.string.pref_navigation_ios_labels_summary),
@@ -232,6 +242,13 @@ fun SettingsScreen(
             item { AppSectionTitle(stringResource(R.string.section_about)) }
             item {
                 AppCard(contentPadding = PaddingValues(0.dp)) {
+                    AppRow(
+                        title = stringResource(R.string.app_name),
+                        summary = stringResource(R.string.about_subtitle),
+                        leadingIcon = MiuixIcons.Info,
+                        onClick = onOpenAbout,
+                    )
+                    AppDivider()
                     AppRow(
                         title = stringResource(R.string.pref_github),
                         summary = stringResource(R.string.pref_github_summary),

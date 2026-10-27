@@ -36,6 +36,7 @@
     <string name="action_download">Tải xuống</string>
     <string name="action_check">Kiểm tra</string>
     <string name="action_learn_more">Tìm hiểu thêm</string>
+    <string name="action_back">Quay lại</string>
 
     <string name="section_recording">Ghi hình</string>
     <string name="section_audio">Âm thanh</string>
@@ -50,6 +51,36 @@
     <string name="section_storage">Lưu trữ</string>
     <string name="section_updates">Cập nhật</string>
     <string name="section_about">Giới thiệu</string>
+    <string name="about_subtitle">Thông tin ứng dụng và liên kết</string>
+    <string name="about_version">Phiên bản %1$s (%2$d)</string>
+    <string name="about_source">Mã nguồn</string>
+    <string name="about_source_summary">github.com/soctrungkien/This-is-Recorder</string>
+    <string name="about_miuix">Miuix for Compose</string>
+    <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0</string>
+    <string name="about_license_mit">Giấy phép MIT</string>
+    <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
+    <string name="about_license_apache">Giấy phép Apache 2.0</string>
+    <string name="about_license_apache_summary">Miuix, Compose, AndroidX, Kotlin và kotlinx</string>
+    <string name="about_credits">Ghi công</string>
+    <string name="about_developer">Nhà phát triển</string>
+    <string name="about_developer_summary">Hihi · github.com/soctrungkien</string>
+    <string name="about_design">Thiết kế và biểu tượng ứng dụng</string>
+    <string name="about_design_summary">Hihi</string>
+    <string name="about_open_source">Phần mềm mã nguồn mở</string>
+    <string name="about_liquid_glass">Thành phần Liquid Glass</string>
+    <string name="about_liquid_glass_summary">© 2025 Kyant; adapted by compose-miuix-ui contributors · Apache-2.0</string>
+    <string name="about_framework">Jetpack Compose</string>
+    <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_material3">Material 3</string>
+    <string name="about_material3_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_androidx">AndroidX Core &amp; Activity</string>
+    <string name="about_androidx_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_kotlin">Kotlin</string>
+    <string name="about_kotlin_summary">© JetBrains s.r.o. và cộng tác viên · Apache-2.0</string>
+    <string name="about_coroutines">kotlinx.coroutines</string>
+    <string name="about_coroutines_summary">© JetBrains s.r.o. · Apache-2.0</string>
+    <string name="about_serialization">kotlinx.serialization</string>
+    <string name="about_serialization_summary">© JetBrains s.r.o. · Apache-2.0</string>
 
     <string name="nav_record">Quay</string>
     <string name="nav_videos">Video</string>
@@ -105,9 +136,11 @@
     <string name="pref_monet_summary">Dùng màu từ hình nền cho toàn bộ ứng dụng.</string>
     <string name="pref_monet_unavailable">Màu động cần Android 12 trở lên.</string>
     <string name="pref_navigation_bar">Thanh điều hướng</string>
-    <string name="pref_navigation_bar_summary">Chọn thanh Monet tiêu chuẩn hoặc thanh kính lỏng kiểu iOS. Liquid dùng làm mờ trên Android 13+.</string>
-    <string name="navigation_bar_monet">Kiểu UI</string>
+    <string name="pref_navigation_bar_summary">Chọn thanh UI Style tiêu chuẩn hoặc thanh kính lỏng kiểu iOS. Làm mờ khả dụng trên Android 13+.</string>
+    <string name="navigation_bar_monet">Theo kiểu giao diện</string>
     <string name="navigation_bar_liquid">Liquid Glass</string>
+    <string name="pref_navigation_blur">Hiệu ứng làm mờ</string>
+    <string name="pref_navigation_blur_summary">Làm mờ nội dung phía sau thanh tiêu đề, thanh điều hướng và các thẻ kính. Cần Android 13 trở lên.</string>
     <string name="pref_navigation_ios_labels">Nhãn tab đang chọn</string>
     <string name="pref_navigation_ios_labels_summary">Thanh Kiểu UI: chỉ hiện nhãn ở tab đang chọn.</string>
     <string name="pref_save_folder">Vị trí lưu</string>
@@ -116,7 +149,7 @@
     <string name="save_folder_message">Video được lưu trong thư mục Movies. Nhập tên thư mục hoặc đường dẫn lồng nhau, ví dụ Recordings/Screen.</string>
     <string name="save_folder_placeholder">ThisIsRecorder</string>
     <string name="pref_check_updates">Kiểm tra cập nhật</string>
-    <string name="pref_check_updates_summary">Tự kiểm tra khi mở ứng dụng. Kết nối đi qua gh-proxy.</string>
+    <string name="pref_check_updates_summary">Tự kiểm tra khi mở ứng dụng.</string>
     <string name="pref_github">GitHub</string>
     <string name="pref_github_summary">github.com/soctrungkien</string>
     <string name="pref_telegram">Telegram</string>
@@ -134,10 +167,10 @@
     <string name="verification_message">Google sắp yêu cầu mọi ứng dụng trên thiết bị Android được chứng nhận phải đăng ký danh tính cá nhân của nhà phát triển. Ứng dụng này miễn phí và mã nguồn mở, không cam kết cung cấp danh tính đã xác minh. Khi quy định có hiệu lực, bản cài ngoài cửa hàng ứng dụng có thể ngừng chạy trên thiết bị được chứng nhận. Bạn vẫn có thể cài bản mới qua ADB hoặc dùng hệ thống không có Google Play Services. Truy cập keepandroidopen.org để tìm hiểu và ủng hộ chiến dịch.</string>
 
     <string name="update_available_title">Có bản cập nhật %1$s</string>
-    <string name="update_available_message">Đã có phiên bản mới trên GitHub. Tải xuống qua máy chủ gh-proxy.</string>
+    <string name="update_available_message">Đã có phiên bản mới trên GitHub.</string>
     <string name="update_up_to_date">Bạn đang dùng phiên bản mới nhất.</string>
     <string name="update_no_releases">Chưa tìm thấy bản phát hành nào trên GitHub.</string>
-    <string name="update_network_error">Không kết nối được GitHub qua gh-proxy. Hãy kiểm tra mạng.</string>
+    <string name="update_network_error">Không kết nối được GitHub. Hãy kiểm tra mạng.</string>
     <string name="update_rate_limited">Đã chạm giới hạn truy cập GitHub. Hãy thử lại sau.</string>
     <string name="update_server_error">GitHub trả về lỗi. Hãy thử lại sau.</string>
     <string name="update_invalid_response">GitHub trả về dữ liệu không hợp lệ.</string>

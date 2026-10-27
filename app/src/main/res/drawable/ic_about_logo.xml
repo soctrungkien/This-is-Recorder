@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tightly cropped copy of ic_launcher_foreground for the About hero. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="58dp"
+    android:viewportWidth="64.0"
+    android:viewportHeight="58.0">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M12,2 H52 A10,10 0 0 1 62,12 V38 A10,10 0 0 1 52,48 H12 A10,10 0 0 1 2,38 V12 A10,10 0 0 1 12,2 Z"
+        android:strokeColor="#ffffffff"
+        android:strokeWidth="4.0"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#ffffffff"
+        android:pathData="M32,16 A9,9 0 1 0 32,34 A9,9 0 1 0 32,16 Z" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M32,48 V56 M22,56 H42"
+        android:strokeColor="#ffffffff"
+        android:strokeWidth="4.0"
+        android:strokeLineCap="round" />
+</vector>

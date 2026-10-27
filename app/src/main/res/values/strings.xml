@@ -36,6 +36,7 @@
     <string name="action_download">Download</string>
     <string name="action_check">Check</string>
     <string name="action_learn_more">Learn more</string>
+    <string name="action_back">Back</string>
 
     <string name="section_recording">Recording</string>
     <string name="section_audio">Audio</string>
@@ -50,6 +51,36 @@
     <string name="section_storage">Storage</string>
     <string name="section_updates">Updates</string>
     <string name="section_about">About</string>
+    <string name="about_subtitle">App information and links</string>
+    <string name="about_version">Version %1$s (%2$d)</string>
+    <string name="about_source">Source code</string>
+    <string name="about_source_summary">github.com/soctrungkien/This-is-Recorder</string>
+    <string name="about_miuix">Miuix for Compose</string>
+    <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0</string>
+    <string name="about_license_mit">MIT License</string>
+    <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
+    <string name="about_license_apache">Apache License 2.0</string>
+    <string name="about_license_apache_summary">Miuix, Compose, AndroidX, Kotlin and kotlinx</string>
+    <string name="about_credits">Credits</string>
+    <string name="about_developer">Developer</string>
+    <string name="about_developer_summary">Hihi · github.com/soctrungkien</string>
+    <string name="about_design">Design and app icon</string>
+    <string name="about_design_summary">Hihi</string>
+    <string name="about_open_source">Open-source software</string>
+    <string name="about_liquid_glass">Liquid Glass components</string>
+    <string name="about_liquid_glass_summary">© 2025 Kyant; adapted by compose-miuix-ui contributors · Apache-2.0</string>
+    <string name="about_framework">Jetpack Compose</string>
+    <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_material3">Material 3</string>
+    <string name="about_material3_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_androidx">AndroidX Core &amp; Activity</string>
+    <string name="about_androidx_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_kotlin">Kotlin</string>
+    <string name="about_kotlin_summary">© JetBrains s.r.o. and contributors · Apache-2.0</string>
+    <string name="about_coroutines">kotlinx.coroutines</string>
+    <string name="about_coroutines_summary">© JetBrains s.r.o. · Apache-2.0</string>
+    <string name="about_serialization">kotlinx.serialization</string>
+    <string name="about_serialization_summary">© JetBrains s.r.o. · Apache-2.0</string>
 
     <string name="nav_record">Record</string>
     <string name="nav_videos">Videos</string>
@@ -105,9 +136,11 @@
     <string name="pref_monet_summary">Use wallpaper colors throughout the app.</string>
     <string name="pref_monet_unavailable">Dynamic color requires Android 12 or newer.</string>
     <string name="pref_navigation_bar">Navigation bar</string>
-    <string name="pref_navigation_bar_summary">Choose the standard Monet bar or the liquid glass iOS bar. Liquid uses blur on Android 13+.</string>
+    <string name="pref_navigation_bar_summary">Choose the standard UI Style bar or the liquid glass bar. Blur is available on Android 13+.</string>
     <string name="navigation_bar_monet">UI Style</string>
     <string name="navigation_bar_liquid">Liquid Glass</string>
+    <string name="pref_navigation_blur">Blur effect</string>
+    <string name="pref_navigation_blur_summary">Blur the content behind the top bar, navigation bar, and glass cards. Requires Android 13 or newer.</string>
     <string name="pref_navigation_ios_labels">Selected tab labels</string>
     <string name="pref_navigation_ios_labels_summary">UI Style bar: show labels only for the selected tab.</string>
     <string name="pref_save_folder">Save location</string>
@@ -116,7 +149,7 @@
     <string name="save_folder_message">Videos are saved inside Movies. Enter a folder name or a nested path such as Recordings/Screen.</string>
     <string name="save_folder_placeholder">ThisIsRecorder</string>
     <string name="pref_check_updates">Check for updates</string>
-    <string name="pref_check_updates_summary">Checked automatically when the app opens. Requests go through gh-proxy.</string>
+    <string name="pref_check_updates_summary">Checked automatically when the app opens.</string>
     <string name="pref_github">GitHub</string>
     <string name="pref_github_summary">github.com/soctrungkien</string>
     <string name="pref_telegram">Telegram</string>
@@ -134,10 +167,10 @@
     <string name="verification_message">Google will soon require every app on certified Android devices to be registered with the developer’s personal identity. This app is free and open source, and no verified identity is promised. After enforcement begins, builds installed outside an app store may stop working on certified devices. You can still install future builds over ADB or use a system without Google Play Services. Visit keepandroidopen.org to learn more and support the campaign.</string>
 
     <string name="update_available_title">Update %1$s available</string>
-    <string name="update_available_message">A newer version has been published on GitHub. Download it through the gh-proxy mirror.</string>
+    <string name="update_available_message">A newer version has been published on GitHub.</string>
     <string name="update_up_to_date">You are using the latest version.</string>
     <string name="update_no_releases">No GitHub releases were found yet.</string>
-    <string name="update_network_error">Could not reach GitHub through gh-proxy. Check your connection.</string>
+    <string name="update_network_error">Could not reach GitHub. Check your connection.</string>
     <string name="update_rate_limited">GitHub rate limit reached. Try again later.</string>
     <string name="update_server_error">GitHub returned an error. Try again later.</string>
     <string name="update_invalid_response">GitHub returned an unexpected response.</string>

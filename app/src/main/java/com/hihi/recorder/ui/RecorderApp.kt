@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,7 +41,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
@@ -53,6 +56,7 @@ import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingState
 import com.hihi.recorder.data.SavedRecording
+import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.net.UpdateChecker
 import com.hihi.recorder.net.UpdateFailure
 import com.hihi.recorder.net.UpdateResult
@@ -91,13 +95,25 @@ private sealed interface AppRoute : NavKey {
 
     @Serializable
     data object Settings : AppRoute
+
+    @Serializable
+    data object About : AppRoute
+
+    @Serializable
+    data object MitLicense : AppRoute
+
+    @Serializable
+    data object ApacheLicense : AppRoute
 }
 
 private val AppRoute.tabIndex: Int
     get() = when (this) {
         AppRoute.Record -> 0
         AppRoute.Videos -> 1
-        AppRoute.Settings -> 2
+        AppRoute.Settings,
+        AppRoute.About,
+        AppRoute.MitLicense,
+        AppRoute.ApacheLicense -> 2
     }
 
 private fun appRouteAt(index: Int): AppRoute = when (index) {
@@ -164,14 +180,43 @@ fun RecorderApp(
     var rootStatus by remember { mutableStateOf<RootStatus>(RootStatus.Unknown) }
     var rootCheckRequest by remember { mutableIntStateOf(0) }
     var timerMs by remember { mutableLongStateOf(0L) }
+    val density = LocalDensity.current
+    val navigationBarInset = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+    var navigationBarHeightPx by remember { mutableIntStateOf(0) }
 
     val showRecordingToolbar =
         recordingState.phase == RecordingPhase.RECORDING && currentRoute != AppRoute.Record
 
-    // The liquid bar samples the page content behind it. Only allocate the
-    // backdrop for the liquid style and only where RuntimeShader exists (33+).
+    // Miuix's Scaffold normally places a FloatingToolbar above its bottomBar.
+    // Here the bar is a standalone overlay, so measure it and reserve exactly
+    // 10 dp between the bar's top edge and the toolbar's bottom edge. The
+    // estimates only cover the first frame before onSizeChanged reports.
     val useLiquidNavigation = settings.navigationBarStyle == NavigationBarStyle.LIQUID_IOS
-    val canBlur = useLiquidNavigation && Build.VERSION.SDK_INT >= 33
+    val estimatedNavigationBarHeight = when {
+        useLiquidNavigation -> 64.dp + if (navigationBarInset != 0.dp) {
+            8.dp + navigationBarInset
+        } else {
+            // The upstream liquid bar uses a 36 dp gap when the inset is zero.
+            36.dp
+        }
+
+        LocalUiStyle.current == UiStyle.MIUIX -> 64.dp + navigationBarInset
+        else -> 80.dp + navigationBarInset
+    }
+    val navigationBarHeight = if (navigationBarHeightPx > 0) {
+        with(density) { navigationBarHeightPx.toDp() }
+    } else {
+        estimatedNavigationBarHeight
+    }
+    val navigationBarHeightAboveInset =
+        (navigationBarHeight - navigationBarInset).coerceAtLeast(0.dp)
+
+    // Blur is a general capability: the liquid bar and the About page can both
+    // sample this backdrop. Allocate it whenever the user enabled blur and
+    // RuntimeShader exists (Android 13+), regardless of the navbar style.
+    val canBlur = settings.navigationBlur && Build.VERSION.SDK_INT >= 33
     val backdrop = if (canBlur) {
         rememberLayerBackdrop {
             drawRect(palette.background)
@@ -300,6 +345,7 @@ fun RecorderApp(
             AmbientGlow(palette = palette)
             CompositionLocalProvider(
                 LocalExtraBottomPadding provides if (showRecordingToolbar) 72.dp else 0.dp,
+                LocalAppBackdrop provides backdrop,
             ) {
                 NavDisplay(
                     backStack = backStack,
@@ -366,44 +412,98 @@ fun RecorderApp(
                             onCheckForUpdates = checkForUpdates,
                             onOpenUrl = onOpenUrl,
                             onShowHelp = { showHelp = true },
+                            onOpenAbout = {
+                                if (backStack.lastOrNull() != AppRoute.About) {
+                                    backStack.add(AppRoute.About)
+                                }
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.About>(swipeDismiss = swipeDismiss) {
+                        AboutPage(
+                            snackbarHostState = snackbarHostState,
+                            backdrop = backdrop,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
+                            onOpenUrl = onOpenUrl,
+                            onShowHelp = { showHelp = true },
+                            onOpenMitLicense = {
+                                if (backStack.lastOrNull() != AppRoute.MitLicense) {
+                                    backStack.add(AppRoute.MitLicense)
+                                }
+                            },
+                            onOpenApacheLicense = {
+                                if (backStack.lastOrNull() != AppRoute.ApacheLicense) {
+                                    backStack.add(AppRoute.ApacheLicense)
+                                }
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.MitLicense>(swipeDismiss = swipeDismiss) {
+                        LicensePage(
+                            kind = LicenseKind.MIT,
+                            snackbarHostState = snackbarHostState,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.ApacheLicense>(swipeDismiss = swipeDismiss) {
+                        LicensePage(
+                            kind = LicenseKind.APACHE,
+                            snackbarHostState = snackbarHostState,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
                         )
                     }
                 }
             }
         }
 
-        if (useLiquidNavigation) {
-            IosLiquidGlassNavigationBar(
-                items = navItems.map { item ->
-                    NavigationItem(label = item.label, icon = item.icon)
-                },
-                selectedIndex = selectedTab,
-                onItemClick = selectTab,
-                backdrop = backdrop,
-                isBlurActive = canBlur,
-                isDark = palette.isDark,
-                badge = { index ->
-                    val count = navItems[index].badgeCount
-                    if (count > 0) {
-                        {
-                            MiuixBadge {
-                                MiuixText(text = navBadgeText(count))
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .onSizeChanged { navigationBarHeightPx = it.height },
+        ) {
+            if (useLiquidNavigation) {
+                IosLiquidGlassNavigationBar(
+                    items = navItems.map { item ->
+                        NavigationItem(label = item.label, icon = item.icon)
+                    },
+                    selectedIndex = selectedTab,
+                    onItemClick = selectTab,
+                    backdrop = backdrop,
+                    isBlurActive = canBlur,
+                    isDark = palette.isDark,
+                    badge = { index ->
+                        val count = navItems[index].badgeCount
+                        if (count > 0) {
+                            {
+                                MiuixBadge {
+                                    MiuixText(text = navBadgeText(count))
+                                }
                             }
+                        } else {
+                            null
                         }
-                    } else {
-                        null
-                    }
-                },
-                modifier = Modifier.align(Alignment.BottomCenter),
-            )
-        } else {
-            AppNavigationBar(
-                items = navItems,
-                selectedIndex = selectedTab,
-                onSelect = selectTab,
-                selectedLabelsOnly = settings.navigationIosLabels,
-                modifier = Modifier.align(Alignment.BottomCenter),
-            )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else {
+                AppNavigationBar(
+                    items = navItems,
+                    selectedIndex = selectedTab,
+                    onSelect = selectTab,
+                    selectedLabelsOnly = settings.navigationIosLabels,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
 
         if (showRecordingToolbar) {
@@ -411,7 +511,11 @@ fun RecorderApp(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 94.dp)
+                    .padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        bottom = navigationBarHeightAboveInset + 10.dp,
+                    )
                     .fillMaxWidth(),
                 color = palette.surfaceContainerHigh,
                 cornerRadius = 26.dp,
