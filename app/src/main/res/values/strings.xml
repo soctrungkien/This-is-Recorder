@@ -24,8 +24,8 @@
     <string name="action_share">Share</string>
     <string name="action_retry">Try again</string>
     <string name="action_close">Close</string>
-    <string name="action_check_root">Check again</string>
-    <string name="action_enable_root">Turn on root mode</string>
+    <string name="action_check_shell">Check again</string>
+    <string name="action_copy_command">Copy command</string>
     <string name="action_open_settings">Open settings</string>
     <string name="action_switch_mic">Use microphone</string>
     <string name="action_refresh">Refresh</string>
@@ -46,7 +46,6 @@
     <string name="section_appearance">Appearance</string>
     <string name="section_help">Help</string>
     <string name="section_last_recording">Latest recording</string>
-    <string name="section_root">Root mode</string>
     <string name="section_capture_mode">Capture mode</string>
     <string name="section_storage">Storage</string>
     <string name="section_updates">Updates</string>
@@ -101,12 +100,11 @@
     <string name="settings_subtitle">Appearance, storage, and updates</string>
 
     <string name="mode_standard_short">Standard</string>
-    <string name="mode_root_short">Root</string>
+    <string name="mode_shell_short">Screenrecord</string>
     <string name="recording_locked_hint">Stop recording to change these options.</string>
 
     <string name="pref_capture_mode">Capture mode</string>
     <string name="pref_capture_mode_summary_standard">MediaProjection + MediaCodec. Supports phone audio.</string>
-    <string name="pref_capture_mode_summary_root">screenrecord through root. Video needs no projection prompt; phone audio still asks once.</string>
     <string name="pref_audio_source">Audio source</string>
     <string name="pref_resolution">Resolution</string>
     <string name="pref_frame_rate">Frame rate</string>
@@ -117,7 +115,8 @@
     <string name="pref_stop_screen_off">Stop when the screen turns off</string>
     <string name="pref_theme">Theme</string>
     <string name="pref_help">Guide and limitations</string>
-    <string name="pref_root_status">Root status</string>
+    <string name="pref_shell_status">Shell status</string>
+    <string name="pref_shell_backend">Activation method</string>
     <string name="pref_version">Version</string>
     <string name="pref_storage">Storage folder</string>
     <string name="pref_storage_summary">Movies/ThisIsRecorder</string>
@@ -175,9 +174,9 @@
     <string name="update_invalid_response">GitHub returned an unexpected response.</string>
 
     <string name="capture_standard">Standard (MediaProjection)</string>
-    <string name="capture_root">Root (screenrecord)</string>
+    <string name="capture_shell">Screenrecord (ADB, Shizuku, root)</string>
     <string name="capture_standard_summary">MediaProjection + MediaCodec. Phone audio is supported.</string>
-    <string name="capture_root_summary">Root shell + screenrecord. Video needs no consent; phone audio still asks once.</string>
+    <string name="capture_shell_summary">Uses Android\'s screenrecord through ADB, Shizuku, or root. Video needs no consent; phone audio still asks once.</string>
 
     <string name="audio_none">None</string>
     <string name="audio_mic">Microphone</string>
@@ -194,7 +193,7 @@
     <string name="resolution_1440">1440p</string>
     <string name="resolution_native">Native</string>
     <string name="fps_value">%1$d fps</string>
-    <string name="fps_root_summary">Root mode follows the display refresh rate.</string>
+    <string name="fps_shell_summary">Screenrecord mode follows the display refresh rate.</string>
     <string name="bitrate_auto">Auto</string>
     <string name="bitrate_value">%1$d Mbps</string>
     <string name="countdown_off">Off</string>
@@ -205,19 +204,30 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
 
-    <string name="root_status_unknown">Not checked</string>
-    <string name="root_status_checking">Checking root…</string>
-    <string name="root_status_available">Root is available</string>
-    <string name="root_status_unavailable">Root is not available</string>
-    <string name="root_status_no_su">su was not found or access was denied.</string>
-    <string name="root_status_timeout">The root prompt timed out.</string>
-    <string name="root_status_no_screenrecord">The screenrecord binary was not found.</string>
-    <string name="root_note_title">Root mode notes</string>
-    <string name="root_note">screenrecord records video in 180-second chunks that are joined when you stop. Audio uses the same microphone and phone-audio pipeline as Standard mode, synchronized to the picture. Secure windows still appear black.</string>
+    <string name="shell_status_unknown">Not checked</string>
+    <string name="shell_status_checking">Checking shell access…</string>
+    <string name="shell_status_adb_ready">ADB helper is running</string>
+    <string name="shell_status_shizuku_ready">Shizuku is ready</string>
+    <string name="shell_status_root_ready">Root is available</string>
+    <string name="shell_status_unavailable">Shell access is not available</string>
 
-    <string name="root_required_title">Root access required</string>
-    <string name="root_required_message">Grant su access to This is Recorder in Magisk, KernelSU, or your root manager, then try again.</string>
-    <string name="root_error_title">Root mode is unavailable</string>
+    <string name="shell_backend_adb">ADB</string>
+    <string name="shell_backend_shizuku">Shizuku</string>
+    <string name="shell_backend_root">Root</string>
+    <string name="shell_backend_adb_summary">Run one command from a computer. The helper keeps running in the background until you stop it or reboot.</string>
+    <string name="shell_backend_shizuku_summary">Start Shizuku, then grant this app permission. No computer is needed after setup.</string>
+    <string name="shell_backend_root_summary">Use su from Magisk, KernelSU, or another root manager.</string>
+
+    <string name="shell_adb_title">Activate through ADB</string>
+    <string name="shell_adb_note">Enable USB debugging, connect this phone to a computer, and run this command once:</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+
+    <string name="shell_required_title">Shell access required</string>
+    <string name="shell_required_message">This capture mode needs shell access. Choose ADB, Shizuku, or root, then try again.</string>
+    <string name="shell_required_adb_message">Connect this phone to a computer with USB debugging and run this command once:\n\n%1$s</string>
+    <string name="shell_required_shizuku_message">Start Shizuku and make sure it is running, then try again.</string>
+    <string name="shell_required_shizuku_permission_message">Open Shizuku and grant This is Recorder permission, then try again.</string>
+    <string name="shell_required_root_message">Grant su access to This is Recorder in Magisk, KernelSU, or your root manager, then try again.</string>
 
     <string name="permission_mic_title">Microphone permission required</string>
     <string name="permission_mic_message">Allow microphone access in app settings to record sound.</string>
@@ -244,9 +254,9 @@
     <string name="help_quick_settings_title">Quick Settings tile</string>
     <string name="help_quick_settings_body">Open the Quick Settings panel, tap Edit, then drag “Screen recorder” into the panel. Tap the tile to start recording. While recording, tap it again to stop without opening the app. The first start still opens the app so Android can show the capture consent prompt.</string>
     <string name="help_audio_title">Phone audio</string>
-    <string name="help_audio_body">Phone audio uses Android\'s playback capture API. Apps can exclude their audio, and calls, DRM-protected content, and some games may be silent. It works in both modes; when video is captured with root, only the audio track asks for capture consent.</string>
-    <string name="help_root_title">Root mode</string>
-    <string name="help_root_body">Root mode runs screenrecord as root and records video without MediaProjection consent. Videos are recorded in 180-second segments and joined when you stop. Audio uses the same microphone and phone-audio pipeline as Standard mode and stays synchronized with the picture; phone audio still asks for capture consent. Secure windows remain black.</string>
+    <string name="help_audio_body">Phone audio uses Android\'s playback capture API. Apps can exclude their audio, and calls, DRM-protected content, and some games may be silent. It works in both modes; when video is captured with shell mode, only the audio track asks for capture consent.</string>
+    <string name="help_shell_title">Shell mode (screenrecord)</string>
+    <string name="help_shell_body">Shell mode runs Android\'s screenrecord through ADB, Shizuku, or root, so video needs no MediaProjection consent. Videos are recorded in 180-second segments and joined when you stop. Audio uses the same microphone and phone-audio pipeline as Standard mode and stays synchronized with the picture; phone audio still asks for capture consent and needs the project_media app-op. Secure windows remain black. ADB needs a one-time command from a computer, Shizuku needs its permission, and root needs su.</string>
     <string name="help_storage_title">Where videos are saved</string>
     <string name="help_storage_body">Videos are saved to %1$s. Change the folder in Settings → Storage; all folders used by this app are listed on the Videos page.</string>
 
@@ -279,19 +289,24 @@
     <string name="error_video_drain_timeout">The video encoder did not finish in time.</string>
     <string name="error_empty_recording">The recording file is empty.</string>
     <string name="error_recording_interrupted">Recording was interrupted.</string>
-    <string name="error_root_unavailable">Root access is not available.</string>
-    <string name="error_root_timeout">The root prompt timed out.</string>
-    <string name="error_root_screenrecord_missing">screenrecord was not found on this device.</string>
-    <string name="error_root_start_timeout">Root recording did not start in time.</string>
-    <string name="error_root_no_video">No video was recorded.</string>
-    <string name="error_root_start_failed">Could not start screenrecord.</string>
-    <string name="error_root_screenrecord_failed">screenrecord stopped unexpectedly.</string>
-    <string name="error_root_screenrecord_failed_with_reason">screenrecord stopped unexpectedly: %1$s</string>
-    <string name="error_root_stopped_early">screenrecord stopped too early.</string>
-    <string name="warning_root_unexpected_stop">Root recording stopped unexpectedly. The finished part is being saved.</string>
+    <string name="error_shell_unavailable">Shell access is not available.</string>
+    <string name="error_shell_adb_not_running">The ADB helper is not running. Run the activation command again.</string>
+    <string name="error_shell_shizuku_not_running">Shizuku is not running.</string>
+    <string name="error_shell_shizuku_no_permission">Shizuku permission was not granted.</string>
+    <string name="error_shell_no_root">su was not found or access was denied.</string>
+    <string name="error_shell_root_timeout">The root prompt timed out.</string>
+    <string name="error_shell_no_screenrecord">The screenrecord tool was not found on this device.</string>
+    <string name="error_shell_backend">The shell backend returned an error.</string>
+    <string name="error_shell_start_timeout">Shell recording did not start in time.</string>
+    <string name="error_shell_no_video">No video was recorded.</string>
+    <string name="error_shell_screenrecord_failed">screenrecord stopped unexpectedly.</string>
+    <string name="error_shell_screenrecord_failed_with_reason">screenrecord stopped unexpectedly: %1$s</string>
+    <string name="error_shell_stopped_early">screenrecord stopped too early.</string>
+    <string name="warning_shell_unexpected_stop">Shell recording stopped unexpectedly. The finished part is being saved.</string>
+    <string name="warning_appop_grant_failed">Could not grant the project_media app-op. Phone audio may be silent.</string>
 
     <string name="recording_summary">%1$s • %2$s • %3$s • %4$d fps</string>
-    <string name="recording_summary_root">%1$s • %2$s • %3$s</string>
+    <string name="recording_summary_shell">%1$s • %2$s • %3$s</string>
     <string name="error_notification_permission">Notification permission was denied. The recording notification may not be visible.</string>
     
 </resources>

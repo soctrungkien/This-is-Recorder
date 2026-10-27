@@ -3,7 +3,7 @@
 Ứng dụng quay màn hình Android viết lại hoàn toàn bằng Kotlin, dùng giao diện **Miuix** (Jetpack Compose). Ứng dụng hỗ trợ hai chế độ:
 
 - **Chuẩn (MediaProjection)**: quay màn hình + âm thanh điện thoại / micrô / trộn cả hai.
-- **Root (screenrecord)**: quay bằng `su -c screenrecord`, không cần hộp thoại cấp quyền MediaProjection.
+- **Screenrecord (ADB / Shizuku / root)**: quay bằng `screenrecord`, không cần hộp thoại cấp quyền MediaProjection cho video.
 
 ## Tính năng
 
@@ -23,19 +23,23 @@
 - Nút **Quay màn hình** trên Bảng điều khiển nhanh (Quick Settings).
 - Lưu video vào `Movies/ThisIsRecorder`; hiển thị bản ghi gần nhất, ảnh thu nhỏ, nút Mở/Chia sẻ.
 - Thông báo đang quay có nút Dừng.
-- Chế độ Root tùy chọn, dùng `screenrecord` và tự ghép các đoạn 180 giây.
+- Chế độ Screenrecord tùy chọn qua ADB, Shizuku hoặc root, dùng `screenrecord` và tự ghép các đoạn 180 giây.
 
-## Chế độ Root
+## Chế độ Screenrecord
 
-Chế độ Root cần quyền `su` (Magisk, KernelSU, APatch...). Đặc điểm:
+Chế độ Screenrecord lấy quyền shell theo một trong ba cách:
 
-- Không cần hộp thoại MediaProjection.
-- Chỉ ghi **micrô**. Không ghi được âm thanh nội bộ của điện thoại.
+- **ADB**: bật gỡ lỗi USB, kết nối máy tính và chạy lệnh kích hoạt một lần trong ứng dụng. Trợ lý chạy nền đến khi dừng hoặc khởi động lại máy.
+- **Shizuku**: khởi động Shizuku rồi cấp quyền cho ứng dụng; không cần máy tính sau khi thiết lập.
+- **Root**: dùng `su` từ Magisk, KernelSU, APatch...
+
+Đặc điểm:
+
+- Không cần hộp thoại MediaProjection cho video.
+- Vẫn hỗ trợ micrô, âm thanh điện thoại và trộn cả hai. Âm thanh điện thoại dùng playback capture nên vẫn cần xác nhận MediaProjection một lần; ứng dụng tự cấp app-op `android:project_media` trước khi quay và khôi phục chế độ cũ khi dừng.
 - `screenrecord` bị giới hạn 180 giây mỗi đoạn; ứng dụng tự quay nhiều đoạn và ghép lại khi dừng.
 - Cửa sổ có `FLAG_SECURE` vẫn hiển thị màu đen.
-- Nếu thiếu `su` hoặc thiết bị không có `screenrecord`, ứng dụng báo lỗi và không ảnh hưởng chế độ Chuẩn.
-
-Khi chọn Root trong lúc đang đặt nguồn âm thanh là “Âm thanh của điện thoại”, ứng dụng sẽ hỏi xác nhận và chuyển sang micrô.
+- Nếu backend không khả dụng hoặc thiếu `screenrecord`, ứng dụng báo lỗi và không ảnh hưởng chế độ Chuẩn.
 
 ## Giới hạn âm thanh điện thoại
 
@@ -116,6 +120,7 @@ Android 14+ không cho Quick Settings tự lấy quyền MediaProjection, nên l
 - `POST_NOTIFICATIONS`: thông báo điều khiển khi đang quay.
 - `FOREGROUND_SERVICE` + các loại `mediaProjection`, `microphone`, `specialUse`.
 - Không xin quyền truy cập toàn bộ thư viện ảnh; video do ứng dụng tạo được ghi trực tiếp qua MediaStore.
+- Chế độ Screenrecord không cần quyền Android đặc biệt; quyền shell do ADB, Shizuku hoặc `su` cấp. Với âm thanh điện thoại, ứng dụng dùng app-op `android:project_media` và khôi phục trạng thái trước đó khi dừng.
 
 ## Cấu trúc chính
 
@@ -123,8 +128,9 @@ Android 14+ không cho Quick Settings tự lấy quyền MediaProjection, nên l
 app/src/main/java/com/hihi/recorder/
 ├── MainActivity.kt           # quyền, MediaProjection, mở đầu ghi
 ├── data/                     # cài đặt, trạng thái, MediaStore, thư viện video
-├── media/                    # engine MediaProjection và root screenrecord
-├── root/                     # su + kiểm tra root
+├── media/                    # engine MediaProjection và shell screenrecord
+├── shell/                    # ADB daemon, Shizuku UserService, root, app-op
+├── root/                     # chạy lệnh su
 ├── service/                  # foreground service, notification, QS tile
 └── ui/                       # giao diện Miuix
 ```
@@ -159,4 +165,6 @@ app/src/main/java/com/hihi/recorder/
 - Video chuẩn: H.264 surface encoder, GOP 1 giây.
 - File tạm được ghi vào cache, chỉ đưa vào MediaStore sau khi muxer hoàn tất.
 - Nếu quá trình quay lỗi, file tạm bị xóa và thông báo lỗi được hiển thị.
-- Chế độ Root dùng một script bọc `screenrecord`, lấy PID con, gửi `SIGINT` khi dừng và `chmod 666` file đầu ra trước khi ứng dụng đọc.
+- Chế độ Screenrecord dùng một script bọc `screenrecord`, lấy PID con, gửi `SIGINT` khi dừng và `chmod 666` file đầu ra trước khi ứng dụng đọc. Đoạn video và file điều khiển nằm trong thư mục external files của ứng dụng để tiến trình shell đọc/ghi được.
+- ADB dùng một daemon chạy nền, trao đổi lệnh qua file và gửi heartbeat mỗi giây. Shizuku dùng `UserService` chạy với UID shell; root dùng `su -c`.
+- App-op `android:project_media` được lưu tạm vào SharedPreferences trước khi cấp, để lần mở ứng dụng sau vẫn khôi phục được nếu tiến trình bị dừng đột ngột.

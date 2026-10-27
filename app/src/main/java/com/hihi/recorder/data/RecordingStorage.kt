@@ -22,17 +22,25 @@ object RecordingStorage {
         return File(directory, "recording_$stamp.mp4")
     }
 
-    fun newSessionDirectory(context: Context): File {
-        val directory = File(context.cacheDir, "root_sessions").apply { mkdirs() }
+    /**
+     * Shell segment files live in the app's external files directory. The ADB
+     * daemon and Shizuku's UserService run with the shell UID and cannot read
+     * the app's internal cache, while the app can still read its own external
+     * files without any storage permission.
+     */
+    fun newShellSessionDirectory(context: Context): File {
+        val base = context.getExternalFilesDir(null) ?: context.cacheDir
+        val directory = File(base, "shell_sessions").apply { mkdirs() }
         val stamp = SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(Date())
         return File(directory, "session_$stamp").apply { mkdirs() }
     }
 
     fun cleanOldTempFiles(context: Context) {
         val now = System.currentTimeMillis()
-        val directories = listOf(
+        val directories = listOfNotNull(
             File(context.cacheDir, TEMP_FOLDER),
             File(context.cacheDir, "root_sessions"),
+            context.getExternalFilesDir(null)?.let { File(it, "shell_sessions") },
         )
         directories.forEach { directory ->
             directory.listFiles()?.forEach { file ->

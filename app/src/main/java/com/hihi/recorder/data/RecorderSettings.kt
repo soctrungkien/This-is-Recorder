@@ -33,7 +33,19 @@ enum class CaptureMode {
     /** MediaProjection + MediaCodec. Supports phone audio through playback capture. */
     STANDARD,
 
-    /** Root shell + Android's screenrecord tool. No MediaProjection consent required. */
+    /** Android's screenrecord through ADB, Shizuku, or root. */
+    SHELL,
+}
+
+/**
+ * How the app obtains a shell identity for [CaptureMode.SHELL].
+ *
+ * [ROOT] stays the default so an updated install keeps the behaviour of the
+ * former root-only mode. [ADB] and [SHIZUKU] can be selected explicitly.
+ */
+enum class ShellBackend {
+    ADB,
+    SHIZUKU,
     ROOT,
 }
 
@@ -110,6 +122,7 @@ enum class NavigationBarStyle {
  */
 data class RecorderSettings(
     val captureMode: CaptureMode = CaptureMode.STANDARD,
+    val shellBackend: ShellBackend = ShellBackend.ROOT,
     val audioSource: AudioSource = AudioSource.DEVICE,
     val resolution: VideoResolution = VideoResolution.P1080,
     val frameRate: VideoFrameRate = VideoFrameRate.FPS_30,

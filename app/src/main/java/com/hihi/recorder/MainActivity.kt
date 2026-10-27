@@ -24,9 +24,13 @@ import androidx.core.content.ContextCompat
 import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.RecordingStateStore
 import com.hihi.recorder.data.SavedRecording
-import com.hihi.recorder.root.RootChecker
-import com.hihi.recorder.root.RootStatus
+import com.hihi.recorder.data.ShellBackend
 import com.hihi.recorder.service.RecordingService
+import com.hihi.recorder.shell.AdbDaemon
+import com.hihi.recorder.shell.ProjectMediaAppOp
+import com.hihi.recorder.shell.ShellChecker
+import com.hihi.recorder.shell.ShellFailure
+import com.hihi.recorder.shell.ShellStatus
 import com.hihi.recorder.ui.RecorderApp
 import com.hihi.recorder.ui.RecorderTheme
 import kotlinx.coroutines.CoroutineScope
@@ -34,11 +38,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import rikka.shizuku.Shizuku
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 
 class MainActivity : ComponentActivity() {
 
-    private enum class PendingStart { STANDARD, ROOT }
+    private enum class PendingStart { STANDARD, SHELL }
 
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val snackbarHostState = SnackbarHostState()
@@ -47,9 +52,22 @@ class MainActivity : ComponentActivity() {
     private var projectionTarget: PendingStart? = null
 
     private var autoStartToken by mutableIntStateOf(0)
-    private var checkingRoot by mutableStateOf(false)
+    private var checkingShell by mutableStateOf(false)
     private var showMicPermissionDialog by mutableStateOf(false)
-    private var showRootUnavailableDialog by mutableStateOf(false)
+    private var showShellUnavailableDialog by mutableStateOf(false)
+    private var shellFailure by mutableStateOf<ShellFailure?>(null)
+
+    private val shizukuPermissionListener =
+        Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+            if (requestCode != SHIZUKU_PERMISSION_REQUEST) return@OnRequestPermissionResultListener
+            if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                beginShellStart()
+            } else {
+                checkingShell = false
+                shellFailure = ShellFailure.SHIZUKU_NO_PERMISSION
+                showShellUnavailableDialog = true
+            }
+        }
 
     private val projectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -60,9 +78,14 @@ class MainActivity : ComponentActivity() {
         if (result.resultCode == Activity.RESULT_OK && data != null) {
             when (target) {
                 PendingStart.STANDARD -> startStandardService(result.resultCode, data)
-                PendingStart.ROOT -> startRootService(result.resultCode, data)
+                PendingStart.SHELL -> startShellService(result.resultCode, data)
             }
         } else {
+            if (target == PendingStart.SHELL) {
+                // The app-op was granted before the prompt; undo it because the
+                // service will never start a projection session.
+                ProjectMediaAppOp.restoreDetached(this)
+            }
             showMessage(getString(R.string.projection_denied))
         }
     }
@@ -91,7 +114,7 @@ class MainActivity : ComponentActivity() {
         }
         when (pending) {
             PendingStart.STANDARD -> requestProjection(PendingStart.STANDARD)
-            PendingStart.ROOT -> beginRootStart()
+            PendingStart.SHELL -> beginShellStart()
             null -> Unit
         }
     }
@@ -107,6 +130,16 @@ class MainActivity : ComponentActivity() {
         projectionTarget = savedInstanceState
             ?.getString(KEY_PROJECTION_TARGET)
             ?.let { name -> runCatching { PendingStart.valueOf(name) }.getOrNull() }
+
+        runCatching { Shizuku.addRequestPermissionResultListener(shizukuPermissionListener) }
+        // A crash or a process kill can leave project_media allowed. Restore it
+        // once the UI is alive, but not while a live session or a shell start
+        // waiting for the projection consent still relies on the grant.
+        val shellProjectionPending = projectionTarget == PendingStart.SHELL
+        if (!shellProjectionPending && !RecordingStateStore.state.value.isActive) {
+            ProjectMediaAppOp.restoreDetached(this)
+        }
+        runCatching { AdbDaemon.ensureScripts(this) }
 
         if (savedInstanceState == null && intent?.getBooleanExtra(EXTRA_AUTO_START, false) == true) {
             autoStartToken = 1
@@ -129,16 +162,17 @@ class MainActivity : ComponentActivity() {
                     recordings = recordings,
                     recordingsLoading = recordingsLoading,
                     snackbarHostState = snackbarHostState,
-                    checkingRoot = checkingRoot,
+                    checkingShell = checkingShell,
                     autoStartToken = autoStartToken,
                     showMicPermissionDialog = showMicPermissionDialog,
-                    showRootUnavailableDialog = showRootUnavailableDialog,
+                    showShellUnavailableDialog = showShellUnavailableDialog,
+                    shellFailure = shellFailure,
                     onSettingsChange = repository::replace,
                     onStart = ::beginStart,
                     onStop = ::stopRecording,
                     onDismissMicPermissionDialog = { showMicPermissionDialog = false },
                     onOpenAppSettings = ::openAppSettings,
-                    onDismissRootUnavailableDialog = { showRootUnavailableDialog = false },
+                    onDismissShellUnavailableDialog = { showShellUnavailableDialog = false },
                     onOpenRecording = ::openRecording,
                     onShareRecording = ::shareRecording,
                     onRefreshRecordings = ::refreshRecordings,
@@ -165,6 +199,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        runCatching {
+            Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener)
+        }
         activityScope.cancel()
         super.onDestroy()
     }
@@ -187,8 +224,8 @@ class MainActivity : ComponentActivity() {
         }
 
         if (permissions.isNotEmpty()) {
-            pendingStart = if (settings.captureMode == CaptureMode.ROOT) {
-                PendingStart.ROOT
+            pendingStart = if (settings.captureMode == CaptureMode.SHELL) {
+                PendingStart.SHELL
             } else {
                 PendingStart.STANDARD
             }
@@ -196,31 +233,66 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        if (settings.captureMode == CaptureMode.ROOT) {
-            // Check root before asking for playback-capture consent: a device
-            // without su should show the root dialog, not a projection prompt.
-            beginRootStart()
+        if (settings.captureMode == CaptureMode.SHELL) {
+            // Check the activation method before asking for playback-capture
+            // consent: an unavailable backend should show its own instructions
+            // instead of a projection prompt.
+            beginShellStart()
         } else {
             requestProjection(PendingStart.STANDARD)
         }
     }
 
-    private fun beginRootStart() {
-        if (checkingRoot) return
-        checkingRoot = true
+    private fun beginShellStart() {
+        if (checkingShell) return
+        val settings = settingsRepository.settings.value
+        if (settings.captureMode != CaptureMode.SHELL) {
+            requestProjection(PendingStart.STANDARD)
+            return
+        }
+
+        checkingShell = true
         activityScope.launch {
-            val status = RootChecker.check(this@MainActivity, force = false)
-            checkingRoot = false
-            if (status == RootStatus.Available) {
-                if (settingsRepository.settings.value.audioSource.usesDeviceAudio) {
-                    // Root video needs no consent, but phone audio still goes
-                    // through MediaProjection's playback-capture API.
-                    requestProjection(PendingStart.ROOT)
-                } else {
-                    startRootService()
+            // A previous session may still be restoring project_media through
+            // a Shizuku user service. Finish that before binding a new one.
+            ProjectMediaAppOp.awaitPendingWork()
+            val backend = settings.shellBackend
+            val status = ShellChecker.check(this@MainActivity, backend, force = true)
+            if (status is ShellStatus.Unavailable &&
+                backend == ShellBackend.SHIZUKU &&
+                status.reason == ShellFailure.SHIZUKU_NO_PERMISSION
+            ) {
+                checkingShell = false
+                runCatching {
+                    Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST)
+                }.onFailure {
+                    shellFailure = ShellFailure.SHIZUKU_NO_PERMISSION
+                    showShellUnavailableDialog = true
                 }
+                return@launch
+            }
+            if (status !is ShellStatus.Available) {
+                checkingShell = false
+                shellFailure = (status as? ShellStatus.Unavailable)?.reason
+                    ?: ShellFailure.BACKEND_ERROR
+                showShellUnavailableDialog = true
+                return@launch
+            }
+
+            val needsProjection = settings.audioSource.usesDeviceAudio
+            if (needsProjection) {
+                val granted = ProjectMediaAppOp(this@MainActivity).grant(backend)
+                if (!granted) {
+                    showMessage(getString(R.string.warning_appop_grant_failed))
+                }
+            }
+            checkingShell = false
+            if (needsProjection) {
+                // Shell video needs no consent, but phone audio still goes
+                // through MediaProjection's playback-capture API.
+                requestProjection(PendingStart.SHELL)
             } else {
-                showRootUnavailableDialog = true
+                startShellService()
             }
         }
     }
@@ -238,10 +310,18 @@ class MainActivity : ComponentActivity() {
             projectionLauncher.launch(captureIntent)
         } catch (_: ActivityNotFoundException) {
             projectionTarget = null
+            abandonShellProjection(target)
             showMessage(getString(R.string.projection_unavailable))
         } catch (_: SecurityException) {
             projectionTarget = null
+            abandonShellProjection(target)
             showMessage(getString(R.string.projection_unavailable))
+        }
+    }
+
+    private fun abandonShellProjection(target: PendingStart) {
+        if (target == PendingStart.SHELL) {
+            ProjectMediaAppOp.restoreDetached(this)
         }
     }
 
@@ -257,7 +337,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startRootService(
+    private fun startShellService(
         resultCode: Int = Activity.RESULT_CANCELED,
         data: Intent? = null,
     ) {
@@ -271,7 +351,8 @@ class MainActivity : ComponentActivity() {
         runCatching {
             ContextCompat.startForegroundService(this, intent)
         }.onFailure {
-            showMessage(it.message ?: getString(R.string.error_root_unavailable))
+            ProjectMediaAppOp.restoreDetached(this)
+            showMessage(it.message ?: getString(R.string.error_shell_unavailable))
         }
     }
 
@@ -386,6 +467,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_AUTO_START = "com.hihi.recorder.extra.AUTO_START"
+        private const val SHIZUKU_PERMISSION_REQUEST = 4102
         private const val UI_PREFS = "miuix_recorder_ui"
         private const val KEY_NOTIFICATION_ASKED = "notification_asked"
         private const val KEY_PENDING_START = "pending_start"

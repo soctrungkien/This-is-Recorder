@@ -24,9 +24,10 @@ import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingStateStore
 import com.hihi.recorder.data.RecordingStorage
 import com.hihi.recorder.media.ProjectionRecorder
-import com.hihi.recorder.media.RootRecorder
+import com.hihi.recorder.media.ShellRecorder
 import com.hihi.recorder.recordingLibrary
 import com.hihi.recorder.settingsRepository
+import com.hihi.recorder.shell.ProjectMediaAppOp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +59,7 @@ class RecordingService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var receiverRegistered = false
     private var finishing = false
+    private var projectMediaRestored = false
 
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -107,6 +109,7 @@ class RecordingService : Service() {
         stopRequested.set(false)
         stopSignal = CompletableDeferred()
         finishing = false
+        projectMediaRestored = false
 
         try {
             startForegroundNow(settings)
@@ -158,7 +161,7 @@ class RecordingService : Service() {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
             }
             if (settings.audioSource.usesDeviceAudio) {
-                // Root video does not need MediaProjection, but phone audio
+                // Shell video does not need MediaProjection, but phone audio
                 // capture does.
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
             }
@@ -241,6 +244,10 @@ class RecordingService : Service() {
             )
 
             active.stop()
+            // Restore before publishing/marking saved. The UI considers the
+            // recording finished at markSaved(), so a new session could grant
+            // the op while this one's delayed restore is still queued.
+            restoreProjectMediaAppOp()
             active.warning?.let { RecordingStateStore.markWarning(it) }
             val duration = (SystemClock.elapsedRealtime() - startedAt).coerceAtLeast(0L)
             val saved = withContext(Dispatchers.IO) {
@@ -286,7 +293,7 @@ class RecordingService : Service() {
         resultCode: Int,
         projectionData: Intent?,
     ): ActiveRecorder {
-        if (settings.captureMode == CaptureMode.ROOT) {
+        if (settings.captureMode == CaptureMode.SHELL) {
             val needsProjection = settings.audioSource.usesDeviceAudio
             val projection = if (needsProjection) {
                 if (resultCode != Activity.RESULT_OK || projectionData == null) {
@@ -299,7 +306,7 @@ class RecordingService : Service() {
             } else {
                 null
             }
-            return RootRecorder(
+            return ShellRecorder(
                 context = this,
                 settings = settings,
                 outputFile = file,
@@ -377,8 +384,20 @@ class RecordingService : Service() {
         currentSettings = null
         outputFile = null
         releaseWakeLock()
+        restoreProjectMediaAppOp()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    /**
+     * Restores the app-op after the projection has been stopped. The detached
+     * scope survives stopSelf/onDestroy, which is important on Android 14
+     * where the service may be torn down immediately after the result is shown.
+     */
+    private fun restoreProjectMediaAppOp() {
+        if (projectMediaRestored) return
+        projectMediaRestored = true
+        ProjectMediaAppOp.restoreDetached(this)
     }
 
     private fun acquireWakeLock() {
@@ -428,6 +447,7 @@ class RecordingService : Service() {
         }
         cleanupFailedSession(deleteFile = true)
         releaseWakeLock()
+        restoreProjectMediaAppOp()
         scope.cancel()
         super.onDestroy()
     }
@@ -439,7 +459,7 @@ class RecordingService : Service() {
         fun abort()
     }
 
-    private fun RootRecorder.asActive(): ActiveRecorder = object : ActiveRecorder {
+    private fun ShellRecorder.asActive(): ActiveRecorder = object : ActiveRecorder {
         override val warning: String? get() = this@asActive.warning
         override suspend fun start() = this@asActive.start()
         override suspend fun stop() = this@asActive.stop()

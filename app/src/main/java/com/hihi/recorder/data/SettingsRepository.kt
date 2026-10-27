@@ -25,6 +25,9 @@ class SettingsRepository(context: Context) {
     fun setCaptureMode(value: CaptureMode) = update { it.copy(captureMode = value) }
 
     @Synchronized
+    fun setShellBackend(value: ShellBackend) = update { it.copy(shellBackend = value) }
+
+    @Synchronized
     fun setAudioSource(value: AudioSource) = update { it.copy(audioSource = value) }
 
     @Synchronized
@@ -95,7 +98,8 @@ class SettingsRepository(context: Context) {
     private fun readSettings(): RecorderSettings {
         val defaults = RecorderSettings()
         return RecorderSettings(
-            captureMode = preferences.enumValue(KEY_CAPTURE_MODE, defaults.captureMode),
+            captureMode = preferences.captureModeValue(KEY_CAPTURE_MODE, defaults.captureMode),
+            shellBackend = preferences.enumValue(KEY_SHELL_BACKEND, defaults.shellBackend),
             audioSource = preferences.enumValue(KEY_AUDIO_SOURCE, defaults.audioSource),
             resolution = preferences.enumValue(KEY_RESOLUTION, defaults.resolution),
             frameRate = preferences.enumValue(KEY_FRAME_RATE, defaults.frameRate),
@@ -129,6 +133,7 @@ class SettingsRepository(context: Context) {
     private fun writeSettings(settings: RecorderSettings) {
         preferences.edit()
             .putString(KEY_CAPTURE_MODE, settings.captureMode.name)
+            .putString(KEY_SHELL_BACKEND, settings.shellBackend.name)
             .putString(KEY_AUDIO_SOURCE, settings.audioSource.name)
             .putString(KEY_RESOLUTION, settings.resolution.name)
             .putString(KEY_FRAME_RATE, settings.frameRate.name)
@@ -156,9 +161,24 @@ class SettingsRepository(context: Context) {
         return runCatching { enumValueOf<T>(raw) }.getOrDefault(fallback)
     }
 
+    /**
+     * Older builds stored `CaptureMode.ROOT`. Treat it as the new shell mode
+     * with its original backend so an update does not silently change how the
+     * screen is captured.
+     */
+    private fun android.content.SharedPreferences.captureModeValue(
+        key: String,
+        fallback: CaptureMode,
+    ): CaptureMode {
+        val raw = getString(key, null) ?: return fallback
+        if (raw == "ROOT") return CaptureMode.SHELL
+        return runCatching { CaptureMode.valueOf(raw) }.getOrDefault(fallback)
+    }
+
     private companion object {
         const val PREFS_NAME = "miuix_recorder_settings"
         const val KEY_CAPTURE_MODE = "capture_mode"
+        const val KEY_SHELL_BACKEND = "shell_backend"
         const val KEY_AUDIO_SOURCE = "audio_source"
         const val KEY_RESOLUTION = "resolution"
         const val KEY_FRAME_RATE = "frame_rate"

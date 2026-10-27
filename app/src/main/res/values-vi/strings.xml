@@ -24,8 +24,8 @@
     <string name="action_share">Chia sẻ</string>
     <string name="action_retry">Thử lại</string>
     <string name="action_close">Đóng</string>
-    <string name="action_check_root">Kiểm tra lại</string>
-    <string name="action_enable_root">Bật chế độ Root</string>
+    <string name="action_check_shell">Kiểm tra lại</string>
+    <string name="action_copy_command">Sao chép lệnh</string>
     <string name="action_open_settings">Mở cài đặt</string>
     <string name="action_switch_mic">Dùng micrô</string>
     <string name="action_refresh">Làm mới</string>
@@ -46,7 +46,6 @@
     <string name="section_appearance">Giao diện</string>
     <string name="section_help">Trợ giúp</string>
     <string name="section_last_recording">Bản ghi gần đây</string>
-    <string name="section_root">Chế độ Root</string>
     <string name="section_capture_mode">Chế độ ghi</string>
     <string name="section_storage">Lưu trữ</string>
     <string name="section_updates">Cập nhật</string>
@@ -101,12 +100,11 @@
     <string name="settings_subtitle">Giao diện, lưu trữ và cập nhật</string>
 
     <string name="mode_standard_short">Chuẩn</string>
-    <string name="mode_root_short">Root</string>
+    <string name="mode_shell_short">Screenrecord</string>
     <string name="recording_locked_hint">Dừng quay để thay đổi các tùy chọn này.</string>
 
     <string name="pref_capture_mode">Chế độ ghi</string>
     <string name="pref_capture_mode_summary_standard">MediaProjection + MediaCodec. Hỗ trợ âm thanh của điện thoại.</string>
-    <string name="pref_capture_mode_summary_root">screenrecord qua root. Video không cần cấp quyền; âm thanh điện thoại vẫn hỏi một lần.</string>
     <string name="pref_audio_source">Nguồn âm thanh</string>
     <string name="pref_resolution">Độ phân giải</string>
     <string name="pref_frame_rate">Tốc độ khung hình</string>
@@ -117,7 +115,8 @@
     <string name="pref_stop_screen_off">Dừng khi tắt màn hình</string>
     <string name="pref_theme">Chủ đề</string>
     <string name="pref_help">Hướng dẫn và giới hạn</string>
-    <string name="pref_root_status">Trạng thái root</string>
+    <string name="pref_shell_status">Trạng thái shell</string>
+    <string name="pref_shell_backend">Cách kích hoạt</string>
     <string name="pref_version">Phiên bản</string>
     <string name="pref_storage">Thư mục lưu</string>
     <string name="pref_storage_summary">Movies/ThisIsRecorder</string>
@@ -175,9 +174,9 @@
     <string name="update_invalid_response">GitHub trả về dữ liệu không hợp lệ.</string>
 
     <string name="capture_standard">Chuẩn (MediaProjection)</string>
-    <string name="capture_root">Root (screenrecord)</string>
+    <string name="capture_shell">Screenrecord (ADB, Shizuku, root)</string>
     <string name="capture_standard_summary">MediaProjection + MediaCodec. Hỗ trợ âm thanh của điện thoại.</string>
-    <string name="capture_root_summary">Root + screenrecord. Video không cần cấp quyền; âm thanh điện thoại vẫn hỏi một lần.</string>
+    <string name="capture_shell_summary">Dùng screenrecord của Android qua ADB, Shizuku hoặc root. Video không cần cấp quyền; âm thanh điện thoại vẫn hỏi một lần.</string>
 
     <string name="audio_none">Không âm thanh</string>
     <string name="audio_mic">Micrô</string>
@@ -194,7 +193,7 @@
     <string name="resolution_1440">1440p</string>
     <string name="resolution_native">Gốc</string>
     <string name="fps_value">%1$d fps</string>
-    <string name="fps_root_summary">Chế độ Root dùng tần số quét của màn hình.</string>
+    <string name="fps_shell_summary">Chế độ Screenrecord dùng tần số quét của màn hình.</string>
     <string name="bitrate_auto">Tự động</string>
     <string name="bitrate_value">%1$d Mbps</string>
     <string name="countdown_off">Tắt</string>
@@ -205,19 +204,30 @@
     <string name="theme_light">Sáng</string>
     <string name="theme_dark">Tối</string>
 
-    <string name="root_status_unknown">Chưa kiểm tra</string>
-    <string name="root_status_checking">Đang kiểm tra root…</string>
-    <string name="root_status_available">Đã có root</string>
-    <string name="root_status_unavailable">Chưa có root</string>
-    <string name="root_status_no_su">Không tìm thấy su hoặc quyền đã bị từ chối.</string>
-    <string name="root_status_timeout">Hết thời gian chờ cấp quyền root.</string>
-    <string name="root_status_no_screenrecord">Không tìm thấy công cụ screenrecord.</string>
-    <string name="root_note_title">Lưu ý về chế độ Root</string>
-    <string name="root_note">screenrecord ghi video thành từng đoạn 180 giây và tự ghép lại khi dừng. Âm thanh dùng chung pipeline micrô và âm thanh điện thoại với chế độ Chuẩn, được đồng bộ với hình. Cửa sổ bảo mật vẫn hiển thị màu đen.</string>
+    <string name="shell_status_unknown">Chưa kiểm tra</string>
+    <string name="shell_status_checking">Đang kiểm tra quyền shell…</string>
+    <string name="shell_status_adb_ready">Trợ lý ADB đang chạy</string>
+    <string name="shell_status_shizuku_ready">Shizuku đã sẵn sàng</string>
+    <string name="shell_status_root_ready">Đã có root</string>
+    <string name="shell_status_unavailable">Chưa có quyền shell</string>
 
-    <string name="root_required_title">Cần quyền root</string>
-    <string name="root_required_message">Hãy cấp quyền su cho This is Recorder trong Magisk, KernelSU hoặc trình quản lý root, rồi thử lại.</string>
-    <string name="root_error_title">Không dùng được chế độ Root</string>
+    <string name="shell_backend_adb">ADB</string>
+    <string name="shell_backend_shizuku">Shizuku</string>
+    <string name="shell_backend_root">Root</string>
+    <string name="shell_backend_adb_summary">Chạy một lệnh từ máy tính. Trợ lý chạy nền cho đến khi bạn dừng hoặc khởi động lại máy.</string>
+    <string name="shell_backend_shizuku_summary">Khởi động Shizuku rồi cấp quyền cho ứng dụng. Sau khi thiết lập không cần máy tính.</string>
+    <string name="shell_backend_root_summary">Dùng su từ Magisk, KernelSU hoặc trình quản lý root khác.</string>
+
+    <string name="shell_adb_title">Kích hoạt qua ADB</string>
+    <string name="shell_adb_note">Bật gỡ lỗi USB, kết nối điện thoại với máy tính rồi chạy lệnh này một lần:</string>
+    <string name="copied_to_clipboard">Đã sao chép</string>
+
+    <string name="shell_required_title">Cần quyền shell</string>
+    <string name="shell_required_message">Chế độ ghi này cần quyền shell. Chọn ADB, Shizuku hoặc root rồi thử lại.</string>
+    <string name="shell_required_adb_message">Kết nối điện thoại với máy tính qua USB gỡ lỗi rồi chạy lệnh này một lần:\n\n%1$s</string>
+    <string name="shell_required_shizuku_message">Hãy khởi động Shizuku và đảm bảo nó đang chạy, rồi thử lại.</string>
+    <string name="shell_required_shizuku_permission_message">Mở Shizuku, cấp quyền cho This is Recorder rồi thử lại.</string>
+    <string name="shell_required_root_message">Hãy cấp quyền su cho This is Recorder trong Magisk, KernelSU hoặc trình quản lý root, rồi thử lại.</string>
 
     <string name="permission_mic_title">Cần quyền micrô</string>
     <string name="permission_mic_message">Hãy cấp quyền micrô cho ứng dụng trong Cài đặt để ghi âm.</string>
@@ -244,9 +254,9 @@
     <string name="help_quick_settings_title">Nút trên Bảng điều khiển nhanh</string>
     <string name="help_quick_settings_body">Mở Bảng điều khiển nhanh, nhấn Chỉnh sửa rồi kéo “Quay màn hình” vào bảng. Nhấn nút để bắt đầu quay; khi đang quay, nhấn lần nữa để dừng mà không cần mở ứng dụng. Lần bắt đầu đầu tiên vẫn mở ứng dụng để Android hiện hộp thoại cấp quyền quay màn hình.</string>
     <string name="help_audio_title">Âm thanh của điện thoại</string>
-    <string name="help_audio_body">Âm thanh của điện thoại dùng API ghi âm phát lại của Android. Ứng dụng có thể loại trừ âm thanh của mình; cuộc gọi, nội dung bảo vệ DRM và một số game có thể bị im lặng. Cả hai chế độ đều hỗ trợ; khi quay video bằng root, chỉ track âm thanh cần xác nhận cấp quyền.</string>
-    <string name="help_root_title">Chế độ Root</string>
-    <string name="help_root_body">Chế độ Root chạy screenrecord với quyền root và quay video không cần cấp quyền MediaProjection. Video được ghi thành các đoạn 180 giây và ghép lại khi bạn dừng. Âm thanh dùng chung pipeline micrô và âm thanh điện thoại với chế độ Chuẩn, được đồng bộ đúng thời gian với hình; âm thanh điện thoại vẫn cần xác nhận cấp quyền. Cửa sổ bảo mật vẫn hiển thị màu đen.</string>
+    <string name="help_audio_body">Âm thanh của điện thoại dùng API ghi âm phát lại của Android. Ứng dụng có thể loại trừ âm thanh của mình; cuộc gọi, nội dung bảo vệ DRM và một số game có thể bị im lặng. Cả hai chế độ đều hỗ trợ; khi quay video bằng shell, chỉ track âm thanh cần xác nhận cấp quyền.</string>
+    <string name="help_shell_title">Chế độ Screenrecord</string>
+    <string name="help_shell_body">Chế độ Screenrecord chạy screenrecord của Android qua ADB, Shizuku hoặc root nên video không cần cấp quyền MediaProjection. Video được ghi thành các đoạn 180 giây và ghép lại khi bạn dừng. Âm thanh dùng chung pipeline micrô và âm thanh điện thoại với chế độ Chuẩn, được đồng bộ đúng thời gian với hình; âm thanh điện thoại vẫn cần xác nhận cấp quyền và cần app-op project_media. Cửa sổ bảo mật vẫn hiển thị màu đen. ADB cần chạy lệnh một lần từ máy tính, Shizuku cần cấp quyền, còn root cần su.</string>
     <string name="help_storage_title">Nơi lưu video</string>
     <string name="help_storage_body">Video được lưu trong %1$s. Bạn có thể đổi thư mục trong Cài đặt → Lưu trữ; mọi thư mục ứng dụng từng dùng đều hiện trong trang Video.</string>
 
@@ -279,19 +289,24 @@
     <string name="error_video_drain_timeout">Bộ mã hóa video không kết thúc kịp.</string>
     <string name="error_empty_recording">Tệp ghi hình bị rỗng.</string>
     <string name="error_recording_interrupted">Quá trình ghi hình bị gián đoạn.</string>
-    <string name="error_root_unavailable">Không có quyền root.</string>
-    <string name="error_root_timeout">Hết thời gian chờ cấp quyền root.</string>
-    <string name="error_root_screenrecord_missing">Không tìm thấy screenrecord trên thiết bị này.</string>
-    <string name="error_root_start_timeout">Chế độ Root không khởi động kịp.</string>
-    <string name="error_root_no_video">Không quay được video.</string>
-    <string name="error_root_start_failed">Không khởi động được screenrecord.</string>
-    <string name="error_root_screenrecord_failed">screenrecord dừng đột ngột.</string>
-    <string name="error_root_screenrecord_failed_with_reason">screenrecord dừng đột ngột: %1$s</string>
-    <string name="error_root_stopped_early">screenrecord dừng quá sớm.</string>
-    <string name="warning_root_unexpected_stop">Chế độ Root dừng đột ngột. Phần đã quay đang được lưu.</string>
+    <string name="error_shell_unavailable">Không có quyền shell.</string>
+    <string name="error_shell_adb_not_running">Trợ lý ADB không chạy. Hãy chạy lại lệnh kích hoạt.</string>
+    <string name="error_shell_shizuku_not_running">Shizuku không chạy.</string>
+    <string name="error_shell_shizuku_no_permission">Chưa được cấp quyền Shizuku.</string>
+    <string name="error_shell_no_root">Không tìm thấy su hoặc quyền đã bị từ chối.</string>
+    <string name="error_shell_root_timeout">Hết thời gian chờ cấp quyền root.</string>
+    <string name="error_shell_no_screenrecord">Không tìm thấy công cụ screenrecord trên thiết bị này.</string>
+    <string name="error_shell_backend">Backend shell trả về lỗi.</string>
+    <string name="error_shell_start_timeout">Chế độ Screenrecord không khởi động kịp.</string>
+    <string name="error_shell_no_video">Không quay được video.</string>
+    <string name="error_shell_screenrecord_failed">screenrecord dừng đột ngột.</string>
+    <string name="error_shell_screenrecord_failed_with_reason">screenrecord dừng đột ngột: %1$s</string>
+    <string name="error_shell_stopped_early">screenrecord dừng quá sớm.</string>
+    <string name="warning_shell_unexpected_stop">Chế độ Screenrecord dừng đột ngột. Phần đã quay đang được lưu.</string>
+    <string name="warning_appop_grant_failed">Không cấp được app-op project_media. Âm thanh điện thoại có thể bị im lặng.</string>
 
     <string name="recording_summary">%1$s • %2$s • %3$s • %4$d fps</string>
-    <string name="recording_summary_root">%1$s • %2$s • %3$s</string>
+    <string name="recording_summary_shell">%1$s • %2$s • %3$s</string>
     <string name="error_notification_permission">Quyền thông báo bị từ chối. Thông báo ghi hình có thể không hiển thị.</string>
     
 </resources>

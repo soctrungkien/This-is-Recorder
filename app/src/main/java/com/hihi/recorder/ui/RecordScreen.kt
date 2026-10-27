@@ -1,5 +1,7 @@
 package com.hihi.recorder.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.net.Uri
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -26,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,11 +48,14 @@ import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingState
 import com.hihi.recorder.data.SavedRecording
+import com.hihi.recorder.data.ShellBackend
 import com.hihi.recorder.data.VideoBitrate
 import com.hihi.recorder.data.VideoFrameRate
 import com.hihi.recorder.data.VideoResolution
 import com.hihi.recorder.media.resolveCaptureSize
-import com.hihi.recorder.root.RootStatus
+import com.hihi.recorder.shell.AdbDaemon
+import com.hihi.recorder.shell.ShellStatus
+import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Info
@@ -71,12 +77,13 @@ fun RecordScreen(
     recordingState: RecordingState,
     lastRecording: SavedRecording?,
     timerMs: Long,
-    rootStatus: RootStatus,
-    checkingRoot: Boolean,
+    shellStatus: ShellStatus,
+    checkingShell: Boolean,
     snackbarHostState: SnackbarHostState,
     onSettingsChange: (RecorderSettings) -> Unit,
     onCaptureModeChange: (CaptureMode) -> Unit,
-    onCheckRoot: () -> Unit,
+    onShellBackendChange: (ShellBackend) -> Unit,
+    onCheckShell: () -> Unit,
     onStart: () -> Unit,
     onStop: () -> Unit,
     onOpenRecording: (Uri) -> Unit,
@@ -85,7 +92,7 @@ fun RecordScreen(
     val context = LocalContext.current
     val locked = recordingState.isActive
     var picker by remember { mutableStateOf<RecordPicker?>(null) }
-    val isRoot = settings.captureMode == CaptureMode.ROOT
+    val isShell = settings.captureMode == CaptureMode.SHELL
     val audioSource = settings.audioSource
     val captureSize = remember(settings.resolution) {
         resolveCaptureSize(context, settings.resolution)
@@ -113,7 +120,7 @@ fun RecordScreen(
                     state = recordingState,
                     lastRecording = lastRecording,
                     timerMs = timerMs,
-                    checkingRoot = checkingRoot,
+                    checkingShell = checkingShell,
                     onStart = onStart,
                     onStop = onStop,
                 )
@@ -127,11 +134,11 @@ fun RecordScreen(
                     AppSegmentedControl(
                         options = listOf(
                             CaptureMode.STANDARD to stringResource(R.string.mode_standard_short),
-                            CaptureMode.ROOT to stringResource(R.string.mode_root_short),
+                            CaptureMode.SHELL to stringResource(R.string.mode_shell_short),
                         ),
                         selected = settings.captureMode,
                         onSelect = onCaptureModeChange,
-                        enabled = !locked,
+                        enabled = !locked && !checkingShell,
                     )
                     Spacer(Modifier.height(9.dp))
                     AppText(
@@ -150,40 +157,17 @@ fun RecordScreen(
                 }
             }
 
-            if (isRoot) {
+            if (isShell) {
                 item {
-                    AppCard(contentPadding = PaddingValues(0.dp)) {
-                        AppRow(
-                            title = stringResource(R.string.pref_root_status),
-                            summary = rootStatus.summary(),
-                            onClick = onCheckRoot,
-                            trailing = {
-                                if (rootStatus == RootStatus.Checking) {
-                                    AppSpinner(size = 18.dp)
-                                } else {
-                                    AppIcon(
-                                        icon = MiuixIcons.Refresh,
-                                        contentDescription = stringResource(R.string.action_check_root),
-                                        modifier = Modifier.size(19.dp),
-                                        tint = appPalette().onSurfaceVariant,
-                                    )
-                                }
-                            },
-                        )
-                        AppDivider()
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            AppText(
-                                text = stringResource(R.string.root_note_title),
-                                style = AppTextStyle.Subtitle,
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            AppText(
-                                text = stringResource(R.string.root_note),
-                                style = AppTextStyle.Footnote,
-                                color = appPalette().onSurfaceVariant,
-                            )
-                        }
-                    }
+                    ShellAccessCard(
+                        backend = settings.shellBackend,
+                        status = shellStatus,
+                        checking = checkingShell,
+                        enabled = !locked && !checkingShell,
+                        snackbarHostState = snackbarHostState,
+                        onBackendChange = onShellBackendChange,
+                        onCheck = onCheckShell,
+                    )
                 }
             }
 
@@ -203,7 +187,7 @@ fun RecordScreen(
                         title = stringResource(R.string.pref_audio_source),
                         summary = audioSource.summary(),
                         value = audioSource.label(),
-                        enabled = !locked,
+                        enabled = !locked && !checkingShell,
                         onClick = { picker = RecordPicker.AUDIO },
                     )
                     if (audioSource.usesDeviceAudio) {
@@ -226,13 +210,13 @@ fun RecordScreen(
                     AppDivider()
                     AppSelectRow(
                         title = stringResource(R.string.pref_frame_rate),
-                        summary = if (isRoot) {
-                            stringResource(R.string.fps_root_summary)
+                        summary = if (isShell) {
+                            stringResource(R.string.fps_shell_summary)
                         } else {
                             null
                         },
                         value = settings.frameRate.label(),
-                        enabled = !locked && !isRoot,
+                        enabled = !locked && !isShell,
                         onClick = { picker = RecordPicker.FRAME_RATE },
                     )
                     AppDivider()
@@ -339,7 +323,7 @@ private fun RecorderHeroCard(
     state: RecordingState,
     lastRecording: SavedRecording?,
     timerMs: Long,
-    checkingRoot: Boolean,
+    checkingShell: Boolean,
     onStart: () -> Unit,
     onStop: () -> Unit,
 ) {
@@ -499,10 +483,121 @@ private fun RecorderHeroCard(
                     },
                 ),
                 onClick = onStart,
-                enabled = !checkingRoot,
-                loading = checkingRoot,
+                enabled = !checkingShell,
+                loading = checkingShell,
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
+    }
+}
+
+@Composable
+private fun ShellAccessCard(
+    backend: ShellBackend,
+    status: ShellStatus,
+    checking: Boolean,
+    enabled: Boolean,
+    snackbarHostState: SnackbarHostState,
+    onBackendChange: (ShellBackend) -> Unit,
+    onCheck: () -> Unit,
+) {
+    val context = LocalContext.current
+    val palette = appPalette()
+    val scope = rememberCoroutineScope()
+    val adbCommand = remember {
+        runCatching { AdbDaemon.activationCommand(context) }.getOrDefault("")
+    }
+    val copiedText = stringResource(R.string.copied_to_clipboard)
+    val adbTitle = stringResource(R.string.shell_adb_title)
+
+    AppCard(contentPadding = PaddingValues(0.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+            AppText(
+                text = stringResource(R.string.pref_shell_backend),
+                style = AppTextStyle.Subtitle,
+            )
+            Spacer(Modifier.height(9.dp))
+            AppSegmentedControl(
+                options = ShellBackend.entries.map { backendOption ->
+                    backendOption to backendOption.label()
+                },
+                selected = backend,
+                onSelect = onBackendChange,
+                enabled = enabled,
+            )
+            Spacer(Modifier.height(9.dp))
+            AppText(
+                text = backend.summary(),
+                style = AppTextStyle.Footnote,
+                color = palette.onSurfaceVariant,
+            )
+        }
+        AppDivider()
+        AppRow(
+            title = stringResource(R.string.pref_shell_status),
+            summary = status.summary(backend),
+            enabled = enabled,
+            onClick = onCheck,
+            trailing = {
+                if (checking || status == ShellStatus.Checking) {
+                    AppSpinner(size = 18.dp)
+                } else {
+                    AppIcon(
+                        icon = MiuixIcons.Refresh,
+                        contentDescription = stringResource(R.string.action_check_shell),
+                        modifier = Modifier.size(19.dp),
+                        tint = palette.onSurfaceVariant,
+                    )
+                }
+            },
+        )
+        if (backend == ShellBackend.ADB) {
+            AppDivider()
+            Column(modifier = Modifier.padding(16.dp)) {
+                AppText(
+                    text = adbTitle,
+                    style = AppTextStyle.Subtitle,
+                )
+                Spacer(Modifier.height(4.dp))
+                AppText(
+                    text = stringResource(R.string.shell_adb_note),
+                    style = AppTextStyle.Footnote,
+                    color = palette.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(palette.surfaceContainerHigh)
+                        .padding(12.dp),
+                ) {
+                    AppText(
+                        text = adbCommand,
+                        style = AppTextStyle.Footnote,
+                        color = palette.onSurface,
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    AppTextButton(
+                        text = stringResource(R.string.action_copy_command),
+                        onClick = {
+                            val clipboard = context.getSystemService(ClipboardManager::class.java)
+                            clipboard?.setPrimaryClip(
+                                ClipData.newPlainText(
+                                    adbTitle,
+                                    adbCommand,
+                                ),
+                            )
+                            scope.launch { snackbarHostState.showSnackbar(copiedText) }
+                        },
+                    )
+                }
+            }
         }
     }
 }

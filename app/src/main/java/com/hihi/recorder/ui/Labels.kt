@@ -10,12 +10,13 @@ import com.hihi.recorder.data.Countdown
 import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
+import com.hihi.recorder.data.ShellBackend
 import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.data.VideoBitrate
 import com.hihi.recorder.data.VideoFrameRate
 import com.hihi.recorder.data.VideoResolution
-import com.hihi.recorder.root.RootFailure
-import com.hihi.recorder.root.RootStatus
+import com.hihi.recorder.shell.ShellStatus
+import com.hihi.recorder.shell.messageRes
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,7 +25,7 @@ import java.util.Locale
 fun CaptureMode.label(): String = stringResource(
     when (this) {
         CaptureMode.STANDARD -> R.string.capture_standard
-        CaptureMode.ROOT -> R.string.capture_root
+        CaptureMode.SHELL -> R.string.capture_shell
     },
 )
 
@@ -32,7 +33,25 @@ fun CaptureMode.label(): String = stringResource(
 fun CaptureMode.summary(): String = stringResource(
     when (this) {
         CaptureMode.STANDARD -> R.string.capture_standard_summary
-        CaptureMode.ROOT -> R.string.capture_root_summary
+        CaptureMode.SHELL -> R.string.capture_shell_summary
+    },
+)
+
+@Composable
+fun ShellBackend.label(): String = stringResource(
+    when (this) {
+        ShellBackend.ADB -> R.string.shell_backend_adb
+        ShellBackend.SHIZUKU -> R.string.shell_backend_shizuku
+        ShellBackend.ROOT -> R.string.shell_backend_root
+    },
+)
+
+@Composable
+fun ShellBackend.summary(): String = stringResource(
+    when (this) {
+        ShellBackend.ADB -> R.string.shell_backend_adb_summary
+        ShellBackend.SHIZUKU -> R.string.shell_backend_shizuku_summary
+        ShellBackend.ROOT -> R.string.shell_backend_root_summary
     },
 )
 
@@ -113,19 +132,20 @@ fun MaterialSpec.label(): String = stringResource(
 )
 
 @Composable
-fun RootStatus.summary(): String = when (this) {
-    RootStatus.Unknown -> stringResource(R.string.root_status_unknown)
-    RootStatus.Checking -> stringResource(R.string.root_status_checking)
-    RootStatus.Available -> stringResource(R.string.root_status_available)
-    is RootStatus.Unavailable -> {
-        val unavailable = stringResource(R.string.root_status_unavailable)
-        val reasonText = stringResource(
-            when (reason) {
-                RootFailure.NO_SU -> R.string.root_status_no_su
-                RootFailure.PROMPT_TIMEOUT -> R.string.root_status_timeout
-                RootFailure.NO_SCREENRECORD -> R.string.root_status_no_screenrecord
-            },
-        )
+fun ShellStatus.summary(backend: ShellBackend): String = when (this) {
+    ShellStatus.Unknown -> stringResource(R.string.shell_status_unknown)
+    ShellStatus.Checking -> stringResource(R.string.shell_status_checking)
+    is ShellStatus.Available -> stringResource(
+        when (backend) {
+            ShellBackend.ADB -> R.string.shell_status_adb_ready
+            ShellBackend.SHIZUKU -> R.string.shell_status_shizuku_ready
+            ShellBackend.ROOT -> R.string.shell_status_root_ready
+        },
+    )
+
+    is ShellStatus.Unavailable -> {
+        val unavailable = stringResource(R.string.shell_status_unavailable)
+        val reasonText = stringResource(reason.messageRes())
         "$unavailable · $reasonText"
     }
 }
@@ -135,8 +155,8 @@ fun recordingSummary(settings: RecorderSettings): String {
     val mode = settings.captureMode.label()
     val audio = settings.audioSource.label()
     val resolution = settings.resolution.label()
-    return if (settings.captureMode == CaptureMode.ROOT) {
-        stringResource(R.string.recording_summary_root, mode, audio, resolution)
+    return if (settings.captureMode == CaptureMode.SHELL) {
+        stringResource(R.string.recording_summary_shell, mode, audio, resolution)
     } else {
         stringResource(
             R.string.recording_summary,

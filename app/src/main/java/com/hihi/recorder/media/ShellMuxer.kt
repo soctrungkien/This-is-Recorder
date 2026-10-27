@@ -4,34 +4,34 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
-import com.hihi.recorder.root.RootShell
 import java.io.Closeable
 import java.io.File
 import java.nio.ByteBuffer
 
-data class RootSegment(
+data class ShellSegment(
     val file: File,
     val startElapsedMs: Long,
     val endElapsedMs: Long,
 )
 
 /**
- * Joins the short screenrecord segments produced by root mode into one MP4 and
- * optionally adds the microphone track. Video gaps between segments are kept so
- * the continuous audio track stays in sync with wall-clock time.
+ * Joins the short screenrecord segments produced by shell mode into one MP4
+ * and optionally adds the microphone/phone-audio track. Video gaps between
+ * segments are kept so the continuous audio track stays in sync with
+ * wall-clock time.
  *
  * The start of a segment is derived from its end time and its encoded duration
- * rather than from the moment the shell process was spawned. `su`, the shell
- * script and MediaCodec initialization add a variable delay before
+ * rather than from the moment the shell process was spawned. `su`, Shizuku,
+ * the ADB daemon and MediaCodec initialization add a variable delay before
  * `screenrecord` captures its first frame, and using the spawn time would make
  * the picture lead the sound by that delay.
  */
-object RootMuxer {
+object ShellMuxer {
 
     private const val SAMPLE_BUFFER_SIZE = 8 * 1024 * 1024
 
     fun combine(
-        segments: List<RootSegment>,
+        segments: List<ShellSegment>,
         audioFile: File?,
         outputFile: File,
         timelineStartElapsedMs: Long,
@@ -63,7 +63,7 @@ object RootMuxer {
     }
 
     private data class ValidSegment(
-        val segment: RootSegment,
+        val segment: ShellSegment,
         val format: MediaFormat,
         val offsetUs: Long,
         val width: Int,
@@ -71,7 +71,7 @@ object RootMuxer {
     )
 
     private data class MeasuredSegment(
-        val segment: RootSegment,
+        val segment: ShellSegment,
         val format: MediaFormat,
         val startElapsedMs: Long,
         val width: Int,
@@ -79,7 +79,7 @@ object RootMuxer {
     )
 
     private fun validate(
-        segments: List<RootSegment>,
+        segments: List<ShellSegment>,
         timelineStartElapsedMs: Long,
     ): List<ValidSegment> {
         val measured = mutableListOf<MeasuredSegment>()

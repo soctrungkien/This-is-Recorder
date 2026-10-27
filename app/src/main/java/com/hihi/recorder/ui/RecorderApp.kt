@@ -65,12 +65,15 @@ import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingState
 import com.hihi.recorder.data.SavedRecording
+import com.hihi.recorder.data.ShellBackend
 import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.net.UpdateChecker
 import com.hihi.recorder.net.UpdateFailure
 import com.hihi.recorder.net.UpdateResult
-import com.hihi.recorder.root.RootChecker
-import com.hihi.recorder.root.RootStatus
+import com.hihi.recorder.shell.AdbDaemon
+import com.hihi.recorder.shell.ShellChecker
+import com.hihi.recorder.shell.ShellFailure
+import com.hihi.recorder.shell.ShellStatus
 import com.hihi.recorder.ui.liquid.IosLiquidGlassNavigationBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -139,16 +142,17 @@ fun RecorderApp(
     recordings: List<SavedRecording>,
     recordingsLoading: Boolean,
     snackbarHostState: SnackbarHostState,
-    checkingRoot: Boolean,
+    checkingShell: Boolean,
     autoStartToken: Int,
     showMicPermissionDialog: Boolean,
-    showRootUnavailableDialog: Boolean,
+    showShellUnavailableDialog: Boolean,
+    shellFailure: ShellFailure?,
     onSettingsChange: (RecorderSettings) -> Unit,
     onStart: () -> Unit,
     onStop: () -> Unit,
     onDismissMicPermissionDialog: () -> Unit,
     onOpenAppSettings: () -> Unit,
-    onDismissRootUnavailableDialog: () -> Unit,
+    onDismissShellUnavailableDialog: () -> Unit,
     onOpenRecording: (Uri) -> Unit,
     onShareRecording: (Uri) -> Unit,
     onRefreshRecordings: () -> Unit,
@@ -185,8 +189,8 @@ fun RecorderApp(
     var showHelp by rememberSaveable { mutableStateOf(false) }
     var updateInfo by remember { mutableStateOf<com.hihi.recorder.net.UpdateInfo?>(null) }
     var updateChecking by remember { mutableStateOf(false) }
-    var rootStatus by remember { mutableStateOf<RootStatus>(RootStatus.Unknown) }
-    var rootCheckRequest by remember { mutableIntStateOf(0) }
+    var shellStatus by remember { mutableStateOf<ShellStatus>(ShellStatus.Unknown) }
+    var shellCheckRequest by remember { mutableIntStateOf(0) }
     var timerMs by remember { mutableLongStateOf(0L) }
     val density = LocalDensity.current
     val navigationBarInset = WindowInsets.navigationBars
@@ -293,12 +297,29 @@ fun RecorderApp(
         if (autoStartToken > 0) onStart()
     }
 
-    LaunchedEffect(settings.captureMode, rootCheckRequest) {
-        if (settings.captureMode == CaptureMode.ROOT) {
-            rootStatus = RootStatus.Checking
-            rootStatus = RootChecker.check(context, force = rootCheckRequest > 0)
+    LaunchedEffect(settings.captureMode, settings.shellBackend, shellCheckRequest) {
+        if (settings.captureMode == CaptureMode.SHELL) {
+            shellStatus = ShellStatus.Checking
+            shellStatus = ShellChecker.check(
+                context = context,
+                backend = settings.shellBackend,
+                force = shellCheckRequest > 0,
+            )
+            if (settings.shellBackend == ShellBackend.ADB) {
+                // The daemon may be started from a computer while this screen
+                // is open. A cheap heartbeat poll makes the status recover
+                // without asking the user to tap refresh.
+                while (true) {
+                    delay(2_000L)
+                    shellStatus = ShellChecker.check(
+                        context = context,
+                        backend = settings.shellBackend,
+                        force = true,
+                    )
+                }
+            }
         } else {
-            rootStatus = RootStatus.Unknown
+            shellStatus = ShellStatus.Unknown
         }
     }
 
@@ -415,17 +436,17 @@ fun RecorderApp(
                             recordingState = recordingState,
                             lastRecording = lastRecording,
                             timerMs = timerMs,
-                            rootStatus = rootStatus,
-                            checkingRoot = checkingRoot || rootStatus == RootStatus.Checking,
+                            shellStatus = shellStatus,
+                            checkingShell = checkingShell || shellStatus == ShellStatus.Checking,
                             snackbarHostState = snackbarHostState,
                             onSettingsChange = onSettingsChange,
                             onCaptureModeChange = changeCaptureMode,
-                            onCheckRoot = {
-                                rootCheckRequest++
-                                if (settings.captureMode != CaptureMode.ROOT) {
-                                    changeCaptureMode(CaptureMode.ROOT)
+                            onShellBackendChange = { backend ->
+                                if (backend != settings.shellBackend) {
+                                    onSettingsChange(settings.copy(shellBackend = backend))
                                 }
                             },
+                            onCheckShell = { shellCheckRequest++ },
                             onStart = onStart,
                             onStop = onStop,
                             onOpenRecording = onOpenRecording,
@@ -634,15 +655,35 @@ fun RecorderApp(
         )
     }
 
-    if (showRootUnavailableDialog) {
+    if (showShellUnavailableDialog) {
+        val adbCommand = remember {
+            runCatching { AdbDaemon.activationCommand(context) }.getOrDefault("")
+        }
+        val message = when (shellFailure) {
+            ShellFailure.ADB_NOT_RUNNING -> stringResource(
+                R.string.shell_required_adb_message,
+                adbCommand,
+            )
+
+            ShellFailure.SHIZUKU_NOT_RUNNING ->
+                stringResource(R.string.shell_required_shizuku_message)
+
+            ShellFailure.SHIZUKU_NO_PERMISSION ->
+                stringResource(R.string.shell_required_shizuku_permission_message)
+
+            ShellFailure.NO_SU -> stringResource(R.string.shell_required_root_message)
+            ShellFailure.PROMPT_TIMEOUT -> stringResource(R.string.error_shell_root_timeout)
+            ShellFailure.NO_SCREENRECORD -> stringResource(R.string.error_shell_no_screenrecord)
+            ShellFailure.BACKEND_ERROR, null -> stringResource(R.string.shell_required_message)
+        }
         AppDialog(
-            title = stringResource(R.string.root_required_title),
-            message = stringResource(R.string.root_required_message),
-            onDismissRequest = onDismissRootUnavailableDialog,
+            title = stringResource(R.string.shell_required_title),
+            message = message,
+            onDismissRequest = onDismissShellUnavailableDialog,
             buttons = {
                 AppTextButton(
                     text = stringResource(R.string.action_close),
-                    onClick = onDismissRootUnavailableDialog,
+                    onClick = onDismissShellUnavailableDialog,
                 )
             },
         )
@@ -673,8 +714,8 @@ fun RecorderApp(
                     body = stringResource(R.string.help_audio_body),
                 )
                 HelpEntry(
-                    title = stringResource(R.string.help_root_title),
-                    body = stringResource(R.string.help_root_body),
+                    title = stringResource(R.string.help_shell_title),
+                    body = stringResource(R.string.help_shell_body),
                 )
                 HelpEntry(
                     title = stringResource(R.string.help_storage_title),

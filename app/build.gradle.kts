@@ -87,6 +87,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        aidl = true
     }
 
     packaging {
@@ -124,6 +125,11 @@ dependencies {
 
     // Optional Material 3 presentation for people who prefer stock Android.
     implementation("androidx.compose.material3:material3:1.4.0")
+
+    // Shizuku provides a shell-identity UserService without root. The provider
+    // is declared in the manifest so the Shizuku manager can verify this app.
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
 
     implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.activity:activity-compose:1.13.0")
