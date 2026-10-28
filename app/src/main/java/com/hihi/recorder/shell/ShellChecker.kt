@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.SystemClock
 import com.hihi.recorder.data.ShellBackend
-import com.hihi.recorder.root.RootShell
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
@@ -40,6 +40,17 @@ object ShellChecker {
             }
         }
 
+        if (backend == ShellBackend.ROOT) {
+            // A running root daemon needs no `su` prompt. When it is missing,
+            // checkRoot() starts it through the same one-time activation path
+            // used by recording, so later checks only read the heartbeat.
+            return@withContext if (RootDaemon.isRunning(context)) {
+                ShellStatus.Available(backend)
+            } else {
+                checkRoot(context)
+            }
+        }
+
         if (!force) {
             val cached = successAt[backend] ?: 0L
             if (SystemClock.elapsedRealtime() - cached < SUCCESS_CACHE_MS) {
@@ -48,9 +59,8 @@ object ShellChecker {
         }
 
         val status = when (backend) {
-            ShellBackend.ADB -> error("handled above")
+            ShellBackend.ADB, ShellBackend.ROOT -> error("handled above")
             ShellBackend.SHIZUKU -> checkShizuku()
-            ShellBackend.ROOT -> checkRoot()
         }
         if (status is ShellStatus.Available) {
             successAt[backend] = SystemClock.elapsedRealtime()
@@ -78,27 +88,16 @@ object ShellChecker {
         return ShellStatus.Available(ShellBackend.SHIZUKU)
     }
 
-    private suspend fun checkRoot(): ShellStatus {
-        val id = RootShell.run("id", timeoutMs = 20_000L)
-        if (id.timedOut) {
-            return ShellStatus.Unavailable(ShellBackend.ROOT, ShellFailure.PROMPT_TIMEOUT)
-        }
-        if (!id.isSuccess || !id.output.contains("uid=0")) {
-            return ShellStatus.Unavailable(ShellBackend.ROOT, ShellFailure.NO_SU, id.output)
-        }
-        val binary = RootShell.run(
-            "test -x /system/bin/screenrecord || command -v screenrecord",
-            timeoutMs = 10_000L,
-        )
-        // `test -x` succeeds without printing, so the exit status is the only
-        // reliable signal here.
-        if (!binary.isSuccess) {
-            return ShellStatus.Unavailable(
-                ShellBackend.ROOT,
-                ShellFailure.NO_SCREENRECORD,
-                binary.output,
-            )
-        }
-        return ShellStatus.Available(ShellBackend.ROOT)
+    private suspend fun checkRoot(context: Context): ShellStatus = try {
+        // Opening a root session starts the daemon through su when needed and
+        // verifies screenrecord through the same file protocol used later.
+        ShellSessions.withSession(context, ShellBackend.ROOT) { }
+        ShellStatus.Available(ShellBackend.ROOT)
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: ShellException) {
+        ShellStatus.Unavailable(ShellBackend.ROOT, error.failure, error.detail)
+    } catch (error: Throwable) {
+        ShellStatus.Unavailable(ShellBackend.ROOT, ShellFailure.BACKEND_ERROR, error.message)
     }
 }

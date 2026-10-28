@@ -7,9 +7,11 @@ import com.hihi.recorder.data.ShellBackend
 object ShellSessions {
 
     fun create(context: Context, backend: ShellBackend): ShellSession = when (backend) {
-        ShellBackend.ADB -> AdbShellSession(context.applicationContext)
+        ShellBackend.ADB -> FileShellSession(AdbDaemon.daemon(context))
         ShellBackend.SHIZUKU -> ShizukuShellSession(context.applicationContext)
-        ShellBackend.ROOT -> RootShellSession()
+        ShellBackend.ROOT -> FileShellSession(RootDaemon.daemon(context)) {
+            RootDaemon.ensureRunning(context)
+        }
     }
 
     /**

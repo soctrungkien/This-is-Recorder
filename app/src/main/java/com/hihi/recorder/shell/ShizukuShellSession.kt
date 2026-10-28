@@ -33,7 +33,14 @@ internal class ShizukuShellSession(
     private var args: Shizuku.UserServiceArgs? = null
     private var connection: ServiceConnection? = null
 
+    /** True only after [open] verified the daemon; a failed bind is removed. */
+    private var serviceReady = false
+
+    @Volatile
+    private var videoActive = false
+
     override suspend fun open() = withContext(Dispatchers.IO) {
+        serviceReady = false
         if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) {
             throw ShellException(ShellFailure.SHIZUKU_NOT_RUNNING)
         }
@@ -47,7 +54,7 @@ internal class ShizukuShellSession(
         val userServiceArgs = Shizuku.UserServiceArgs(
             ComponentName(context.packageName, ShizukuShellService::class.java.name),
         )
-            .daemon(false)
+            .daemon(true)
             .processNameSuffix("shell")
             .tag("ThisIsRecorderShell")
             .debuggable(BuildConfig.DEBUG)
@@ -113,6 +120,7 @@ internal class ShizukuShellSession(
             close()
             throw ShellException(ShellFailure.NO_SCREENRECORD, binary.output)
         }
+        serviceReady = true
     }
 
     override suspend fun exec(command: String, timeoutMs: Long): ShellCommandResult {
@@ -151,6 +159,7 @@ internal class ShizukuShellSession(
             val detail = runCatching { active.segmentError() }.getOrDefault("")
             throw ShellException(ShellFailure.BACKEND_ERROR, detail)
         }
+        videoActive = true
         started
     }
 
@@ -171,6 +180,7 @@ internal class ShizukuShellSession(
             if (!running) {
                 val endedAt = runCatching { active.segmentEndedAt() }.getOrDefault(0L)
                 if (endedAt > 0L) {
+                    videoActive = false
                     return@withContext ShellVideoEnd(
                         endedAtElapsedMs = endedAt,
                         exitCode = runCatching { active.segmentExitCode() }.getOrDefault(-1),
@@ -188,17 +198,33 @@ internal class ShizukuShellSession(
     override fun close() {
         val active = service
         service = null
-        runCatching { active?.stopSegment() }
+        // The UserService is a daemon shared by all sessions, so a short-lived
+        // app-op session must not stop the recorder's active segment.
+        if (videoActive) {
+            runCatching { active?.stopSegment() }
+            videoActive = false
+        }
         val boundArgs = args
         val boundConnection = connection
+        val removeService = !serviceReady
+        serviceReady = false
         args = null
         connection = null
         if (boundArgs != null && boundConnection != null) {
-            runCatching { Shizuku.unbindUserService(boundArgs, boundConnection, true) }
+            // Keep a healthy daemon alive for the next session: ADB and root
+            // behave the same, activation happens once and the background
+            // service stays ready. A service that failed to answer is removed
+            // instead, so the next attempt gets a fresh process.
+            runCatching { Shizuku.unbindUserService(boundArgs, boundConnection, removeService) }
         }
     }
 
     private companion object {
+        /**
+         * Bump whenever the AIDL, the service behaviour or the protocol in
+         * [ShizukuShellService] changes. Shizuku reuses a daemon process with
+         * the same component, tag and version, even after the app updates.
+         */
         const val SERVICE_VERSION = 1
     }
 }

@@ -71,6 +71,8 @@ import com.hihi.recorder.net.UpdateChecker
 import com.hihi.recorder.net.UpdateFailure
 import com.hihi.recorder.net.UpdateResult
 import com.hihi.recorder.shell.AdbDaemon
+import com.hihi.recorder.shell.ProjectMediaAppOp
+import com.hihi.recorder.shell.RootDaemon
 import com.hihi.recorder.shell.ShellChecker
 import com.hihi.recorder.shell.ShellFailure
 import com.hihi.recorder.shell.ShellStatus
@@ -116,6 +118,9 @@ private sealed interface AppRoute : NavKey {
 
     @Serializable
     data object ApacheLicense : AppRoute
+
+    @Serializable
+    data object ShizukuLicense : AppRoute
 }
 
 private val AppRoute.tabIndex: Int
@@ -125,7 +130,8 @@ private val AppRoute.tabIndex: Int
         AppRoute.Settings,
         AppRoute.About,
         AppRoute.MitLicense,
-        AppRoute.ApacheLicense -> 2
+        AppRoute.ApacheLicense,
+        AppRoute.ShizukuLicense -> 2
     }
 
 private fun appRouteAt(index: Int): AppRoute = when (index) {
@@ -298,7 +304,20 @@ fun RecorderApp(
     }
 
     LaunchedEffect(settings.captureMode, settings.shellBackend, shellCheckRequest) {
+        fun stopRootHelperIfIdle() {
+            // Do not kill the daemon while a segment is recording or an app-op
+            // restore is still queued; that restore may be the only copy of
+            // the previous mode.
+            if (!recordingState.isActive && !ProjectMediaAppOp.hasPending(context)) {
+                RootDaemon.shutdown(context)
+            }
+        }
         if (settings.captureMode == CaptureMode.SHELL) {
+            if (settings.shellBackend != ShellBackend.ROOT) {
+                // The root helper is a background daemon. Stop it as soon as
+                // the user switches to another backend or capture mode.
+                stopRootHelperIfIdle()
+            }
             shellStatus = ShellStatus.Checking
             shellStatus = ShellChecker.check(
                 context = context,
@@ -319,6 +338,9 @@ fun RecorderApp(
                 }
             }
         } else {
+            // Shell mode is not active, so a root daemon from a previous
+            // session no longer needs to listen for commands.
+            stopRootHelperIfIdle()
             shellStatus = ShellStatus.Unknown
         }
     }
@@ -503,6 +525,11 @@ fun RecorderApp(
                                     backStack.add(AppRoute.ApacheLicense)
                                 }
                             },
+                            onOpenShizukuLicense = {
+                                if (backStack.lastOrNull() != AppRoute.ShizukuLicense) {
+                                    backStack.add(AppRoute.ShizukuLicense)
+                                }
+                            },
                         )
                     }
 
@@ -519,6 +546,16 @@ fun RecorderApp(
                     entry<AppRoute.ApacheLicense>(swipeDismiss = swipeDismiss) {
                         LicensePage(
                             kind = LicenseKind.APACHE,
+                            snackbarHostState = snackbarHostState,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.ShizukuLicense>(swipeDismiss = swipeDismiss) {
+                        LicensePage(
+                            kind = LicenseKind.SHIZUKU,
                             snackbarHostState = snackbarHostState,
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()

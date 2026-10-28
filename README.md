@@ -30,13 +30,13 @@
 Chế độ Screenrecord lấy quyền shell theo một trong ba cách:
 
 - **ADB**: bật gỡ lỗi USB, kết nối máy tính và chạy lệnh kích hoạt một lần trong ứng dụng. Trợ lý chạy nền đến khi dừng hoặc khởi động lại máy.
-- **Shizuku**: khởi động Shizuku rồi cấp quyền cho ứng dụng; không cần máy tính sau khi thiết lập.
-- **Root**: dùng `su` từ Magisk, KernelSU, APatch...
+- **Shizuku**: khởi động Shizuku rồi cấp quyền cho ứng dụng; `UserService` chạy nền với UID shell và được giữ sống giữa các phiên.
+- **Root**: cấp quyền `su` một lần; ứng dụng khởi động daemon chạy nền giống ADB, nên các lệnh và đoạn quay sau không hỏi lại root.
 
 Đặc điểm:
 
 - Không cần hộp thoại MediaProjection cho video.
-- Vẫn hỗ trợ micrô, âm thanh điện thoại và trộn cả hai. Âm thanh điện thoại dùng playback capture nên vẫn cần xác nhận MediaProjection một lần; ứng dụng tự cấp app-op `android:project_media` trước khi quay và khôi phục chế độ cũ khi dừng.
+- Vẫn hỗ trợ micrô, âm thanh điện thoại và trộn cả hai. Âm thanh điện thoại dùng playback capture nên vẫn cần xác nhận MediaProjection một lần; ứng dụng tự cấp app-op `PROJECT_MEDIA` trước khi quay và khôi phục chế độ cũ khi dừng.
 - `screenrecord` bị giới hạn 180 giây mỗi đoạn; ứng dụng tự quay nhiều đoạn và ghép lại khi dừng.
 - Cửa sổ có `FLAG_SECURE` vẫn hiển thị màu đen.
 - Nếu backend không khả dụng hoặc thiếu `screenrecord`, ứng dụng báo lỗi và không ảnh hưởng chế độ Chuẩn.
@@ -120,7 +120,7 @@ Android 14+ không cho Quick Settings tự lấy quyền MediaProjection, nên l
 - `POST_NOTIFICATIONS`: thông báo điều khiển khi đang quay.
 - `FOREGROUND_SERVICE` + các loại `mediaProjection`, `microphone`, `specialUse`.
 - Không xin quyền truy cập toàn bộ thư viện ảnh; video do ứng dụng tạo được ghi trực tiếp qua MediaStore.
-- Chế độ Screenrecord không cần quyền Android đặc biệt; quyền shell do ADB, Shizuku hoặc `su` cấp. Với âm thanh điện thoại, ứng dụng dùng app-op `android:project_media` và khôi phục trạng thái trước đó khi dừng.
+- Chế độ Screenrecord không cần quyền Android đặc biệt; quyền shell do ADB, Shizuku hoặc `su` cấp. Với âm thanh điện thoại, ứng dụng chạy `cmd appops set --user <id> <package> PROJECT_MEDIA allow` và khôi phục trạng thái trước đó khi dừng.
 
 ## Cấu trúc chính
 
@@ -129,8 +129,8 @@ app/src/main/java/com/hihi/recorder/
 ├── MainActivity.kt           # quyền, MediaProjection, mở đầu ghi
 ├── data/                     # cài đặt, trạng thái, MediaStore, thư viện video
 ├── media/                    # engine MediaProjection và shell screenrecord
-├── shell/                    # ADB daemon, Shizuku UserService, root, app-op
-├── root/                     # chạy lệnh su
+├── shell/                    # ADB/root daemon, Shizuku UserService, app-op
+├── root/                     # khởi động daemon qua su
 ├── service/                  # foreground service, notification, QS tile
 └── ui/                       # giao diện Miuix
 ```
@@ -144,20 +144,22 @@ app/src/main/java/com/hihi/recorder/
 
 ### Thư viện và nền tảng mã nguồn mở
 
-- **[Miuix for Compose](https://github.com/compose-miuix-ui/miuix)** — © compose-miuix-ui contributors, giấy phép Apache-2.0. Cung cấp UI, icon, blur, squircle và navigation.
+- **[Miuix for Compose](https://github.com/compose-miuix-ui/miuix)** 0.9.4 — © compose-miuix-ui contributors, giấy phép Apache-2.0. Dùng các module `miuix-ui`, `miuix-preference`, `miuix-icons`, `miuix-blur`, `miuix-squircle` và `miuix-nav`.
 - **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa bởi compose-miuix-ui contributors.
-- **[Jetpack Compose](https://developer.android.com/compose)** (UI, Foundation, Animation) — © The Android Open Source Project, giấy phép Apache-2.0.
-- **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** — © The Android Open Source Project, giấy phép Apache-2.0.
-- **[AndroidX Core & Activity](https://developer.android.com/jetpack/androidx)** — © The Android Open Source Project, giấy phép Apache-2.0.
-- **[Kotlin](https://kotlinlang.org)** — © JetBrains s.r.o. và cộng tác viên, giấy phép Apache-2.0.
-- **[kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines)** — © JetBrains s.r.o., giấy phép Apache-2.0.
-- **[kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)** — © JetBrains s.r.o., giấy phép Apache-2.0.
+- **[Jetpack Compose](https://developer.android.com/compose)** 1.12.0 (`foundation`, `ui`, `animation`) — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.4.0 — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[AndroidX Core KTX & Activity Compose](https://developer.android.com/jetpack/androidx)** 1.19.1 / 1.13.0 — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[Shizuku API & Provider](https://github.com/RikkaApps/Shizuku-API)** 13.1.5 — © 2021 RikkaW, giấy phép MIT. Cung cấp `UserService` chạy với UID shell để thực hiện lệnh `screenrecord` và app-op mà không cần root.
+- **[Kotlin](https://kotlinlang.org)** 2.4.21 — © JetBrains s.r.o. và cộng tác viên, giấy phép Apache-2.0.
+- **[kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines)** 1.11.0 — © JetBrains s.r.o., giấy phép Apache-2.0.
+- **[kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)** 1.11.0 — © JetBrains s.r.o., giấy phép Apache-2.0.
 
 ### Giấy phép
 
 - Mã nguồn ứng dụng: [MIT](LICENSE), bản quyền © 2026 Hihi.
-- Các thư viện bên thứ ba: Apache-2.0; tác giả của từng thư viện được ghi ở trên.
-- Toàn văn MIT và Apache-2.0 có thể xem ngay trong ứng dụng tại **Giới thiệu → Giấy phép**.
+- Miuix, Jetpack Compose, Material 3, AndroidX, Kotlin và kotlinx: Apache-2.0. Tác giả của từng thư viện được ghi ở trên.
+- Shizuku API: MIT, bản quyền © 2021 RikkaW.
+- Toàn văn MIT của ứng dụng, MIT của Shizuku và Apache-2.0 có thể xem ngay trong ứng dụng tại **Giới thiệu → Giấy phép**.
 
 ## Ghi chú kỹ thuật
 
@@ -166,5 +168,5 @@ app/src/main/java/com/hihi/recorder/
 - File tạm được ghi vào cache, chỉ đưa vào MediaStore sau khi muxer hoàn tất.
 - Nếu quá trình quay lỗi, file tạm bị xóa và thông báo lỗi được hiển thị.
 - Chế độ Screenrecord dùng một script bọc `screenrecord`, lấy PID con, gửi `SIGINT` khi dừng và `chmod 666` file đầu ra trước khi ứng dụng đọc. Đoạn video và file điều khiển nằm trong thư mục external files của ứng dụng để tiến trình shell đọc/ghi được.
-- ADB dùng một daemon chạy nền, trao đổi lệnh qua file và gửi heartbeat mỗi giây. Shizuku dùng `UserService` chạy với UID shell; root dùng `su -c`.
-- App-op `android:project_media` được lưu tạm vào SharedPreferences trước khi cấp, để lần mở ứng dụng sau vẫn khôi phục được nếu tiến trình bị dừng đột ngột.
+- ADB và root dùng chung một daemon script chạy nền, trao đổi lệnh qua file và gửi heartbeat mỗi giây. ADB khởi động daemon bằng lệnh từ máy tính; root khởi động cùng daemon đó qua `su` một lần. Thư mục điều khiển của root là `0700` để ứng dụng khác không ghi được lệnh. Shizuku dùng `UserService` ở daemon mode, chạy với UID shell và được giữ sống giữa các phiên.
+- App-op `PROJECT_MEDIA` được lưu tạm vào SharedPreferences trước khi cấp, để lần mở ứng dụng sau vẫn khôi phục được nếu tiến trình bị dừng đột ngột.

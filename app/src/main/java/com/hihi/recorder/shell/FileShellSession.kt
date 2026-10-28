@@ -1,6 +1,5 @@
 package com.hihi.recorder.shell
 
-import android.content.Context
 import android.os.SystemClock
 import com.hihi.recorder.data.ShellBackend
 import kotlinx.coroutines.Dispatchers
@@ -12,14 +11,16 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Talks to [AdbDaemon] through files. The app never forks `adb`; the user
- * starts the daemon once from a computer.
+ * Talks to an ADB or root [ShellFileDaemon] through files. The app never forks
+ * `adb` or `su` for individual commands; the daemon is started once and then
+ * serves commands and screenrecord segments from its background loop.
  */
-internal class AdbShellSession(
-    private val context: Context,
+internal class FileShellSession(
+    private val daemon: ShellFileDaemon,
+    private val startIfNeeded: (suspend () -> Unit)? = null,
 ) : ShellSession {
 
-    override val backend: ShellBackend = ShellBackend.ADB
+    override val backend: ShellBackend = daemon.backend
 
     private val requestId = AtomicInteger(0)
     private val segmentCounter = AtomicInteger(0)
@@ -31,13 +32,16 @@ internal class AdbShellSession(
     private var activeToken: String? = null
 
     override suspend fun open() = withContext(Dispatchers.IO) {
-        AdbDaemon.ensureScripts(context)
-        if (!AdbDaemon.isRunning(context)) {
-            throw ShellException(ShellFailure.ADB_NOT_RUNNING)
+        daemon.ensureScripts()
+        if (!daemon.isRunning()) {
+            startIfNeeded?.invoke() ?: throw ShellException(daemon.lostFailure)
+        }
+        if (!daemon.isRunning()) {
+            throw ShellException(daemon.lostFailure)
         }
         val ping = exec("echo ready", timeoutMs = 5_000L)
         if (!ping.isSuccess || !ping.output.contains("ready")) {
-            throw ShellException(ShellFailure.ADB_NOT_RUNNING, ping.output)
+            throw ShellException(daemon.lostFailure, ping.output)
         }
         val binary = exec(
             "test -x /system/bin/screenrecord || command -v screenrecord",
@@ -54,15 +58,15 @@ internal class AdbShellSession(
         withContext(Dispatchers.IO) {
             commandMutex.withLock {
                 val id = requestId.incrementAndGet().toString()
-                AdbDaemon.writeAtomically(
-                    AdbDaemon.commandFile(context),
+                daemon.writeAtomically(
+                    daemon.commandFile(),
                     "$id\n$command\n",
                 )
 
                 val deadline = SystemClock.elapsedRealtime() + timeoutMs
                 while (SystemClock.elapsedRealtime() < deadline) {
-                    if (!AdbDaemon.isRunning(context)) {
-                        throw ShellException(ShellFailure.ADB_NOT_RUNNING)
+                    if (!daemon.isRunning()) {
+                        throw ShellException(daemon.lostFailure)
                     }
                     val result = readResult(id)
                     if (result != null) return@withLock result
@@ -82,16 +86,16 @@ internal class AdbShellSession(
         file.delete()
 
         val token = "${System.currentTimeMillis()}_${segmentCounter.incrementAndGet()}"
-        val startMarker = AdbDaemon.videoStartMarker(context, token)
-        val endMarker = AdbDaemon.videoEndMarker(context, token)
-        val errorFile = AdbDaemon.videoErrorFile(context, token)
+        val startMarker = daemon.videoStartMarker(token)
+        val endMarker = daemon.videoEndMarker(token)
+        val errorFile = daemon.videoErrorFile(token)
         listOf(startMarker, endMarker, errorFile).forEach { it.delete() }
         // A stop left over from an abandoned segment must not kill this one.
-        AdbDaemon.videoStopRequest(context).delete()
+        daemon.videoStopRequest().delete()
         activeToken = token
 
-        AdbDaemon.writeAtomically(
-            AdbDaemon.videoStartRequest(context),
+        daemon.writeAtomically(
+            daemon.videoStartRequest(),
             buildString {
                 append(file.absolutePath).append('\n')
                 append(size).append('\n')
@@ -110,8 +114,8 @@ internal class AdbShellSession(
                     return@withContext elapsed
                 }
             }
-            if (!AdbDaemon.isRunning(context)) {
-                throw ShellException(ShellFailure.ADB_NOT_RUNNING)
+            if (!daemon.isRunning()) {
+                throw ShellException(daemon.lostFailure)
             }
             delay(80L)
         }
@@ -133,8 +137,8 @@ internal class AdbShellSession(
     override suspend fun awaitVideoEnd(): ShellVideoEnd = withContext(Dispatchers.IO) {
         val token = activeToken
             ?: throw ShellException(ShellFailure.BACKEND_ERROR, "No active segment")
-        val endMarker = AdbDaemon.videoEndMarker(context, token)
-        val errorFile = AdbDaemon.videoErrorFile(context, token)
+        val endMarker = daemon.videoEndMarker(token)
+        val errorFile = daemon.videoErrorFile(token)
         val deadline = SystemClock.elapsedRealtime() + 240_000L
         while (SystemClock.elapsedRealtime() < deadline) {
             if (endMarker.isFile) {
@@ -152,8 +156,8 @@ internal class AdbShellSession(
                     return@withContext ShellVideoEnd(endedAt, exitCode, error.take(8_000))
                 }
             }
-            if (!AdbDaemon.isRunning(context)) {
-                throw ShellException(ShellFailure.ADB_NOT_RUNNING)
+            if (!daemon.isRunning()) {
+                throw ShellException(daemon.lostFailure)
             }
             delay(120L)
         }
@@ -171,11 +175,11 @@ internal class AdbShellSession(
     }
 
     private fun requestStop(token: String) {
-        AdbDaemon.writeAtomically(AdbDaemon.videoStopRequest(context), "$token\n")
+        daemon.writeAtomically(daemon.videoStopRequest(), "$token\n")
     }
 
     private fun readResult(expectedId: String): ShellCommandResult? {
-        val file = AdbDaemon.resultFile(context)
+        val file = daemon.resultFile()
         if (!file.isFile) return null
         val text = runCatching { file.readText() }.getOrNull() ?: return null
         val first = text.indexOf('\n')
@@ -187,7 +191,7 @@ internal class AdbShellSession(
         val exitCode = text.substring(first + 1, second).trim().toIntOrNull() ?: -1
         val output = text.substring(second + 1).trimEnd('\n')
         runCatching { file.delete() }
-        return ShellCommandResult(exitCode, AdbDaemon.trimOutput(output))
+        return ShellCommandResult(exitCode, ShellFileDaemon.trimOutput(output))
     }
 
     private fun parseUptimeMs(raw: String): Long {
@@ -201,6 +205,9 @@ internal class AdbShellSession(
          * Every session shares the daemon's single command/result file pair.
          * Serialize process-wide, not per instance, or concurrent app-op and
          * recording sessions can overwrite each other's pending command.
+         *
+         * ADB and root use separate daemons and directories; a single mutex
+         * only adds a short wait if both backends are active at once.
          */
         val commandMutex = Mutex()
     }

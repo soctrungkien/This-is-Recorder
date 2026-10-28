@@ -55,11 +55,13 @@
     <string name="about_source">Mã nguồn</string>
     <string name="about_source_summary">github.com/soctrungkien/This-is-Recorder</string>
     <string name="about_miuix">Miuix for Compose</string>
-    <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0</string>
+    <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0 · UI, Preference, Icons, Blur, Squircle, Nav</string>
     <string name="about_license_mit">Giấy phép MIT</string>
     <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
     <string name="about_license_apache">Giấy phép Apache 2.0</string>
-    <string name="about_license_apache_summary">Miuix, Compose, AndroidX, Kotlin và kotlinx</string>
+    <string name="about_license_apache_summary">Miuix, Compose, AndroidX, Kotlin, kotlinx và các thư viện khác</string>
+    <string name="about_license_shizuku">Giấy phép Shizuku API</string>
+    <string name="about_license_shizuku_summary">© 2021 RikkaW · MIT</string>
     <string name="about_credits">Ghi công</string>
     <string name="about_developer">Nhà phát triển</string>
     <string name="about_developer_summary">Hihi · github.com/soctrungkien</string>
@@ -74,6 +76,8 @@
     <string name="about_material3_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_androidx">AndroidX Core &amp; Activity</string>
     <string name="about_androidx_summary">© The Android Open Source Project · Apache-2.0</string>
+    <string name="about_shizuku">Shizuku API</string>
+    <string name="about_shizuku_summary">© 2021 RikkaW · MIT · UserService chạy với UID shell</string>
     <string name="about_kotlin">Kotlin</string>
     <string name="about_kotlin_summary">© JetBrains s.r.o. và cộng tác viên · Apache-2.0</string>
     <string name="about_coroutines">kotlinx.coroutines</string>
@@ -215,8 +219,8 @@
     <string name="shell_backend_shizuku">Shizuku</string>
     <string name="shell_backend_root">Root</string>
     <string name="shell_backend_adb_summary">Chạy một lệnh từ máy tính. Trợ lý chạy nền cho đến khi bạn dừng hoặc khởi động lại máy.</string>
-    <string name="shell_backend_shizuku_summary">Khởi động Shizuku rồi cấp quyền cho ứng dụng. Sau khi thiết lập không cần máy tính.</string>
-    <string name="shell_backend_root_summary">Dùng su từ Magisk, KernelSU hoặc trình quản lý root khác.</string>
+    <string name="shell_backend_shizuku_summary">Khởi động Shizuku rồi cấp quyền cho ứng dụng. Dịch vụ shell luôn sẵn sàng trong nền.</string>
+    <string name="shell_backend_root_summary">Cấp quyền su một lần. Daemon trợ lý sẽ chạy nền cho đến khi bạn dừng hoặc khởi động lại máy.</string>
 
     <string name="shell_adb_title">Kích hoạt qua ADB</string>
     <string name="shell_adb_note">Bật gỡ lỗi USB, kết nối điện thoại với máy tính rồi chạy lệnh này một lần:</string>

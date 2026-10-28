@@ -1,6 +1,7 @@
 package com.hihi.recorder.shell
 
 import android.content.Context
+import android.os.Process
 import androidx.core.content.edit
 import com.hihi.recorder.data.ShellBackend
 import kotlinx.coroutines.CancellationException
@@ -82,8 +83,11 @@ class ProjectMediaAppOp(context: Context) {
         val result = try {
             ShellSessions.withSession(appContext, backend) { session ->
                 session.exec(
-                    // Sửa thành PROJECT_MEDIA chuẩn của appops
-                    "appops get ${shellQuote(packageName)} PROJECT_MEDIA",
+                    // `cmd appops` accepts the public name printed by `appops
+                    // get` (`PROJECT_MEDIA`) as well as `android:project_media`.
+                    // Target the app's own user instead of the shell's user.
+                    "cmd appops get --user ${appUserId()} " +
+                        "${shellQuote(packageName)} PROJECT_MEDIA",
                     timeoutMs = 15_000L,
                 )
             }
@@ -110,9 +114,10 @@ class ProjectMediaAppOp(context: Context) {
     ): Boolean = try {
         ShellSessions.withSession(appContext, backend) { session ->
             val result = session.exec(
-                // Sửa thành PROJECT_MEDIA chuẩn của appops
-                "appops set ${shellQuote(packageName)} PROJECT_MEDIA " +
-                    shellQuote(mode),
+                // Same operation as:
+                //   adb shell cmd appops set --user <id> <package> PROJECT_MEDIA allow
+                "cmd appops set --user ${appUserId()} " +
+                    "${shellQuote(packageName)} PROJECT_MEDIA ${shellQuote(mode)}",
                 timeoutMs = 15_000L,
             )
             result.isSuccess &&
@@ -126,6 +131,9 @@ class ProjectMediaAppOp(context: Context) {
     } catch (_: Throwable) {
         false
     }
+
+    /** Android user id of this app process (0 for the owner, 10+ for work profiles). */
+    private fun appUserId(): Int = Process.myUid() / USER_ID_RANGE
 
     private fun normalizeMode(raw: String): String = when (raw.lowercase(Locale.US)) {
         MODE_ALLOW, MODE_DENY, MODE_IGNORE, MODE_FOREGROUND -> raw.lowercase(Locale.US)
@@ -154,9 +162,12 @@ class ProjectMediaAppOp(context: Context) {
         private const val MODE_DEFAULT = "default"
         private const val MODE_FOREGROUND = "foreground"
 
+        /** Number of UIDs reserved for each Android user. */
+        private const val USER_ID_RANGE = 100_000
+
         private val MODE_PATTERN = Regex(
-            // Vẫn giữ bắt dạng `android:project_media` hoặc `PROJECT_MEDIA` ở kết quả trả về
-            // để tương thích với các OEM in ra định dạng đầy đủ.
+            // `appops get` prints `PROJECT_MEDIA` on AOSP, but some OEM builds
+            // print the full `android:project_media` name.
             """(?:android:)?project_media:\s*([A-Za-z]+)""",
             RegexOption.IGNORE_CASE,
         )

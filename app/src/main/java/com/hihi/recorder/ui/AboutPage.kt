@@ -82,6 +82,7 @@ fun AboutPage(
     onShowHelp: () -> Unit,
     onOpenMitLicense: () -> Unit,
     onOpenApacheLicense: () -> Unit,
+    onOpenShizukuLicense: () -> Unit,
 ) {
     val palette = appPalette()
     val effectSupported = remember { isRuntimeShaderSupported() }
@@ -279,6 +280,13 @@ fun AboutPage(
                             onClick = {
                                 onOpenUrl("https://developer.android.com/jetpack/androidx")
                             },
+                        )
+                        AppDivider()
+                        AppRow(
+                            title = stringResource(R.string.about_shizuku),
+                            summary = stringResource(R.string.about_shizuku_summary),
+                            leadingIcon = MiuixIcons.Info,
+                            onClick = onOpenShizukuLicense,
                         )
                         AppDivider()
                         AppRow(

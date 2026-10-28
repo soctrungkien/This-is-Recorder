@@ -51,6 +51,11 @@ enum class LicenseKind(
         titleRes = R.string.about_license_apache,
         summaryRes = R.string.about_license_apache_summary,
     ),
+    SHIZUKU(
+        rawRes = R.raw.license_shizuku_mit,
+        titleRes = R.string.about_license_shizuku,
+        summaryRes = R.string.about_license_shizuku_summary,
+    ),
 }
 
 /**

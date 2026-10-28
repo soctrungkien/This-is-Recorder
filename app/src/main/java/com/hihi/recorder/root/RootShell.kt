@@ -30,9 +30,6 @@ object RootShell {
     private fun resolveSu(): String =
         suCandidates.firstOrNull { File(it).exists() } ?: "su"
 
-    /** The `su` binary used by [run]; sessions should spawn the same one. */
-    fun suBinary(): String = resolveSu()
-
     suspend fun run(command: String, timeoutMs: Long = 15_000L): Result =
         withContext(Dispatchers.IO) {
             val su = resolveSu()
