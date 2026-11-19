@@ -2,6 +2,7 @@ package com.hihi.recorder.ui
 
 import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,10 +22,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 import top.yukonga.miuix.kmp.icon.MiuixIcons
@@ -66,7 +70,19 @@ fun ShowcaseScreen(
             )
         },
     ) { padding ->
-        LazyColumn(
+        val liquidToggles = settings.toggleStyle == com.hihi.recorder.data.ToggleStyle.LIQUID &&
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
+        val toggleBackdrop = rememberLayerBackdrop()
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (liquidToggles) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .layerBackdrop(toggleBackdrop)
+                        .drawBehind { drawRect(palette.surfaceContainer) },
+                )
+            }
+            LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 start = 12.dp,
@@ -126,12 +142,14 @@ fun ShowcaseScreen(
                 AppCard {
                     ToggleRow(
                         settings = settings,
+                        backdrop = toggleBackdrop,
                         title = stringResource(R.string.showcase_switches),
                         checked = demoSwitch,
                     ) { demoSwitch = it }
                     AppDivider()
                     ToggleRow(
                         settings = settings,
+                        backdrop = toggleBackdrop,
                         title = stringResource(R.string.showcase_demo_value),
                         summary = demoSwitch.toString(),
                         checked = demoSwitch,
@@ -246,6 +264,7 @@ fun ShowcaseScreen(
                         onOpenUrl = onOpenUrl,
                     )
                 }
+            }
             }
         }
     }

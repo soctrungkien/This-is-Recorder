@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
@@ -34,6 +35,7 @@ import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.data.ToggleStyle
 import com.hihi.recorder.data.normalizeSaveFolder
 import com.hihi.recorder.ui.liquid.LiquidToggle
+import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.basic.BreadcrumbBar
@@ -53,6 +55,7 @@ private enum class SettingsPicker {
 @Composable
 internal fun ToggleRow(
     settings: RecorderSettings,
+    backdrop: Backdrop?,
     title: String,
     summary: String? = null,
     checked: Boolean,
@@ -61,7 +64,7 @@ internal fun ToggleRow(
 ) {
     val liquid = settings.toggleStyle == ToggleStyle.LIQUID &&
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-    if (!liquid) {
+    if (!liquid || backdrop == null) {
         AppSwitchRow(
             title = title,
             summary = summary,
@@ -72,28 +75,25 @@ internal fun ToggleRow(
         return
     }
 
-    val backdrop = rememberLayerBackdrop()
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .layerBackdrop(backdrop)
-            .background(appPalette().surfaceContainer),
-    ) {
-        AppRow(
-            title = title,
-            summary = summary,
-            enabled = enabled,
-            onClick = { if (enabled) onCheckedChange(!checked) },
-            trailing = {
-                LiquidToggle(
-                    selected = { checked },
-                    onSelect = onCheckedChange,
-                    enabled = enabled,
-                    backdrop = backdrop,
-                )
-            },
-        )
-    }
+    // Never wrap the row in layerBackdrop(backdrop): the LiquidToggle inside
+    // samples that same layer, and a layer must not contain the surface that
+    // samples it — HWUI would recurse through prepareTreeImpl until the
+    // RenderThread stack overflows. The backdrop is recorded by a sibling
+    // source layer owned by the screen instead.
+    AppRow(
+        title = title,
+        summary = summary,
+        enabled = enabled,
+        onClick = { if (enabled) onCheckedChange(!checked) },
+        trailing = {
+            LiquidToggle(
+                selected = { checked },
+                onSelect = onCheckedChange,
+                enabled = enabled,
+                backdrop = backdrop,
+            )
+        },
+    )
 }
 
 @Composable
@@ -113,13 +113,27 @@ fun SettingsScreen(
     val palette = appPalette()
     val dynamicColorAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val bottomContentPadding = appBottomContentPadding()
+    val liquidToggles = settings.toggleStyle == ToggleStyle.LIQUID &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    // One shared backdrop for every switch. Its source layer below is a
+    // SIBLING of the content — never an ancestor of a surface sampling it.
+    val toggleBackdrop = rememberLayerBackdrop()
 
     AppScaffold(
         title = stringResource(R.string.settings_title),
         subtitle = stringResource(R.string.settings_subtitle),
         snackbarHostState = snackbarHostState,
     ) { padding ->
-        LazyColumn(
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (liquidToggles) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .layerBackdrop(toggleBackdrop)
+                        .drawBehind { drawRect(palette.surfaceContainer) },
+                )
+            }
+            LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 start = 12.dp,
@@ -189,6 +203,7 @@ fun SettingsScreen(
                 AppCard(contentPadding = PaddingValues(0.dp)) {
                     ToggleRow(
                         settings = settings,
+                        backdrop = toggleBackdrop,
                         title = stringResource(R.string.pref_navigation_blur),
                         summary = stringResource(R.string.pref_navigation_blur_summary),
                         checked = settings.navigationBlur,
@@ -196,6 +211,7 @@ fun SettingsScreen(
                     AppDivider()
                     ToggleRow(
                         settings = settings,
+                        backdrop = toggleBackdrop,
                         title = stringResource(R.string.pref_navigation_ios_labels),
                         summary = stringResource(R.string.pref_navigation_ios_labels_summary),
                         checked = settings.navigationIosLabels,
@@ -257,12 +273,14 @@ fun SettingsScreen(
                 AppCard(contentPadding = PaddingValues(0.dp)) {
                     ToggleRow(
                         settings = settings,
+                        backdrop = toggleBackdrop,
                         title = stringResource(R.string.pref_haptics),
                         checked = settings.hapticFeedback,
                     ) { onSettingsChange(settings.copy(hapticFeedback = it)) }
                     AppDivider()
                     ToggleRow(
                         settings = settings,
+                        backdrop = toggleBackdrop,
                         title = stringResource(R.string.pref_stop_screen_off),
                         checked = settings.stopOnScreenOff,
                     ) { onSettingsChange(settings.copy(stopOnScreenOff = it)) }
@@ -345,6 +363,7 @@ fun SettingsScreen(
                         onClick = onShowHelp,
                     )
                 }
+            }
             }
         }
     }
