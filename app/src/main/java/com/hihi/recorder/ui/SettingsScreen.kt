@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
@@ -129,8 +128,7 @@ fun SettingsScreen(
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .layerBackdrop(toggleBackdrop)
-                        .drawBehind { drawRect(palette.surfaceContainer) },
+                        .layerBackdrop(toggleBackdrop),
                 )
             }
             LazyColumn(
