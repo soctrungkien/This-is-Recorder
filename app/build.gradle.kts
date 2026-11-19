@@ -104,6 +104,9 @@ kotlin {
 }
 
 dependencies {
+    // ZeroUI design system (Miuix + Material 3 components and theme).
+    implementation(project(":kit"))
+
     // AGP 9 uses built-in Kotlin. The classpath override in the root project
     // upgrades KGP, while this keeps the compiler itself on the same version as
     // the Compose compiler plugin (the built-in default may still be older).
@@ -124,7 +127,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     // Optional Material 3 presentation for people who prefer stock Android.
-    implementation("androidx.compose.material3:material3:1.4.0")
+    // Matches the version the ZeroUI kit is built against.
+    implementation("androidx.compose.material3:material3:1.5.0-alpha29")
+
+    // Renders the release-notes changelog as markdown (full GFM).
+    implementation("com.mikepenz:multiplatform-markdown-renderer:0.46.0")
+    implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.46.0")
 
     // Shizuku provides a shell-identity UserService without root. The provider
     // is declared in the manifest so the Shizuku manager can verify this app.

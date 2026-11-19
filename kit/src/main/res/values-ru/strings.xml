@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">Назад</string>
+    <string name="move_down">Переместить вниз</string>
+    <string name="move_up">Переместить вверх</string>
+    <string name="cancel">Отмена</string>
+    <string name="dialog_position_bottom">Снизу</string>
+    <string name="dialog_position_center">По центру</string>
+    <string name="follow_system">Как в системе</string>
+    <string name="glass_frosted">Miuix-размытие</string>
+    <string name="glass_liquid">Liquid Glass</string>
+    <string name="glass_off">Выкл.</string>
+    <string name="home_bg_cards_solid">Непрозрачные</string>
+    <string name="icon_style_colorful">Цветные</string>
+    <string name="icon_style_filled">Тёмные заливкой</string>
+    <string name="icon_style_line">Светлые контурные</string>
+    <string name="icon_style_tinted">Цвет темы</string>
+    <string name="list_density_compact">Компактная</string>
+    <string name="list_density_standard">Стандартная</string>
+    <string name="off">Выкл.</string>
+    <string name="ok">ОК</string>
+    <string name="page_transition_slide">Сдвиг</string>
+    <string name="page_transition_slide_fade">Сдвиг с затуханием</string>
+    <string name="predictive_back_custom">Отслеживание касания</string>
+    <string name="predictive_back_off">Выкл.</string>
+    <string name="predictive_back_official">Стандартный</string>
+    <string name="reduce_motion_off">Выкл.</string>
+    <string name="reduce_motion_on">Вкл.</string>
+    <string name="top_bar_compact">Компактная</string>
+    <string name="top_bar_large">Крупный заголовок</string>
+    <string name="ui_style_material">Material 3</string>
+    <string name="ui_style_miuix">HyperOS</string>
+    <string name="unit_hours">Часы</string>
+</resources>

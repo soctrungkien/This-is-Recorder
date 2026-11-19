@@ -1,5 +1,15 @@
 package com.hihi.recorder.data
 
+import com.zeroui.kit.components.SettingIconStyle
+import com.zeroui.kit.theme.DarkMode
+import com.zeroui.kit.theme.GlassMode
+import com.zeroui.kit.theme.MotionMode
+import com.zeroui.kit.theme.PaletteStyle
+import com.zeroui.kit.theme.TopBarStyle
+import com.zeroui.kit.theme.ListDensity
+import com.zeroui.kit.theme.DialogPosition
+import com.zeroui.kit.theme.ThemeSettings
+
 /** Where the soundtrack of a recording comes from. */
 enum class AudioSource(
     val requiresAudioPermission: Boolean,
@@ -140,10 +150,55 @@ data class RecorderSettings(
     val navigationBlur: Boolean = true,
     val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
+
+    // ZeroUI theme / interface preferences. These drive com.zeroui.kit.theme.ZeroTheme.
+    val seedColor: Int = 0,
+    val palette: PaletteStyle = PaletteStyle.TonalSpot,
+    val pureBlack: Boolean = false,
+    val motion: MotionMode = MotionMode.System,
+    val uiScale: Int = 100,
+    val glassMode: GlassMode = GlassMode.Off,
+    val glassIntensity: Int = 100,
+    val compactList: Boolean = false,
+    val topBarBlur: Boolean = false,
+    val smoothCorners: Boolean = true,
+    val elasticScroll: Boolean = true,
+    val dialogCentered: Boolean = false,
+    val iconStyle: SettingIconStyle = SettingIconStyle.Filled,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
 
     val storagePath: String get() = "Movies/${normalizeSaveFolder(saveFolder)}"
+
+    /** Maps the recorder preferences onto the ZeroUI kit theme input. */
+    fun kitTheme(): ThemeSettings = ThemeSettings(
+        style = if (uiStyle == UiStyle.MATERIAL) {
+            com.zeroui.kit.theme.UiStyle.Material
+        } else {
+            com.zeroui.kit.theme.UiStyle.Miuix
+        },
+        darkMode = when (theme) {
+            RecorderTheme.SYSTEM -> DarkMode.System
+            RecorderTheme.LIGHT -> DarkMode.Light
+            RecorderTheme.DARK -> DarkMode.Dark
+        },
+        dynamicColor = monetColor,
+        seedColor = seedColor,
+        palette = palette,
+        pureBlack = pureBlack,
+        motion = motion,
+        uiScale = uiScale,
+        glassMode = glassMode,
+        glassIntensity = glassIntensity,
+        listDensity = if (compactList) ListDensity.Compact else ListDensity.Standard,
+        topBar = TopBarStyle.Large,
+        topBarBlur = topBarBlur,
+        smoothCorners = smoothCorners,
+        elasticScroll = elasticScroll,
+        haptics = hapticFeedback,
+        dialogPosition = if (dialogCentered) DialogPosition.Center else DialogPosition.Bottom,
+        iconStyle = iconStyle,
+    )
 
     companion object {
         const val DEFAULT_SAVE_FOLDER = "ThisIsRecorder"

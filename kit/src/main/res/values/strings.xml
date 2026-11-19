@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">Back</string>
+    <string name="move_down">Move down</string>
+    <string name="move_up">Move up</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_position_bottom">Bottom</string>
+    <string name="dialog_position_center">Center</string>
+    <string name="follow_system">Follow system</string>
+    <string name="glass_frosted">Miuix-blur</string>
+    <string name="glass_liquid">Liquid Glass</string>
+    <string name="glass_off">Off</string>
+    <string name="home_bg_cards_solid">Opaque</string>
+    <string name="icon_style_colorful">Colorful</string>
+    <string name="icon_style_filled">Dark filled</string>
+    <string name="icon_style_line">Light outline</string>
+    <string name="icon_style_tinted">Theme color</string>
+    <string name="list_density_compact">Compact</string>
+    <string name="list_density_standard">Standard</string>
+    <string name="off">Off</string>
+    <string name="ok">OK</string>
+    <string name="page_transition_slide">Slide</string>
+    <string name="page_transition_slide_fade">Slide and fade</string>
+    <string name="predictive_back_custom">Touch tracking</string>
+    <string name="predictive_back_off">Off</string>
+    <string name="predictive_back_official">Standard</string>
+    <string name="reduce_motion_off">Off</string>
+    <string name="reduce_motion_on">On</string>
+    <string name="top_bar_compact">Compact</string>
+    <string name="top_bar_large">Large title</string>
+    <string name="ui_style_material">Material 3</string>
+    <string name="ui_style_miuix">HyperOS</string>
+    <string name="unit_hours">Hours</string>
+</resources>

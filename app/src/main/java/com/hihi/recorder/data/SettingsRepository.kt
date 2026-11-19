@@ -1,6 +1,10 @@
 package com.hihi.recorder.data
 
 import android.content.Context
+import com.zeroui.kit.components.SettingIconStyle
+import com.zeroui.kit.theme.GlassMode
+import com.zeroui.kit.theme.MotionMode
+import com.zeroui.kit.theme.PaletteStyle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,6 +81,46 @@ class SettingsRepository(context: Context) {
     @Synchronized
     fun setSaveFolder(value: String) = update { it.copy(saveFolder = normalizeSaveFolder(value)) }
 
+    // ZeroUI theme / interface preferences.
+    @Synchronized
+    fun setSeedColor(value: Int) = update { it.copy(seedColor = value) }
+
+    @Synchronized
+    fun setPalette(value: PaletteStyle) = update { it.copy(palette = value) }
+
+    @Synchronized
+    fun setPureBlack(value: Boolean) = update { it.copy(pureBlack = value) }
+
+    @Synchronized
+    fun setMotion(value: MotionMode) = update { it.copy(motion = value) }
+
+    @Synchronized
+    fun setUiScale(value: Int) = update { it.copy(uiScale = value.coerceIn(80, 130)) }
+
+    @Synchronized
+    fun setGlassMode(value: GlassMode) = update { it.copy(glassMode = value) }
+
+    @Synchronized
+    fun setGlassIntensity(value: Int) = update { it.copy(glassIntensity = value.coerceIn(25, 200)) }
+
+    @Synchronized
+    fun setCompactList(value: Boolean) = update { it.copy(compactList = value) }
+
+    @Synchronized
+    fun setTopBarBlur(value: Boolean) = update { it.copy(topBarBlur = value) }
+
+    @Synchronized
+    fun setSmoothCorners(value: Boolean) = update { it.copy(smoothCorners = value) }
+
+    @Synchronized
+    fun setElasticScroll(value: Boolean) = update { it.copy(elasticScroll = value) }
+
+    @Synchronized
+    fun setDialogCentered(value: Boolean) = update { it.copy(dialogCentered = value) }
+
+    @Synchronized
+    fun setIconStyle(value: SettingIconStyle) = update { it.copy(iconStyle = value) }
+
     /**
      * Android 13+ notification permission is optional. Remember that we asked
      * once so the permission dialog does not appear before every recording.
@@ -127,6 +171,19 @@ class SettingsRepository(context: Context) {
             saveFolder = preferences.getString(KEY_SAVE_FOLDER, defaults.saveFolder)
                 ?.let(::normalizeSaveFolder)
                 ?: defaults.saveFolder,
+            seedColor = preferences.getInt(KEY_SEED_COLOR, defaults.seedColor),
+            palette = preferences.enumValue(KEY_PALETTE, defaults.palette),
+            pureBlack = preferences.getBoolean(KEY_PURE_BLACK, defaults.pureBlack),
+            motion = preferences.enumValue(KEY_MOTION, defaults.motion),
+            uiScale = preferences.getInt(KEY_UI_SCALE, defaults.uiScale),
+            glassMode = preferences.enumValue(KEY_GLASS_MODE, defaults.glassMode),
+            glassIntensity = preferences.getInt(KEY_GLASS_INTENSITY, defaults.glassIntensity),
+            compactList = preferences.getBoolean(KEY_COMPACT_LIST, defaults.compactList),
+            topBarBlur = preferences.getBoolean(KEY_TOP_BAR_BLUR, defaults.topBarBlur),
+            smoothCorners = preferences.getBoolean(KEY_SMOOTH_CORNERS, defaults.smoothCorners),
+            elasticScroll = preferences.getBoolean(KEY_ELASTIC_SCROLL, defaults.elasticScroll),
+            dialogCentered = preferences.getBoolean(KEY_DIALOG_CENTERED, defaults.dialogCentered),
+            iconStyle = preferences.enumValue(KEY_ICON_STYLE, defaults.iconStyle),
         )
     }
 
@@ -150,6 +207,19 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
+            .putInt(KEY_SEED_COLOR, settings.seedColor)
+            .putString(KEY_PALETTE, settings.palette.name)
+            .putBoolean(KEY_PURE_BLACK, settings.pureBlack)
+            .putString(KEY_MOTION, settings.motion.name)
+            .putInt(KEY_UI_SCALE, settings.uiScale)
+            .putString(KEY_GLASS_MODE, settings.glassMode.name)
+            .putInt(KEY_GLASS_INTENSITY, settings.glassIntensity)
+            .putBoolean(KEY_COMPACT_LIST, settings.compactList)
+            .putBoolean(KEY_TOP_BAR_BLUR, settings.topBarBlur)
+            .putBoolean(KEY_SMOOTH_CORNERS, settings.smoothCorners)
+            .putBoolean(KEY_ELASTIC_SCROLL, settings.elasticScroll)
+            .putBoolean(KEY_DIALOG_CENTERED, settings.dialogCentered)
+            .putString(KEY_ICON_STYLE, settings.iconStyle.name)
             .apply()
     }
 
@@ -196,5 +266,18 @@ class SettingsRepository(context: Context) {
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
+        const val KEY_SEED_COLOR = "seed_color"
+        const val KEY_PALETTE = "palette"
+        const val KEY_PURE_BLACK = "pure_black"
+        const val KEY_MOTION = "motion"
+        const val KEY_UI_SCALE = "ui_scale"
+        const val KEY_GLASS_MODE = "glass_mode"
+        const val KEY_GLASS_INTENSITY = "glass_intensity"
+        const val KEY_COMPACT_LIST = "compact_list"
+        const val KEY_TOP_BAR_BLUR = "top_bar_blur"
+        const val KEY_SMOOTH_CORNERS = "smooth_corners"
+        const val KEY_ELASTIC_SCROLL = "elastic_scroll"
+        const val KEY_DIALOG_CENTERED = "dialog_centered"
+        const val KEY_ICON_STYLE = "icon_style"
     }
 }

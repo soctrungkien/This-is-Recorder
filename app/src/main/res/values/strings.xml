@@ -56,6 +56,8 @@
     <string name="about_source_summary">github.com/soctrungkien/This-is-Recorder</string>
     <string name="about_miuix">Miuix for Compose</string>
     <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0 · UI, Preference, Icons, Blur, Squircle, Nav</string>
+    <string name="about_zeroui">ZeroUI</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Design system (theme, components, settings UI)</string>
     <string name="about_license_mit">MIT License</string>
     <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
     <string name="about_license_apache">Apache License 2.0</string>
@@ -176,6 +178,29 @@
     <string name="update_rate_limited">GitHub rate limit reached. Try again later.</string>
     <string name="update_server_error">GitHub returned an error. Try again later.</string>
     <string name="update_invalid_response">GitHub returned an unexpected response.</string>
+
+    <!-- ZeroUI settings -->
+    <string name="zero_capture">Capture</string>
+    <string name="zero_audio">Audio</string>
+    <string name="zero_video">Video</string>
+    <string name="zero_timer">Timer</string>
+    <string name="zero_behavior">Behavior</string>
+    <string name="zero_theme_sub">Colors, dark mode and palette</string>
+    <string name="zero_interface">Interface</string>
+    <string name="zero_interface_sub">Density, scale, glass and motion</string>
+    <string name="zero_glass">Glass material</string>
+    <string name="zero_glass_intensity">Glass intensity</string>
+    <string name="zero_pure_black">Pure black dark mode</string>
+    <string name="zero_motion">Motion</string>
+    <string name="zero_ui_scale">UI scale</string>
+    <string name="zero_list_density">List density</string>
+    <string name="zero_top_bar_blur">Blur top bar</string>
+    <string name="zero_smooth_corners">Smooth corners</string>
+    <string name="zero_elastic_scroll">Elastic scrolling</string>
+    <string name="zero_dialog_position">Dialog position</string>
+    <string name="zero_icon_style">Icon style</string>
+    <string name="zero_palette">Color palette</string>
+    <string name="zero_seed_color">Custom seed color (0 = wallpaper)</string>
 
     <string name="capture_standard">Standard (MediaProjection)</string>
     <string name="capture_shell">Screenrecord (ADB, Shizuku, root)</string>

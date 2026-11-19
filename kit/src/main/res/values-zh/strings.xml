@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="back">返回</string>
+    <string name="move_down">下移</string>
+    <string name="move_up">上移</string>
+    <string name="cancel">取消</string>
+    <string name="dialog_position_bottom">底部</string>
+    <string name="dialog_position_center">居中</string>
+    <string name="follow_system">跟随系统</string>
+    <string name="glass_frosted">Miuix-blur</string>
+    <string name="glass_liquid">Liquid Glass</string>
+    <string name="glass_off">关闭</string>
+    <string name="home_bg_cards_solid">不透明</string>
+    <string name="icon_style_colorful">彩色</string>
+    <string name="icon_style_filled">深色填充</string>
+    <string name="icon_style_line">浅色线性</string>
+    <string name="icon_style_tinted">主题色</string>
+    <string name="list_density_compact">紧凑</string>
+    <string name="list_density_standard">标准</string>
+    <string name="off">关闭</string>
+    <string name="ok">确定</string>
+    <string name="page_transition_slide">横向滑入</string>
+    <string name="page_transition_slide_fade">渐显滑入</string>
+    <string name="predictive_back_custom">触点跟随</string>
+    <string name="predictive_back_off">关闭</string>
+    <string name="predictive_back_official">标准</string>
+    <string name="reduce_motion_off">关闭</string>
+    <string name="reduce_motion_on">开启</string>
+    <string name="top_bar_compact">紧凑</string>
+    <string name="top_bar_large">大标题</string>
+    <string name="ui_style_material">Material 3</string>
+    <string name="ui_style_miuix">Miuix</string>
+    <string name="unit_hours">小时</string>
+</resources>

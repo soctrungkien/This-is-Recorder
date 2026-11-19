@@ -33,8 +33,9 @@ sealed interface UpdateResult {
 /**
  * Checks the official GitHub release feed through gh-proxy. No analytics or
  * identifiers are sent; this is a single anonymous GET. The proxy exists
- * because api.github.com and release assets are often unreachable directly in
- * the regions where this app is used.
+ * because api.github.com is often unreachable directly in the regions where
+ * this app is used. It is used ONLY for this check: the link returned to the
+ * user points straight at GitHub and never goes through the proxy.
  */
 object UpdateChecker {
 
@@ -116,7 +117,10 @@ object UpdateChecker {
 
             val releaseUrl = json.optString("html_url").takeIf { it.isNotBlank() }
                 ?: RELEASE_PAGE
-            var downloadUrl = proxied(releaseUrl)
+            // Keep the user-facing link DIRECT. gh-proxy is for reaching the
+            // JSON API during the check only - downloads and release pages
+            // must open at github.com so they work in a normal browser.
+            var downloadUrl = releaseUrl
             val assets = json.optJSONArray("assets")
             if (assets != null) {
                 for (index in 0 until assets.length()) {
@@ -125,7 +129,7 @@ object UpdateChecker {
                     if (name.endsWith(".apk", ignoreCase = true) && !name.contains("debug", true)) {
                         val candidate = asset.optString("browser_download_url")
                         if (candidate.isNotBlank()) {
-                            downloadUrl = proxied(candidate)
+                            downloadUrl = candidate
                             break
                         }
                     }

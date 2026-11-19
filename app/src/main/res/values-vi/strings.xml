@@ -56,6 +56,8 @@
     <string name="about_source_summary">github.com/soctrungkien/This-is-Recorder</string>
     <string name="about_miuix">Miuix for Compose</string>
     <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0 · UI, Preference, Icons, Blur, Squircle, Nav</string>
+    <string name="about_zeroui">ZeroUI</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Design system (theme, component, giao diện cài đặt)</string>
     <string name="about_license_mit">Giấy phép MIT</string>
     <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
     <string name="about_license_apache">Giấy phép Apache 2.0</string>
@@ -176,6 +178,29 @@
     <string name="update_rate_limited">Đã chạm giới hạn truy cập GitHub. Hãy thử lại sau.</string>
     <string name="update_server_error">GitHub trả về lỗi. Hãy thử lại sau.</string>
     <string name="update_invalid_response">GitHub trả về dữ liệu không hợp lệ.</string>
+
+    <!-- ZeroUI settings -->
+    <string name="zero_capture">Thu hình</string>
+    <string name="zero_audio">Âm thanh</string>
+    <string name="zero_video">Video</string>
+    <string name="zero_timer">Hẹn giờ</string>
+    <string name="zero_behavior">Hành vi</string>
+    <string name="zero_theme_sub">Màu sắc, chế độ tối và bảng màu</string>
+    <string name="zero_interface">Giao diện</string>
+    <string name="zero_interface_sub">Mật độ, tỉ lệ, glass và chuyển động</string>
+    <string name="zero_glass">Vật liệu glass</string>
+    <string name="zero_glass_intensity">Cường độ glass</string>
+    <string name="zero_pure_black">Nền đen thuần khi tối</string>
+    <string name="zero_motion">Chuyển động</string>
+    <string name="zero_ui_scale">Tỉ lệ giao diện</string>
+    <string name="zero_list_density">Mật độ danh sách</string>
+    <string name="zero_top_bar_blur">Mờ thanh trên</string>
+    <string name="zero_smooth_corners">Góc bo mượt</string>
+    <string name="zero_elastic_scroll">Cuộn đàn hồi</string>
+    <string name="zero_dialog_position">Vị trí hộp thoại</string>
+    <string name="zero_icon_style">Kiểu biểu tượng</string>
+    <string name="zero_palette">Bảng màu</string>
+    <string name="zero_seed_color">Màu gốc tùy chỉnh (0 = theo hình nền)</string>
 
     <string name="capture_standard">Chuẩn (MediaProjection)</string>
     <string name="capture_shell">Screenrecord (ADB, Shizuku, root)</string>

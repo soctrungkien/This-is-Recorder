@@ -792,10 +792,9 @@ fun RecorderApp(
                         .heightIn(max = 240.dp)
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    AppText(
-                        text = info.notes.take(2_000),
-                        style = AppTextStyle.SmallBody,
-                        color = palette.onSurfaceVariant,
+                    MarkdownText(
+                        text = info.notes.take(4_000),
+                        onOpenUrl = onOpenUrl,
                     )
                 }
             }
