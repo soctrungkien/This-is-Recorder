@@ -69,7 +69,9 @@
     <string name="about_design_summary">Hihi</string>
     <string name="about_open_source">Open-source software</string>
     <string name="about_liquid_glass">Liquid Glass components</string>
-    <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass, toggle and slider components</string>
+    <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass components</string>
+    <string name="about_zeroui">ZeroUI</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid toggle component</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
@@ -314,8 +316,7 @@
     <string name="error_notification_permission">Notification permission was denied. The recording notification may not be visible.</string>
     
     <string name="pref_liquid_glass">Liquid glass components</string>
-    <string name="pref_liquid_glass_summary">Use the liquid toggle and slider in the UI.</string>
-    <string name="pref_liquid_intensity">Glass intensity</string>
+    <string name="pref_liquid_glass_summary">Use the liquid glass switch in the UI.</string>
 
     <string name="showcase_title">Component showcase</string>
     <string name="showcase_subtitle">Preview UI components and dialogs</string>

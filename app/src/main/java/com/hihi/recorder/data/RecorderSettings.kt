@@ -140,9 +140,8 @@ data class RecorderSettings(
     val navigationBlur: Boolean = true,
     val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
-    /** Master switch for the liquid glass toggle and slider components. */
+    /** Master switch for the liquid glass toggle component. */
     val liquidGlass: Boolean = true,
-    val liquidGlassIntensity: Int = 100,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
 

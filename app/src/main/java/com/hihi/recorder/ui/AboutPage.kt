@@ -276,6 +276,13 @@ fun AboutPage(
                         )
                         AppDivider()
                         AppRow(
+                            title = stringResource(R.string.about_zeroui),
+                            summary = stringResource(R.string.about_zeroui_summary),
+                            leadingIcon = MiuixIcons.Theme,
+                            onClick = { onOpenUrl("https://github.com/Xocio/ZeroUI") },
+                        )
+                        AppDivider()
+                        AppRow(
                             title = stringResource(R.string.about_framework),
                             summary = stringResource(R.string.about_framework_summary),
                             leadingIcon = MiuixIcons.Theme,

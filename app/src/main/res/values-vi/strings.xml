@@ -69,7 +69,9 @@
     <string name="about_design_summary">Hihi</string>
     <string name="about_open_source">Phần mềm mã nguồn mở</string>
     <string name="about_liquid_glass">Thành phần Liquid Glass</string>
-    <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass, công tắc và thanh kéo</string>
+    <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Thành phần liquid glass</string>
+    <string name="about_zeroui">ZeroUI</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Công tắc liquid</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
@@ -314,8 +316,7 @@
     <string name="error_notification_permission">Quyền thông báo bị từ chối. Thông báo ghi hình có thể không hiển thị.</string>
     
     <string name="pref_liquid_glass">Thành phần liquid glass</string>
-    <string name="pref_liquid_glass_summary">Dùng công tắc và thanh kéo dạng liquid trong giao diện.</string>
-    <string name="pref_liquid_intensity">Cường độ glass</string>
+    <string name="pref_liquid_glass_summary">Dùng công tắc liquid glass trong giao diện.</string>
 
     <string name="showcase_title">Xem thành phần giao diện</string>
     <string name="showcase_subtitle">Thử các thành phần và hộp thoại</string>

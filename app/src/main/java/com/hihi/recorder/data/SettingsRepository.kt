@@ -80,11 +80,6 @@ class SettingsRepository(context: Context) {
     @Synchronized
     fun setLiquidGlass(value: Boolean) = update { it.copy(liquidGlass = value) }
 
-    @Synchronized
-    fun setLiquidGlassIntensity(value: Int) = update {
-        it.copy(liquidGlassIntensity = value.coerceIn(25, 200))
-    }
-
     /**
      * Android 13+ notification permission is optional. Remember that we asked
      * once so the permission dialog does not appear before every recording.
@@ -136,10 +131,6 @@ class SettingsRepository(context: Context) {
                 ?.let(::normalizeSaveFolder)
                 ?: defaults.saveFolder,
             liquidGlass = preferences.getBoolean(KEY_LIQUID_GLASS, defaults.liquidGlass),
-            liquidGlassIntensity = preferences.getInt(
-                KEY_LIQUID_GLASS_INTENSITY,
-                defaults.liquidGlassIntensity,
-            ),
         )
     }
 
@@ -164,7 +155,6 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .putBoolean(KEY_LIQUID_GLASS, settings.liquidGlass)
-            .putInt(KEY_LIQUID_GLASS_INTENSITY, settings.liquidGlassIntensity)
             .apply()
     }
 
@@ -211,7 +201,6 @@ class SettingsRepository(context: Context) {
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_LIQUID_GLASS = "liquid_glass"
-        const val KEY_LIQUID_GLASS_INTENSITY = "liquid_glass_intensity"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
     }
 }

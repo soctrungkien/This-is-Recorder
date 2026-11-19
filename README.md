@@ -145,7 +145,8 @@ app/src/main/java/com/hihi/recorder/
 ### Thư viện và nền tảng mã nguồn mở
 
 - **[Miuix for Compose](https://github.com/compose-miuix-ui/miuix)** 0.9.4 — © compose-miuix-ui contributors, giấy phép Apache-2.0. Dùng các module `miuix-ui`, `miuix-preference`, `miuix-icons`, `miuix-blur`, `miuix-squircle` và `miuix-nav`.
-- **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass (hiệu ứng kính, công tắc `LiquidToggle` và thanh kéo `LiquidSlider`) được phỏng theo và chỉnh sửa từ catalog của dự án.
+- **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa từ dự án.
+- **[ZeroUI](https://github.com/Xocio/ZeroUI)** — © ZeroUI contributors, giấy phép Apache-2.0. Thành phần `LiquidToggle` được lấy từ module `glass` của ZeroUI và chỉnh để đồng bộ màu với theme của ứng dụng.
 - **[Jetpack Compose](https://developer.android.com/compose)** 1.12.0 (`foundation`, `ui`, `animation`) — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.4.0 — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[AndroidX Core KTX & Activity Compose](https://developer.android.com/jetpack/androidx)** 1.19.1 / 1.13.0 — © The Android Open Source Project, giấy phép Apache-2.0.

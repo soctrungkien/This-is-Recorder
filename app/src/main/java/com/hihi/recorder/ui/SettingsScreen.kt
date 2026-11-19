@@ -31,7 +31,6 @@ import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.data.normalizeSaveFolder
-import com.hihi.recorder.ui.liquid.LiquidSlider
 import com.hihi.recorder.ui.liquid.LiquidToggle
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
@@ -135,29 +134,6 @@ fun SettingsScreen(
                                 },
                             )
                         }
-                    }
-                    if (settings.liquidGlass && liquidAvailable) {
-                        Spacer(Modifier.height(14.dp))
-                        AppText(
-                            text = stringResource(R.string.pref_liquid_intensity) +
-                                ": ${settings.liquidGlassIntensity}%",
-                            style = AppTextStyle.Footnote,
-                            color = palette.onSurfaceVariant,
-                        )
-                        LiquidSlider(
-                            value = { settings.liquidGlassIntensity / 100f },
-                            onValueChange = {
-                                onSettingsChange(
-                                    settings.copy(liquidGlassIntensity = (it * 100).toInt()),
-                                )
-                            },
-                            valueRange = 0.25f..2f,
-                            visibilityThreshold = 0.001f,
-                            backdrop = backdrop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp),
-                        )
                     }
                 }
             }
