@@ -115,6 +115,12 @@ enum class NavigationBarStyle {
     LIQUID_IOS,
 }
 
+/** Style of the switches shown in the settings UI. */
+enum class ToggleStyle {
+    UI,
+    LIQUID,
+}
+
 /**
  * Immutable snapshot of all user preferences. The recording service takes a
  * snapshot when a session starts, so changing a switch while recording cannot
@@ -140,8 +146,8 @@ data class RecorderSettings(
     val navigationBlur: Boolean = true,
     val navigationIosLabels: Boolean = true,
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
-    /** Master switch for the liquid glass toggle component. */
-    val liquidGlass: Boolean = true,
+    /** Component family used for every switch in the settings UI. */
+    val toggleStyle: ToggleStyle = ToggleStyle.LIQUID,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
 

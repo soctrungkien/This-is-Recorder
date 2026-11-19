@@ -78,7 +78,7 @@ class SettingsRepository(context: Context) {
     fun setSaveFolder(value: String) = update { it.copy(saveFolder = normalizeSaveFolder(value)) }
 
     @Synchronized
-    fun setLiquidGlass(value: Boolean) = update { it.copy(liquidGlass = value) }
+    fun setToggleStyle(value: ToggleStyle) = update { it.copy(toggleStyle = value) }
 
     /**
      * Android 13+ notification permission is optional. Remember that we asked
@@ -130,7 +130,7 @@ class SettingsRepository(context: Context) {
             saveFolder = preferences.getString(KEY_SAVE_FOLDER, defaults.saveFolder)
                 ?.let(::normalizeSaveFolder)
                 ?: defaults.saveFolder,
-            liquidGlass = preferences.getBoolean(KEY_LIQUID_GLASS, defaults.liquidGlass),
+            toggleStyle = preferences.enumValue(KEY_TOGGLE_STYLE, defaults.toggleStyle),
         )
     }
 
@@ -154,7 +154,7 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
-            .putBoolean(KEY_LIQUID_GLASS, settings.liquidGlass)
+            .putString(KEY_TOGGLE_STYLE, settings.toggleStyle.name)
             .apply()
     }
 
@@ -200,7 +200,7 @@ class SettingsRepository(context: Context) {
         const val KEY_NAVIGATION_BLUR = "navigation_blur"
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
-        const val KEY_LIQUID_GLASS = "liquid_glass"
+        const val KEY_TOGGLE_STYLE = "toggle_style"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
     }
 }

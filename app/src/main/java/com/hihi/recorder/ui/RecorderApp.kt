@@ -545,6 +545,7 @@ fun RecorderApp(
 
                     entry<AppRoute.Showcase>(swipeDismiss = swipeDismiss) {
                         ShowcaseScreen(
+                            settings = settings,
                             snackbarHostState = snackbarHostState,
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()

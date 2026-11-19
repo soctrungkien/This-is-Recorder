@@ -315,8 +315,10 @@
     <string name="recording_summary_shell">%1$s • %2$s • %3$s</string>
     <string name="error_notification_permission">Notification permission was denied. The recording notification may not be visible.</string>
     
-    <string name="pref_liquid_glass">Liquid glass components</string>
-    <string name="pref_liquid_glass_summary">Use the liquid glass switch in the UI.</string>
+    <string name="pref_toggle_style">Toggle style</string>
+    <string name="pref_toggle_style_summary">Choose how switches look across the settings.</string>
+    <string name="toggle_style_ui">Interface</string>
+    <string name="toggle_style_liquid">Liquid glass</string>
 
     <string name="showcase_title">Component showcase</string>
     <string name="showcase_subtitle">Preview UI components and dialogs</string>

@@ -1,6 +1,7 @@
 package com.hihi.recorder.ui
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import com.hihi.recorder.data.NavigationBarStyle
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
+import com.hihi.recorder.data.ToggleStyle
 import com.hihi.recorder.data.normalizeSaveFolder
 import com.hihi.recorder.ui.liquid.LiquidToggle
 import com.kyant.backdrop.backdrops.layerBackdrop
@@ -45,6 +47,53 @@ import top.yukonga.miuix.kmp.icon.extended.Send
 
 private enum class SettingsPicker {
     THEME,
+}
+
+/** Switch row that follows the user's Toggle style preference. */
+@Composable
+internal fun ToggleRow(
+    settings: RecorderSettings,
+    title: String,
+    summary: String? = null,
+    checked: Boolean,
+    enabled: Boolean = true,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    val liquid = settings.toggleStyle == ToggleStyle.LIQUID &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    if (!liquid) {
+        AppSwitchRow(
+            title = title,
+            summary = summary,
+            checked = checked,
+            enabled = enabled,
+            onCheckedChange = onCheckedChange,
+        )
+        return
+    }
+
+    val backdrop = rememberLayerBackdrop()
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .layerBackdrop(backdrop)
+            .background(appPalette().surfaceContainer),
+    ) {
+        AppRow(
+            title = title,
+            summary = summary,
+            enabled = enabled,
+            onClick = { if (enabled) onCheckedChange(!checked) },
+            trailing = {
+                LiquidToggle(
+                    selected = { checked },
+                    onSelect = onCheckedChange,
+                    enabled = enabled,
+                    backdrop = backdrop,
+                )
+            },
+        )
+    }
 }
 
 @Composable
@@ -88,53 +137,6 @@ fun SettingsScreen(
                         value = settings.theme.label(),
                         onClick = { picker = SettingsPicker.THEME },
                     )
-                }
-            }
-            item {
-                val liquidAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                val backdrop = rememberLayerBackdrop()
-                AppCard(contentPadding = PaddingValues(16.dp)) {
-                    // Source layer for the liquid controls to refract.
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .layerBackdrop(backdrop),
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            AppText(
-                                text = stringResource(R.string.pref_liquid_glass),
-                                style = AppTextStyle.Subtitle,
-                            )
-                            Spacer(Modifier.height(2.dp))
-                            AppText(
-                                text = stringResource(R.string.pref_liquid_glass_summary),
-                                style = AppTextStyle.Footnote,
-                                color = palette.onSurfaceVariant,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        if (settings.liquidGlass && liquidAvailable) {
-                            LiquidToggle(
-                                selected = { true },
-                                onSelect = {
-                                    onSettingsChange(settings.copy(liquidGlass = it))
-                                },
-                                backdrop = backdrop,
-                            )
-                        } else {
-                            AppSwitch(
-                                checked = settings.liquidGlass,
-                                onCheckedChange = {
-                                    onSettingsChange(settings.copy(liquidGlass = it))
-                                },
-                            )
-                        }
-                    }
                 }
             }
             item {
@@ -185,22 +187,41 @@ fun SettingsScreen(
             }
             item {
                 AppCard(contentPadding = PaddingValues(0.dp)) {
-                    AppSwitchRow(
+                    ToggleRow(
+                        settings = settings,
                         title = stringResource(R.string.pref_navigation_blur),
                         summary = stringResource(R.string.pref_navigation_blur_summary),
                         checked = settings.navigationBlur,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(navigationBlur = it))
-                        },
-                    )
+                    ) { onSettingsChange(settings.copy(navigationBlur = it)) }
                     AppDivider()
-                    AppSwitchRow(
+                    ToggleRow(
+                        settings = settings,
                         title = stringResource(R.string.pref_navigation_ios_labels),
                         summary = stringResource(R.string.pref_navigation_ios_labels_summary),
                         checked = settings.navigationIosLabels,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(navigationIosLabels = it))
-                        },
+                    ) { onSettingsChange(settings.copy(navigationIosLabels = it)) }
+                }
+            }
+            item {
+                AppCard(contentPadding = PaddingValues(14.dp)) {
+                    AppText(
+                        text = stringResource(R.string.pref_toggle_style),
+                        style = AppTextStyle.Subtitle,
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    AppText(
+                        text = stringResource(R.string.pref_toggle_style_summary),
+                        style = AppTextStyle.Footnote,
+                        color = palette.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    AppSegmentedControl(
+                        options = listOf(
+                            ToggleStyle.UI to stringResource(R.string.toggle_style_ui),
+                            ToggleStyle.LIQUID to stringResource(R.string.toggle_style_liquid),
+                        ),
+                        selected = settings.toggleStyle,
+                        onSelect = { onSettingsChange(settings.copy(toggleStyle = it)) },
                     )
                 }
             }
@@ -234,21 +255,17 @@ fun SettingsScreen(
             item { AppSectionTitle(stringResource(R.string.section_recording)) }
             item {
                 AppCard(contentPadding = PaddingValues(0.dp)) {
-                    AppSwitchRow(
+                    ToggleRow(
+                        settings = settings,
                         title = stringResource(R.string.pref_haptics),
                         checked = settings.hapticFeedback,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(hapticFeedback = it))
-                        },
-                    )
+                    ) { onSettingsChange(settings.copy(hapticFeedback = it)) }
                     AppDivider()
-                    AppSwitchRow(
+                    ToggleRow(
+                        settings = settings,
                         title = stringResource(R.string.pref_stop_screen_off),
                         checked = settings.stopOnScreenOff,
-                        onCheckedChange = {
-                            onSettingsChange(settings.copy(stopOnScreenOff = it))
-                        },
-                    )
+                    ) { onSettingsChange(settings.copy(stopOnScreenOff = it)) }
                 }
             }
 

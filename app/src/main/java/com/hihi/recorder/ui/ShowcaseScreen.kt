@@ -37,6 +37,7 @@ import kotlin.system.exitProcess
 /** Easter-egg screen: every local component and dialog in one place. */
 @Composable
 fun ShowcaseScreen(
+    settings: com.hihi.recorder.data.RecorderSettings,
     snackbarHostState: SnackbarHostState,
     onBack: () -> Unit,
     onOpenUrl: (String) -> Unit,
@@ -123,21 +124,18 @@ fun ShowcaseScreen(
             item { AppSectionTitle(stringResource(R.string.showcase_switches)) }
             item {
                 AppCard {
-                    AppSwitchRow(
+                    ToggleRow(
+                        settings = settings,
                         title = stringResource(R.string.showcase_switches),
                         checked = demoSwitch,
-                        onCheckedChange = { demoSwitch = it },
-                    )
+                    ) { demoSwitch = it }
                     AppDivider()
-                    AppRow(
+                    ToggleRow(
+                        settings = settings,
                         title = stringResource(R.string.showcase_demo_value),
                         summary = demoSwitch.toString(),
-                        leadingIcon = MiuixIcons.Info,
-                        onClick = { demoSwitch = !demoSwitch },
-                        trailing = {
-                            AppSwitch(checked = demoSwitch, onCheckedChange = null)
-                        },
-                    )
+                        checked = demoSwitch,
+                    ) { demoSwitch = it }
                 }
             }
 
