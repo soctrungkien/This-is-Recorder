@@ -57,7 +57,7 @@
     <string name="about_miuix">Miuix for Compose</string>
     <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0 · UI, Preference, Icons, Blur, Squircle, Nav</string>
     <string name="about_zeroui">ZeroUI</string>
-    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Design system (theme, components, settings UI)</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid Glass effects for Miuix</string>
     <string name="about_license_mit">MIT License</string>
     <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
     <string name="about_license_apache">Apache License 2.0</string>
@@ -178,6 +178,28 @@
     <string name="update_rate_limited">GitHub rate limit reached. Try again later.</string>
     <string name="update_server_error">GitHub returned an error. Try again later.</string>
     <string name="update_invalid_response">GitHub returned an unexpected response.</string>
+
+    <!-- Component showcase -->
+    <string name="showcase_title">Component showcase</string>
+    <string name="showcase_subtitle">Preview UI components and dialogs</string>
+    <string name="showcase_buttons">Buttons</string>
+    <string name="showcase_text_styles">Text styles</string>
+    <string name="showcase_switches">Switches</string>
+    <string name="showcase_cards">Cards</string>
+    <string name="showcase_dialogs">Dialogs</string>
+    <string name="showcase_feedback">Feedback</string>
+    <string name="showcase_markdown">Markdown preview</string>
+    <string name="showcase_normal_button">Normal button</string>
+    <string name="showcase_primary_button">Primary button</string>
+    <string name="showcase_disabled_button">Disabled button</string>
+    <string name="showcase_preview_update">Preview update dialog</string>
+    <string name="showcase_preview_confirm">Preview confirm dialog</string>
+    <string name="showcase_preview_input">Preview input dialog</string>
+    <string name="showcase_preview_select">Preview select dialog</string>
+    <string name="showcase_show_snackbar">Show snackbar</string>
+    <string name="showcase_dialog_message">This is a preview dialog from the component showcase.</string>
+    <string name="showcase_demo_value">Demo value</string>
+    <string name="action_taps">Taps: %1$d</string>
 
     <!-- ZeroUI settings -->
     <string name="zero_capture">Capture</string>

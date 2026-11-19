@@ -2,8 +2,10 @@
 
 package com.hihi.recorder.ui
 
+import android.os.SystemClock
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +25,11 @@ import androidx.compose.material3.Card as MaterialCard
 import androidx.compose.material3.CardDefaults as MaterialCardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -83,6 +89,7 @@ fun AboutPage(
     onOpenMitLicense: () -> Unit,
     onOpenApacheLicense: () -> Unit,
     onOpenShizukuLicense: () -> Unit,
+    onOpenShowcase: () -> Unit,
 ) {
     val palette = appPalette()
     val effectSupported = remember { isRuntimeShaderSupported() }
@@ -93,6 +100,20 @@ fun AboutPage(
     }
     val bottomContentPadding = appBottomContentPadding()
     val listState = rememberLazyListState()
+
+    // Easter egg: five taps on the app logo open the component showcase.
+    var logoTaps by remember { mutableIntStateOf(0) }
+    var lastLogoTap by remember { mutableLongStateOf(0L) }
+    val onLogoTap = {
+        val now = SystemClock.elapsedRealtime()
+        logoTaps = if (now - lastLogoTap <= 2_000L) logoTaps + 1 else 1
+        lastLogoTap = now
+        if (logoTaps >= 5) {
+            logoTaps = 0
+            onOpenShowcase()
+        }
+        Unit
+    }
     // Same 16 dp corners as the reference About page in `miuix-readonly`.
     val cardCornerRadius = 16.dp
     val cardShape = RoundedCornerShape(cardCornerRadius)
@@ -144,7 +165,7 @@ fun AboutPage(
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item { AboutHero() }
+                item { AboutHero(onLogoTap = onLogoTap) }
 
                 item {
                     AboutCard(
@@ -343,7 +364,7 @@ fun AboutPage(
 }
 
 @Composable
-private fun AboutHero() {
+private fun AboutHero(onLogoTap: () -> Unit) {
     val palette = appPalette()
     Column(
         modifier = Modifier
@@ -355,7 +376,8 @@ private fun AboutHero() {
             modifier = Modifier
                 .size(88.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(palette.primary),
+                .background(palette.primary)
+                .clickable(onClick = onLogoTap),
             contentAlignment = Alignment.Center,
         ) {
             Image(

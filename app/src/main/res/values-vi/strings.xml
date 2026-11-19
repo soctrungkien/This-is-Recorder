@@ -57,7 +57,7 @@
     <string name="about_miuix">Miuix for Compose</string>
     <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0 · UI, Preference, Icons, Blur, Squircle, Nav</string>
     <string name="about_zeroui">ZeroUI</string>
-    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Design system (theme, component, giao diện cài đặt)</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Hiệu ứng Liquid Glass cho Miuix</string>
     <string name="about_license_mit">Giấy phép MIT</string>
     <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
     <string name="about_license_apache">Giấy phép Apache 2.0</string>
@@ -178,6 +178,28 @@
     <string name="update_rate_limited">Đã chạm giới hạn truy cập GitHub. Hãy thử lại sau.</string>
     <string name="update_server_error">GitHub trả về lỗi. Hãy thử lại sau.</string>
     <string name="update_invalid_response">GitHub trả về dữ liệu không hợp lệ.</string>
+
+    <!-- Component showcase -->
+    <string name="showcase_title">Xem thành phần giao diện</string>
+    <string name="showcase_subtitle">Thử các thành phần và hộp thoại</string>
+    <string name="showcase_buttons">Nút</string>
+    <string name="showcase_text_styles">Kiểu chữ</string>
+    <string name="showcase_switches">Công tắc</string>
+    <string name="showcase_cards">Thẻ</string>
+    <string name="showcase_dialogs">Hộp thoại</string>
+    <string name="showcase_feedback">Phản hồi</string>
+    <string name="showcase_markdown">Xem trước Markdown</string>
+    <string name="showcase_normal_button">Nút thường</string>
+    <string name="showcase_primary_button">Nút chính</string>
+    <string name="showcase_disabled_button">Nút bị vô hiệu</string>
+    <string name="showcase_preview_update">Thử hộp thoại cập nhật</string>
+    <string name="showcase_preview_confirm">Thử hộp thoại xác nhận</string>
+    <string name="showcase_preview_input">Thử hộp thoại nhập liệu</string>
+    <string name="showcase_preview_select">Thử hộp thoại chọn</string>
+    <string name="showcase_show_snackbar">Hiện snackbar</string>
+    <string name="showcase_dialog_message">Đây là hộp thoại thử từ màn hình xem thành phần.</string>
+    <string name="showcase_demo_value">Giá trị mẫu</string>
+    <string name="action_taps">Số lần bấm: %1$d</string>
 
     <!-- ZeroUI settings -->
     <string name="zero_capture">Thu hình</string>

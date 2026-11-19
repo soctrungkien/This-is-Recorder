@@ -69,6 +69,7 @@ import com.hihi.recorder.data.ShellBackend
 import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.net.UpdateChecker
 import com.hihi.recorder.net.UpdateFailure
+import com.hihi.recorder.net.UpdateInfo
 import com.hihi.recorder.net.UpdateResult
 import com.hihi.recorder.shell.AdbDaemon
 import com.hihi.recorder.shell.ProjectMediaAppOp
@@ -121,6 +122,9 @@ private sealed interface AppRoute : NavKey {
 
     @Serializable
     data object ShizukuLicense : AppRoute
+
+    @Serializable
+    data object Showcase : AppRoute
 }
 
 private val AppRoute.tabIndex: Int
@@ -131,7 +135,8 @@ private val AppRoute.tabIndex: Int
         AppRoute.About,
         AppRoute.MitLicense,
         AppRoute.ApacheLicense,
-        AppRoute.ShizukuLicense -> 2
+        AppRoute.ShizukuLicense,
+        AppRoute.Showcase -> 2
     }
 
 private fun appRouteAt(index: Int): AppRoute = when (index) {
@@ -530,6 +535,22 @@ fun RecorderApp(
                                     backStack.add(AppRoute.ShizukuLicense)
                                 }
                             },
+                            onOpenShowcase = {
+                                if (backStack.lastOrNull() != AppRoute.Showcase) {
+                                    backStack.add(AppRoute.Showcase)
+                                }
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.Showcase>(swipeDismiss = swipeDismiss) {
+                        ShowcaseScreen(
+                            snackbarHostState = snackbarHostState,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
+                            onOpenUrl = onOpenUrl,
+                            onPreviewUpdate = { updateInfo = sampleUpdateInfo() },
                         )
                     }
 
@@ -801,6 +822,29 @@ fun RecorderApp(
         }
     }
 }
+
+/** Fake release used by the component showcase to preview the update dialog. */
+private fun sampleUpdateInfo() = UpdateInfo(
+    versionName = "9.9.9",
+    tagName = "v9.9.9",
+    releaseUrl = "https://github.com/soctrungkien/This-is-Recorder/releases",
+    notes = """
+        ## What's new in 9.9.9
+
+        - **Markdown** release notes now render properly
+        - Direct download links — no more **gh-proxy** for updates
+        - New *component showcase* screen (you found it!)
+
+        ### Improvements
+        1. Faster update checks
+        2. Better `Liquid Glass` effects on Miuix
+        3. More settings icons
+
+        > This is a preview dialog. Nothing will actually be downloaded.
+
+        [View the release on GitHub](https://github.com/soctrungkien/This-is-Recorder/releases)
+    """.trimIndent(),
+)
 
 @Composable
 private fun AmbientGlow(palette: AppPalette) {

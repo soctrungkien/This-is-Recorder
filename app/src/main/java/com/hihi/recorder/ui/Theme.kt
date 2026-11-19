@@ -42,14 +42,70 @@ fun RecorderTheme(
     settings: RecorderSettings,
     content: @Composable () -> Unit,
 ) {
-    // ZeroUI kit owns Miuix/Material theming so every screen shares the same
-    // theme input (including uiScale, pure black, palette and glass settings).
-    com.zeroui.kit.theme.ZeroTheme(settings = settings.kitTheme()) {
-        CompositionLocalProvider(
-            LocalUiStyle provides settings.uiStyle,
-            LocalMaterialSpec provides settings.materialSpec,
-            content = content,
+    val dark = when (settings.theme) {
+        RecorderTheme.SYSTEM -> isSystemInDarkTheme()
+        RecorderTheme.LIGHT -> false
+        RecorderTheme.DARK -> true
+    }
+    // Dynamic color is only available on Android 12+. A restored preference
+    // from a newer device must not force a Monet controller on older systems.
+    val useMonet = settings.monetColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val controller = remember(
+        settings.theme,
+        useMonet,
+        settings.materialSpec,
+        dark,
+    ) {
+        ThemeController(
+            colorSchemeMode = when (settings.theme) {
+                RecorderTheme.SYSTEM -> if (useMonet) {
+                    ColorSchemeMode.MonetSystem
+                } else {
+                    ColorSchemeMode.System
+                }
+
+                RecorderTheme.LIGHT -> if (useMonet) {
+                    ColorSchemeMode.MonetLight
+                } else {
+                    ColorSchemeMode.Light
+                }
+
+                RecorderTheme.DARK -> if (useMonet) {
+                    ColorSchemeMode.MonetDark
+                } else {
+                    ColorSchemeMode.Dark
+                }
+            },
+            colorSpec = if (settings.materialSpec == MaterialSpec.SPEC_2025) {
+                ThemeColorSpec.Spec2025
+            } else {
+                ThemeColorSpec.Spec2021
+            },
+            paletteStyle = ThemePaletteStyle.TonalSpot,
+            isDark = dark,
         )
+    }
+
+    SystemBarsEffect(dark)
+
+    MiuixTheme(controller = controller) {
+        val materialColors = MiuixTheme.colorScheme.toMaterialColors(dark)
+        val specification = settings.materialSpec
+        MaterialTheme(
+            colorScheme = materialColors,
+            shapes = if (specification == MaterialSpec.SPEC_2025) ExpressiveShapes else ClassicShapes,
+            typography = if (specification == MaterialSpec.SPEC_2025) {
+                ExpressiveTypography
+            } else {
+                Typography()
+            },
+        ) {
+            CompositionLocalProvider(
+                LocalUiStyle provides settings.uiStyle,
+                LocalMaterialSpec provides specification,
+                content = content,
+            )
+        }
     }
 }
 
