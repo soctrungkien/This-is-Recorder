@@ -283,6 +283,15 @@ fun AboutPage(
                         )
                         AppDivider()
                         AppRow(
+                            title = stringResource(R.string.about_crash_handler),
+                            summary = stringResource(R.string.about_crash_handler_summary),
+                            leadingIcon = MiuixIcons.Info,
+                            onClick = {
+                                onOpenUrl("https://github.com/Bhuvaneshw/CrashHandler")
+                            },
+                        )
+                        AppDivider()
+                        AppRow(
                             title = stringResource(R.string.about_framework),
                             summary = stringResource(R.string.about_framework_summary),
                             leadingIcon = MiuixIcons.Theme,

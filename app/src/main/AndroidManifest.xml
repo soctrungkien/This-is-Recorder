@@ -43,6 +43,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.CrashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ThisIsRecorder" />
+
         <service
             android:name=".service.RecordingService"
             android:exported="false"

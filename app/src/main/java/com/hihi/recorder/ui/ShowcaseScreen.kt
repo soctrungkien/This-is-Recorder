@@ -1,5 +1,6 @@
 package com.hihi.recorder.ui
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
@@ -30,6 +32,7 @@ import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.icon.extended.File
 import top.yukonga.miuix.kmp.icon.extended.Info
 import top.yukonga.miuix.kmp.icon.extended.Refresh
+import kotlin.system.exitProcess
 
 /** Easter-egg screen: every local component and dialog in one place. */
 @Composable
@@ -200,6 +203,31 @@ fun ShowcaseScreen(
                         leadingIcon = MiuixIcons.Info,
                         onClick = {
                             scope.launch { snackbarHostState.showSnackbar(message) }
+                        },
+                    )
+                }
+            }
+
+            item { AppSectionTitle(stringResource(R.string.showcase_test_title)) }
+            item {
+                val context = LocalContext.current
+                AppCard {
+                    AppRow(
+                        title = stringResource(R.string.showcase_force_crash),
+                        summary = stringResource(R.string.showcase_force_crash_summary),
+                        leadingIcon = MiuixIcons.Info,
+                        onClick = {
+                            throw RuntimeException("Test crash from component showcase")
+                        },
+                    )
+                    AppDivider()
+                    AppRow(
+                        title = stringResource(R.string.showcase_force_stop),
+                        summary = stringResource(R.string.showcase_force_stop_summary),
+                        leadingIcon = MiuixIcons.Back,
+                        onClick = {
+                            (context as? Activity)?.finishAffinity()
+                            exitProcess(0)
                         },
                     )
                 }

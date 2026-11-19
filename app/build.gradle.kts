@@ -135,6 +135,9 @@ dependencies {
     // Optional Material 3 presentation for people who prefer stock Android.
     implementation("androidx.compose.material3:material3:1.4.0")
 
+    // Crash logging with a custom Miuix crash screen.
+    implementation("com.github.Bhuvaneshw:CrashHandler:1.0.4")
+
     // Renders the release-notes changelog as markdown (full GFM).
     implementation("com.mikepenz:multiplatform-markdown-renderer:0.46.0")
     implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.46.0")

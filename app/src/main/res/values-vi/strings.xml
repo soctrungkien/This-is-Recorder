@@ -338,4 +338,20 @@
     <string name="showcase_dialog_message">Đây là hộp thoại thử từ màn hình xem thành phần.</string>
     <string name="showcase_demo_value">Giá trị mẫu</string>
     <string name="action_taps">Số lần bấm: %1$d</string>
+
+    <string name="crash_title">Nhật ký lỗi</string>
+    <string name="crash_subtitle">Ứng dụng đã dừng ngoài ý muốn</string>
+    <string name="crash_loading">Đang tải nhật ký lỗi…</string>
+    <string name="crash_no_log">Không tìm thấy nhật ký lỗi.</string>
+    <string name="crash_last_time">Lần crash gần nhất: %1$s</string>
+    <string name="crash_clear">Xóa nhật ký</string>
+    <string name="crash_copy">Sao chép</string>
+    <string name="crash_copied">Đã sao chép nhật ký lỗi</string>
+    <string name="showcase_test_title">Thử nghiệm</string>
+    <string name="showcase_force_crash">Buộc crash ứng dụng</string>
+    <string name="showcase_force_crash_summary">Ném ngoại lệ để mở màn hình crash</string>
+    <string name="showcase_force_stop">Buộc dừng / thoát app</string>
+    <string name="showcase_force_stop_summary">Đóng mọi màn hình và kết thúc tiến trình</string>
+    <string name="about_crash_handler">CrashHandler</string>
+    <string name="about_crash_handler_summary">© 2024 Bhuvaneshwaran · GPL-3.0 · Ghi nhật ký lỗi</string>
 </resources>
