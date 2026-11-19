@@ -604,6 +604,7 @@ fun RecorderApp(
                     backdrop = navigationBackdrop,
                     isBlurActive = canBlur,
                     isDark = palette.isDark,
+                    intensity = settings.glassIntensity / 100f,
                     badge = { index ->
                         val count = navItems[index].badgeCount
                         if (count > 0) {

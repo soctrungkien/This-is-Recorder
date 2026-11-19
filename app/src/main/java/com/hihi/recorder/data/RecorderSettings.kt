@@ -148,6 +148,15 @@ data class RecorderSettings(
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
     /** Component family used for every switch in the settings UI. */
     val toggleStyle: ToggleStyle = ToggleStyle.LIQUID,
+    /**
+     * Monet key color: 0 = wallpaper, 1 = from app background,
+     * any other value is an ARGB custom color.
+     */
+    val monetKeyColor: Int = 0,
+    val monetPaletteStyle: top.yukonga.miuix.kmp.theme.ThemePaletteStyle =
+        top.yukonga.miuix.kmp.theme.ThemePaletteStyle.TonalSpot,
+    /** Liquid glass strength in percent (25..200). */
+    val glassIntensity: Int = 100,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
 

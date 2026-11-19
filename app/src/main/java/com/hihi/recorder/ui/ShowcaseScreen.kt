@@ -22,7 +22,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -75,12 +74,7 @@ fun ShowcaseScreen(
         val toggleBackdrop = rememberLayerBackdrop()
         Box(modifier = Modifier.fillMaxSize()) {
             if (liquidToggles) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .layerBackdrop(toggleBackdrop)
-                        .drawBehind { drawRect(palette.surfaceContainer) },
-                )
+                Box(Modifier.fillMaxSize().layerBackdrop(toggleBackdrop))
             }
             LazyColumn(
             modifier = Modifier.fillMaxSize(),

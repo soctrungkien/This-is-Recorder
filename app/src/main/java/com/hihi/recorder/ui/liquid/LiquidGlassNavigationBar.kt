@@ -196,6 +196,7 @@ internal fun IosLiquidGlassNavigationBar(
     backdrop: LayerBackdrop?,
     isBlurActive: Boolean,
     isDark: Boolean,
+    intensity: Float = 1f,
     modifier: Modifier = Modifier,
     badge: (Int) -> (@Composable () -> Unit)? = { null },
 ) {
@@ -428,12 +429,12 @@ internal fun IosLiquidGlassNavigationBar(
                                         padding = maxOf(padding, 40.dp.toPx())
                                         vibrancy()
                                         blur(
-                                            4.dp.toPx(),
-                                            4.dp.toPx(),
+                                            4.dp.toPx() * intensity,
+                                            4.dp.toPx() * intensity,
                                         )
                                         lens(
-                                            refractionHeight = 24.dp.toPx(),
-                                            refractionAmount = 24.dp.toPx(),
+                                            refractionHeight = 24.dp.toPx() * intensity,
+                                            refractionAmount = 24.dp.toPx() * intensity,
                                         )
                                     },
                                     highlight = { baseHighlight.value.copy(alpha = 0.75f) },
@@ -481,10 +482,10 @@ internal fun IosLiquidGlassNavigationBar(
                                 shape = { pillShape },
                                 effects = {
                                     vibrancy()
-                                    blur(4.dp.toPx(), 4.dp.toPx())
+                                    blur(4.dp.toPx() * intensity, 4.dp.toPx() * intensity)
                                     lens(
-                                        refractionHeight = 24.dp.toPx(),
-                                        refractionAmount = 24.dp.toPx(),
+                                        refractionHeight = 24.dp.toPx() * intensity,
+                                        refractionAmount = 24.dp.toPx() * intensity,
                                     )
                                 },
                                 onDrawSurface = { drawRect(containerColor) },

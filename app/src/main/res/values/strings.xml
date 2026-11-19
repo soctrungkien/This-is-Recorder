@@ -71,7 +71,7 @@
     <string name="about_liquid_glass">Liquid Glass components</string>
     <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass components</string>
     <string name="about_zeroui">ZeroUI</string>
-    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid toggle component</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid toggle, key color and glass intensity settings</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
@@ -319,6 +319,14 @@
     <string name="pref_toggle_style_summary">Choose how switches look across the settings.</string>
     <string name="toggle_style_ui">Interface</string>
     <string name="toggle_style_liquid">Liquid glass</string>
+    <string name="pref_monet_key_color">Monet key color</string>
+    <string name="monet_key_wallpaper">Wallpaper</string>
+    <string name="monet_key_background">App background</string>
+    <string name="monet_key_custom">Custom</string>
+    <string name="pref_monet_palette_style">Palette style</string>
+    <string name="pref_glass_intensity">Glass intensity</string>
+    <string name="glass_custom_color">Custom color</string>
+    <string name="glass_color_hint">Hex color (e.g. #FF2196F3)</string>
 
     <string name="showcase_title">Component showcase</string>
     <string name="showcase_subtitle">Preview UI components and dialogs</string>
