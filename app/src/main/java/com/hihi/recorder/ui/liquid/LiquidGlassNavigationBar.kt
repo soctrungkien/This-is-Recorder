@@ -23,7 +23,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -325,7 +327,7 @@ internal fun IosLiquidGlassNavigationBar(
         .asPaddingValues()
         .calculateBottomPadding()
     val bottomPaddingValue = if (navBarBottomPadding != 0.dp) {
-        8.dp + navBarBottomPadding
+        12.dp + navBarBottomPadding
     } else {
         36.dp
     }
@@ -355,6 +357,7 @@ internal fun IosLiquidGlassNavigationBar(
                         }
                     }
                     .focusable()
+                    .defaultMinSize(minWidth = 76.dp)
                     .weight(1f)
                     .fillMaxHeight()
                     .graphicsLayer {
@@ -376,9 +379,11 @@ internal fun IosLiquidGlassNavigationBar(
                 Text(
                     text = item.label,
                     fontSize = 11.sp,
+                    lineHeight = 14.sp,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    softWrap = false,
+                    overflow = TextOverflow.Visible,
                 )
             }
         }
@@ -387,6 +392,9 @@ internal fun IosLiquidGlassNavigationBar(
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
+                .windowInsetsPadding(
+                    WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal),
+                )
                 .padding(bottom = bottomPaddingValue, start = 24.dp, end = 24.dp)
                 .fillMaxWidth(),
             contentAlignment = Alignment.CenterStart,
