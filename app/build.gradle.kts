@@ -25,7 +25,7 @@ android {
     namespace = "com.hihi.recorder"
     compileSdk {
         version = release(37) {
-            minorApiLevel = 1
+            minorApiLevel = 2
         }
     }
     buildToolsVersion = "36.0.0"
@@ -104,9 +104,6 @@ kotlin {
 }
 
 dependencies {
-    // ZeroUI design system (Miuix + Material 3 components and theme).
-    implementation(project(":kit"))
-
     // AGP 9 uses built-in Kotlin. The classpath override in the root project
     // upgrades KGP, while this keeps the compiler itself on the same version as
     // the Compose compiler plugin (the built-in default may still be older).
@@ -117,18 +114,26 @@ dependencies {
     implementation("top.yukonga.miuix.kmp:miuix-preference-android:0.9.4")
     implementation("top.yukonga.miuix.kmp:miuix-icons-android:0.9.4")
     implementation("top.yukonga.miuix.kmp:miuix-blur-android:0.9.4")
-    // Continuous-corner (squircle) shapes for the floating glass navigation bar.
     implementation("top.yukonga.miuix.kmp:miuix-squircle-android:0.9.4")
-
-    // Continuous-depth navigation runtime. The back stack is a single
-    // Animatable<Float>, so tab pushes/pops and the swipe-back gesture share the
-    // same transition and velocity handoff.
     implementation("top.yukonga.miuix.kmp:miuix-nav-android:0.9.4")
+
+    // Glass modules are only published from 0.9.5-beta01. Exclude their
+    // transitive Miuix modules so the rest of the app stays on 0.9.4.
+    val glassGroup = "top.yukonga.miuix.kmp"
+    implementation("top.yukonga.miuix.kmp:miuix-glass-icons-android:0.9.5-beta01") {
+        exclude(group = glassGroup)
+    }
+    implementation("top.yukonga.miuix.kmp:miuix-glass-android:0.9.5-beta01") {
+        exclude(group = glassGroup)
+    }
+
+    // Backdrop primitives used by the liquid toggle and slider.
+    implementation("io.github.kyant0:backdrop:1.0.6")
+    implementation("io.github.kyant0:shapes:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     // Optional Material 3 presentation for people who prefer stock Android.
-    // Matches the version the ZeroUI kit is built against.
-    implementation("androidx.compose.material3:material3:1.5.0-alpha29")
+    implementation("androidx.compose.material3:material3:1.4.0")
 
     // Renders the release-notes changelog as markdown (full GFM).
     implementation("com.mikepenz:multiplatform-markdown-renderer:0.46.0")

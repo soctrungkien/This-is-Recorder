@@ -29,4 +29,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ThisIsRecorder"
 include(":app")
-include(":kit")

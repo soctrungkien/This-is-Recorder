@@ -56,8 +56,6 @@
     <string name="about_source_summary">github.com/soctrungkien/This-is-Recorder</string>
     <string name="about_miuix">Miuix for Compose</string>
     <string name="about_miuix_summary">© compose-miuix-ui contributors · Apache-2.0 · UI, Preference, Icons, Blur, Squircle, Nav</string>
-    <string name="about_zeroui">ZeroUI</string>
-    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid Glass effects for Miuix</string>
     <string name="about_license_mit">MIT License</string>
     <string name="about_license_mit_summary">This is Recorder · © 2026 Hihi</string>
     <string name="about_license_apache">Apache License 2.0</string>
@@ -71,7 +69,7 @@
     <string name="about_design_summary">Hihi</string>
     <string name="about_open_source">Open-source software</string>
     <string name="about_liquid_glass">Liquid Glass components</string>
-    <string name="about_liquid_glass_summary">© 2025 Kyant; adapted by compose-miuix-ui contributors · Apache-2.0</string>
+    <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass, toggle and slider components</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
@@ -178,51 +176,6 @@
     <string name="update_rate_limited">GitHub rate limit reached. Try again later.</string>
     <string name="update_server_error">GitHub returned an error. Try again later.</string>
     <string name="update_invalid_response">GitHub returned an unexpected response.</string>
-
-    <!-- Component showcase -->
-    <string name="showcase_title">Component showcase</string>
-    <string name="showcase_subtitle">Preview UI components and dialogs</string>
-    <string name="showcase_buttons">Buttons</string>
-    <string name="showcase_text_styles">Text styles</string>
-    <string name="showcase_switches">Switches</string>
-    <string name="showcase_cards">Cards</string>
-    <string name="showcase_dialogs">Dialogs</string>
-    <string name="showcase_feedback">Feedback</string>
-    <string name="showcase_markdown">Markdown preview</string>
-    <string name="showcase_normal_button">Normal button</string>
-    <string name="showcase_primary_button">Primary button</string>
-    <string name="showcase_disabled_button">Disabled button</string>
-    <string name="showcase_preview_update">Preview update dialog</string>
-    <string name="showcase_preview_confirm">Preview confirm dialog</string>
-    <string name="showcase_preview_input">Preview input dialog</string>
-    <string name="showcase_preview_select">Preview select dialog</string>
-    <string name="showcase_show_snackbar">Show snackbar</string>
-    <string name="showcase_dialog_message">This is a preview dialog from the component showcase.</string>
-    <string name="showcase_demo_value">Demo value</string>
-    <string name="action_taps">Taps: %1$d</string>
-
-    <!-- ZeroUI settings -->
-    <string name="zero_capture">Capture</string>
-    <string name="zero_audio">Audio</string>
-    <string name="zero_video">Video</string>
-    <string name="zero_timer">Timer</string>
-    <string name="zero_behavior">Behavior</string>
-    <string name="zero_theme_sub">Colors, dark mode and palette</string>
-    <string name="zero_interface">Interface</string>
-    <string name="zero_interface_sub">Density, scale, glass and motion</string>
-    <string name="zero_glass">Glass material</string>
-    <string name="zero_glass_intensity">Glass intensity</string>
-    <string name="zero_pure_black">Pure black dark mode</string>
-    <string name="zero_motion">Motion</string>
-    <string name="zero_ui_scale">UI scale</string>
-    <string name="zero_list_density">List density</string>
-    <string name="zero_top_bar_blur">Blur top bar</string>
-    <string name="zero_smooth_corners">Smooth corners</string>
-    <string name="zero_elastic_scroll">Elastic scrolling</string>
-    <string name="zero_dialog_position">Dialog position</string>
-    <string name="zero_icon_style">Icon style</string>
-    <string name="zero_palette">Color palette</string>
-    <string name="zero_seed_color">Custom seed color (0 = wallpaper)</string>
 
     <string name="capture_standard">Standard (MediaProjection)</string>
     <string name="capture_shell">Screenrecord (ADB, Shizuku, root)</string>
@@ -360,4 +313,28 @@
     <string name="recording_summary_shell">%1$s • %2$s • %3$s</string>
     <string name="error_notification_permission">Notification permission was denied. The recording notification may not be visible.</string>
     
+    <string name="pref_liquid_glass">Liquid glass components</string>
+    <string name="pref_liquid_glass_summary">Use the liquid toggle and slider in the UI.</string>
+    <string name="pref_liquid_intensity">Glass intensity</string>
+
+    <string name="showcase_title">Component showcase</string>
+    <string name="showcase_subtitle">Preview UI components and dialogs</string>
+    <string name="showcase_buttons">Buttons</string>
+    <string name="showcase_text_styles">Text styles</string>
+    <string name="showcase_switches">Switches</string>
+    <string name="showcase_cards">Cards</string>
+    <string name="showcase_dialogs">Dialogs</string>
+    <string name="showcase_feedback">Feedback</string>
+    <string name="showcase_markdown">Markdown preview</string>
+    <string name="showcase_normal_button">Normal button</string>
+    <string name="showcase_primary_button">Primary button</string>
+    <string name="showcase_disabled_button">Disabled button</string>
+    <string name="showcase_preview_update">Preview update dialog</string>
+    <string name="showcase_preview_confirm">Preview confirm dialog</string>
+    <string name="showcase_preview_input">Preview input dialog</string>
+    <string name="showcase_preview_select">Preview select dialog</string>
+    <string name="showcase_show_snackbar">Show snackbar</string>
+    <string name="showcase_dialog_message">This is a preview dialog from the component showcase.</string>
+    <string name="showcase_demo_value">Demo value</string>
+    <string name="action_taps">Taps: %1$d</string>
 </resources>

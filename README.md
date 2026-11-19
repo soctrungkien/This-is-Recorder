@@ -145,11 +145,9 @@ app/src/main/java/com/hihi/recorder/
 ### Thư viện và nền tảng mã nguồn mở
 
 - **[Miuix for Compose](https://github.com/compose-miuix-ui/miuix)** 0.9.4 — © compose-miuix-ui contributors, giấy phép Apache-2.0. Dùng các module `miuix-ui`, `miuix-preference`, `miuix-icons`, `miuix-blur`, `miuix-squircle` và `miuix-nav`.
-- **[ZeroUI](https://github.com/Xocio/ZeroUI)** — © ZeroUI contributors, giấy phép Apache-2.0. Module `:kit` được đưa vào repo; ứng dụng chỉ dùng phần Liquid Glass của kit cho giao diện Miuix, hệ thống UI cũ được giữ nguyên.
-- **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa bởi compose-miuix-ui contributors.
-- **[multiplatform-markdown-renderer](https://github.com/mikepenz/multiplatform-markdown-renderer)** 0.46.0 — © Mike Penz, giấy phép Apache-2.0. Dùng để hiển thị lịch sử thay đổi bản cập nhật dạng Markdown.
+- **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass (hiệu ứng kính, công tắc `LiquidToggle` và thanh kéo `LiquidSlider`) được phỏng theo và chỉnh sửa từ catalog của dự án.
 - **[Jetpack Compose](https://developer.android.com/compose)** 1.12.0 (`foundation`, `ui`, `animation`) — © The Android Open Source Project, giấy phép Apache-2.0.
-- **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.5.0-alpha29 — © The Android Open Source Project, giấy phép Apache-2.0.
+- **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.4.0 — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[AndroidX Core KTX & Activity Compose](https://developer.android.com/jetpack/androidx)** 1.19.1 / 1.13.0 — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[Shizuku API & Provider](https://github.com/RikkaApps/Shizuku-API)** 13.1.5 — © 2021 RikkaW, giấy phép MIT. Cung cấp `UserService` chạy với UID shell để thực hiện lệnh `screenrecord` và app-op mà không cần root.
 - **[Kotlin](https://kotlinlang.org)** 2.4.21 — © JetBrains s.r.o. và cộng tác viên, giấy phép Apache-2.0.
@@ -159,7 +157,7 @@ app/src/main/java/com/hihi/recorder/
 ### Giấy phép
 
 - Mã nguồn ứng dụng: [MIT](LICENSE), bản quyền © 2026 Hihi.
-- Miuix, ZeroUI, multiplatform-markdown-renderer, Jetpack Compose, Material 3, AndroidX, Kotlin và kotlinx: Apache-2.0. Tác giả của từng thư viện được ghi ở trên.
+- Miuix, Jetpack Compose, Material 3, AndroidX, Kotlin và kotlinx: Apache-2.0. Tác giả của từng thư viện được ghi ở trên.
 - Shizuku API: MIT, bản quyền © 2021 RikkaW.
 - Toàn văn MIT của ứng dụng, MIT của Shizuku và Apache-2.0 có thể xem ngay trong ứng dụng tại **Giới thiệu → Giấy phép**.
 
