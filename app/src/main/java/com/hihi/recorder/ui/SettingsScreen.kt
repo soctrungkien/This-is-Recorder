@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
@@ -90,7 +91,6 @@ internal fun ToggleRow(
                 onSelect = onCheckedChange,
                 enabled = enabled,
                 backdrop = backdrop,
-                intensity = settings.glassIntensity / 100f,
             )
         },
     )
@@ -110,9 +110,6 @@ fun SettingsScreen(
     var picker by remember { mutableStateOf<SettingsPicker?>(null) }
     var showSaveFolderDialog by remember { mutableStateOf(false) }
     var showVerificationInfo by remember { mutableStateOf(false) }
-    var showKeyColorPicker by remember { mutableStateOf(false) }
-    var showPalettePicker by remember { mutableStateOf(false) }
-    var showCustomColorDialog by remember { mutableStateOf(false) }
     val palette = appPalette()
     val dynamicColorAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val bottomContentPadding = appBottomContentPadding()
@@ -129,9 +126,12 @@ fun SettingsScreen(
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (liquidToggles) {
-                // Empty sibling source: recording a solid rect here used to
-                // repaint the whole screen background when Liquid was enabled.
-                Box(Modifier.fillMaxSize().layerBackdrop(toggleBackdrop))
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .layerBackdrop(toggleBackdrop)
+                        .drawBehind { drawRect(palette.surfaceContainer) },
+                )
             }
             LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -150,55 +150,6 @@ fun SettingsScreen(
                         title = stringResource(R.string.pref_theme),
                         value = settings.theme.label(),
                         onClick = { picker = SettingsPicker.THEME },
-                    )
-                }
-            }
-            item {
-                AppCard(contentPadding = PaddingValues(0.dp)) {
-                    ToggleRow(
-                        settings = settings,
-                        backdrop = toggleBackdrop,
-                        title = stringResource(R.string.pref_monet),
-                        summary = stringResource(R.string.pref_monet_summary),
-                        checked = settings.monetColor,
-                        enabled = dynamicColorAvailable,
-                    ) { onSettingsChange(settings.copy(monetColor = it)) }
-                    if (settings.monetColor && dynamicColorAvailable) {
-                        AppDivider()
-                        AppRow(
-                            title = stringResource(R.string.pref_monet_key_color),
-                            summary = when (settings.monetKeyColor) {
-                                0 -> stringResource(R.string.monet_key_wallpaper)
-                                1 -> stringResource(R.string.monet_key_background)
-                                -1 -> stringResource(R.string.monet_key_custom)
-                                else -> String.format("#%06X", settings.monetKeyColor and 0xFFFFFF)
-                            },
-                            onClick = { showKeyColorPicker = true },
-                        )
-                        AppDivider()
-                        AppRow(
-                            title = stringResource(R.string.pref_monet_palette_style),
-                            summary = settings.monetPaletteStyle.name,
-                            onClick = { showPalettePicker = true },
-                        )
-                    }
-                }
-            }
-            item {
-                AppCard(contentPadding = PaddingValues(16.dp)) {
-                    AppText(
-                        text = stringResource(R.string.pref_glass_intensity) +
-                            ": ${settings.glassIntensity}%",
-                        style = AppTextStyle.Subtitle,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    androidx.compose.material3.Slider(
-                        value = settings.glassIntensity.toFloat(),
-                        onValueChange = {
-                            onSettingsChange(settings.copy(glassIntensity = it.toInt()))
-                        },
-                        valueRange = 25f..200f,
-                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
@@ -429,76 +380,6 @@ fun SettingsScreen(
         )
 
         null -> Unit
-    }
-
-    if (showKeyColorPicker) {
-        val presets = listOf(
-            0xFF2196F3.toInt(), 0xFF3F51B5.toInt(), 0xFF9C27B0.toInt(),
-            0xFFE91E63.toInt(), 0xFFFF5722.toInt(), 0xFF4CAF50.toInt(),
-            0xFF009688.toInt(), 0xFFFFC107.toInt(),
-        )
-        AppSelectDialog(
-            title = stringResource(R.string.pref_monet_key_color),
-            options = listOf(
-                SelectOption<Any>(0, stringResource(R.string.monet_key_wallpaper)),
-                SelectOption<Any>(1, stringResource(R.string.monet_key_background)),
-                SelectOption<Any>(-1, stringResource(R.string.monet_key_custom)),
-            ) + presets.mapIndexed { index, color ->
-                SelectOption<Any>(color, String.format("#%06X", color and 0xFFFFFF) + " ${index + 1}")
-            },
-            selected = settings.monetKeyColor,
-            onSelect = { value ->
-                val key = value as Int
-                if (key == -1) {
-                    showCustomColorDialog = true
-                } else {
-                    onSettingsChange(settings.copy(monetKeyColor = key))
-                }
-                showKeyColorPicker = false
-            },
-            onDismissRequest = { showKeyColorPicker = false },
-        )
-    }
-
-    if (showPalettePicker) {
-        AppSelectDialog(
-            title = stringResource(R.string.pref_monet_palette_style),
-            options = top.yukonga.miuix.kmp.theme.ThemePaletteStyle.entries.map {
-                SelectOption(it, it.name)
-            },
-            selected = settings.monetPaletteStyle,
-            onSelect = {
-                onSettingsChange(settings.copy(monetPaletteStyle = it))
-                showPalettePicker = false
-            },
-            onDismissRequest = { showPalettePicker = false },
-        )
-    }
-
-    if (showCustomColorDialog) {
-        AppInputDialog(
-            title = stringResource(R.string.glass_custom_color),
-            message = stringResource(R.string.glass_color_hint),
-            initialValue = String.format("#%06X", settings.monetKeyColor and 0xFFFFFF),
-            placeholder = "#FF2196F3",
-            confirmLabel = stringResource(R.string.action_save),
-            dismissLabel = stringResource(R.string.action_cancel),
-            onConfirm = { value ->
-                val hex = value.trim().removePrefix("#")
-                val parsed = runCatching {
-                    if (hex.length == 6) {
-                        ("FF" + hex).toLong(16).toInt()
-                    } else {
-                        hex.toLong(16).toInt()
-                    }
-                }.getOrNull()
-                if (parsed != null) {
-                    onSettingsChange(settings.copy(monetKeyColor = parsed))
-                }
-                showCustomColorDialog = false
-            },
-            onDismissRequest = { showCustomColorDialog = false },
-        )
     }
 
     if (showSaveFolderDialog) {

@@ -146,7 +146,7 @@ app/src/main/java/com/hihi/recorder/
 
 - **[Miuix for Compose](https://github.com/compose-miuix-ui/miuix)** 0.9.4 — © compose-miuix-ui contributors, giấy phép Apache-2.0. Dùng các module `miuix-ui`, `miuix-preference`, `miuix-icons`, `miuix-blur`, `miuix-squircle` và `miuix-nav`.
 - **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa từ dự án.
-- **[ZeroUI](https://github.com/Xocio/ZeroUI)** — © ZeroUI contributors, giấy phép Apache-2.0. Thành phần `LiquidToggle` và ý tưởng giao diện chọn màu gốc Monet / cường độ Liquid Glass được lấy từ module `glass` và trang cài đặt của ZeroUI, chỉnh lại cho app này.
+- **[ZeroUI](https://github.com/Xocio/ZeroUI)** — © ZeroUI contributors, giấy phép Apache-2.0. Thành phần `LiquidToggle` được lấy từ module `glass` của ZeroUI và chỉnh để đồng bộ màu với theme của ứng dụng.
 - **[CrashHandler](https://github.com/Bhuvaneshw/CrashHandler)** — © 2024 Bhuvaneshwaran, giấy phép GPL-3.0. Ghi và lưu nhật ký crash; màn hình crash dùng Miuix theme với màu Monet và chế độ sáng/tối theo hệ thống.
 - **[Jetpack Compose](https://developer.android.com/compose)** 1.12.0 (`foundation`, `ui`, `animation`) — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.4.0 — © The Android Open Source Project, giấy phép Apache-2.0.

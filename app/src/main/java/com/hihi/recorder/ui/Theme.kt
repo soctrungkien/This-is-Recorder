@@ -53,8 +53,6 @@ fun RecorderTheme(
     val controller = remember(
         settings.theme,
         useMonet,
-        settings.monetKeyColor,
-        settings.monetPaletteStyle,
         settings.materialSpec,
         dark,
     ) {
@@ -83,17 +81,7 @@ fun RecorderTheme(
             } else {
                 ThemeColorSpec.Spec2021
             },
-            // 0 = wallpaper, 1 = app background, >1 = custom ARGB color.
-            keyColor = if (useMonet && settings.monetKeyColor > 1) {
-                Color(settings.monetKeyColor)
-            } else {
-                null
-            },
-            paletteStyle = if (useMonet) {
-                settings.monetPaletteStyle
-            } else {
-                ThemePaletteStyle.TonalSpot
-            },
+            paletteStyle = ThemePaletteStyle.TonalSpot,
             isDark = dark,
         )
     }

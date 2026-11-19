@@ -71,7 +71,7 @@
     <string name="about_liquid_glass">Thành phần Liquid Glass</string>
     <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Thành phần liquid glass</string>
     <string name="about_zeroui">ZeroUI</string>
-    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Công tắc liquid, màu gốc Monet và cường độ glass</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Công tắc liquid</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
@@ -319,14 +319,6 @@
     <string name="pref_toggle_style_summary">Chọn kiểu hiển thị cho các công tắc trong cài đặt.</string>
     <string name="toggle_style_ui">Giao diện</string>
     <string name="toggle_style_liquid">Liquid glass</string>
-    <string name="pref_monet_key_color">Màu gốc Monet</string>
-    <string name="monet_key_wallpaper">Hình nền</string>
-    <string name="monet_key_background">Nền ứng dụng</string>
-    <string name="monet_key_custom">Tuỳ chỉnh</string>
-    <string name="pref_monet_palette_style">Kiểu bảng màu</string>
-    <string name="pref_glass_intensity">Cường độ Liquid Glass</string>
-    <string name="glass_custom_color">Màu tuỳ chỉnh</string>
-    <string name="glass_color_hint">Màu hex (vd: #FF2196F3)</string>
 
     <string name="showcase_title">Xem thành phần giao diện</string>
     <string name="showcase_subtitle">Thử các thành phần và hộp thoại</string>

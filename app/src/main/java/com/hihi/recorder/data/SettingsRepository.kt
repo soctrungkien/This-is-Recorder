@@ -80,18 +80,6 @@ class SettingsRepository(context: Context) {
     @Synchronized
     fun setToggleStyle(value: ToggleStyle) = update { it.copy(toggleStyle = value) }
 
-    @Synchronized
-    fun setMonetKeyColor(value: Int) = update { it.copy(monetKeyColor = value) }
-
-    @Synchronized
-    fun setMonetPaletteStyle(value: top.yukonga.miuix.kmp.theme.ThemePaletteStyle) =
-        update { it.copy(monetPaletteStyle = value) }
-
-    @Synchronized
-    fun setGlassIntensity(value: Int) = update {
-        it.copy(glassIntensity = value.coerceIn(25, 200))
-    }
-
     /**
      * Android 13+ notification permission is optional. Remember that we asked
      * once so the permission dialog does not appear before every recording.
@@ -143,12 +131,6 @@ class SettingsRepository(context: Context) {
                 ?.let(::normalizeSaveFolder)
                 ?: defaults.saveFolder,
             toggleStyle = preferences.enumValue(KEY_TOGGLE_STYLE, defaults.toggleStyle),
-            monetKeyColor = preferences.getInt(KEY_MONET_KEY_COLOR, defaults.monetKeyColor),
-            monetPaletteStyle = preferences.enumValue(
-                KEY_MONET_PALETTE_STYLE,
-                defaults.monetPaletteStyle,
-            ),
-            glassIntensity = preferences.getInt(KEY_GLASS_INTENSITY, defaults.glassIntensity),
         )
     }
 
@@ -173,9 +155,6 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .putString(KEY_TOGGLE_STYLE, settings.toggleStyle.name)
-            .putInt(KEY_MONET_KEY_COLOR, settings.monetKeyColor)
-            .putString(KEY_MONET_PALETTE_STYLE, settings.monetPaletteStyle.name)
-            .putInt(KEY_GLASS_INTENSITY, settings.glassIntensity)
             .apply()
     }
 
@@ -222,9 +201,6 @@ class SettingsRepository(context: Context) {
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_TOGGLE_STYLE = "toggle_style"
-        const val KEY_MONET_KEY_COLOR = "monet_key_color"
-        const val KEY_MONET_PALETTE_STYLE = "monet_palette_style"
-        const val KEY_GLASS_INTENSITY = "glass_intensity"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
     }
 }
