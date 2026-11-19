@@ -1,3 +1,4 @@
+
 package com.hihi.recorder.ui
 
 import android.content.ClipData
@@ -28,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -48,9 +50,8 @@ import top.yukonga.miuix.kmp.theme.ThemeController
 import top.yukonga.miuix.kmp.theme.ThemePaletteStyle
 
 /**
- * Crash screen shown by the crash handler. It deliberately uses a fixed Miuix
- * theme — Monet dynamic color and the system light/dark setting — instead of
- * the app's saved UI preferences, which may be the very thing that crashed.
+ * Crash screen shown by the crash handler.
+ * Uses a fixed Miuix theme instead of app preferences.
  */
 class CrashActivity : ComponentActivity() {
 
@@ -72,6 +73,7 @@ class CrashActivity : ComponentActivity() {
                     isDark = dark,
                 )
             }
+
             MiuixTheme(controller = controller) {
                 CrashScreen(onClose = { finish() })
             }
@@ -84,13 +86,17 @@ private fun CrashScreen(onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
     var log by remember { mutableStateOf<ErrorLog?>(null) }
     var loaded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         val result = withContext(Dispatchers.IO) {
-            runCatching { context.crashHandler.loadErrorLog() }.getOrNull()
+            runCatching {
+                context.crashHandler.loadErrorLog()
+            }.getOrNull()
         }
+
         log = result
         loaded = true
     }
@@ -107,6 +113,7 @@ private fun CrashScreen(onClose: () -> Unit) {
             )
         },
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,12 +123,16 @@ private fun CrashScreen(onClose: () -> Unit) {
                 ),
         ) {
             val time = log?.lastErrorTime
+
             if (!time.isNullOrBlank()) {
                 AppText(
                     text = stringResource(R.string.crash_last_time, time),
                     style = AppTextStyle.Footnote,
                     color = appPalette().onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(
+                        horizontal = 16.dp,
+                        vertical = 4.dp,
+                    ),
                 )
             }
 
@@ -129,7 +140,10 @@ private fun CrashScreen(onClose: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 6.dp,
+                    ),
                 contentPadding = PaddingValues(16.dp),
             ) {
                 val text = when {
@@ -137,6 +151,7 @@ private fun CrashScreen(onClose: () -> Unit) {
                     log == null -> stringResource(R.string.crash_no_log)
                     else -> log!!.simplifiedLog()
                 }
+
                 SelectionContainer {
                     AppText(
                         text = text,
@@ -150,25 +165,41 @@ private fun CrashScreen(onClose: () -> Unit) {
             }
 
             Spacer(Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 AppButton(
                     text = stringResource(R.string.crash_clear),
+                    modifier = Modifier.height(48.dp),
                     onClick = {
-                        runCatching { context.crashHandler.clearAll() }
+                        runCatching {
+                            context.crashHandler.clearAll()
+                        }
                         onClose()
                     },
                 )
+
                 Spacer(Modifier.weight(1f))
+
                 AppTextButton(
                     text = stringResource(R.string.crash_copy),
                     primary = true,
+                    modifier = Modifier.height(48.dp),
                     onClick = {
                         val value = log?.simplifiedLog().orEmpty()
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
-                            as? ClipboardManager
+
+                        val clipboard =
+                            context.getSystemService(Context.CLIPBOARD_SERVICE)
+                                as? ClipboardManager
+
                         clipboard?.setPrimaryClip(
                             ClipData.newPlainText("Crash log", value),
                         )
+
                         scope.launch {
                             snackbarHostState.showSnackbar(
                                 context.getString(R.string.crash_copied),

@@ -317,8 +317,8 @@
     
     <string name="pref_toggle_style">Kiểu Toggle</string>
     <string name="pref_toggle_style_summary">Chọn kiểu hiển thị cho các công tắc trong cài đặt.</string>
-    <string name="toggle_style_ui">Giao diện</string>
-    <string name="toggle_style_liquid">Liquid glass</string>
+    <string name="toggle_style_ui">Theo kiểu giao diện</string>
+    <string name="toggle_style_liquid">Liquid Glass</string>
 
     <string name="showcase_title">Xem thành phần giao diện</string>
     <string name="showcase_subtitle">Thử các thành phần và hộp thoại</string>

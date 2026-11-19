@@ -198,25 +198,6 @@ fun SettingsScreen(
                 }
             }
             item {
-                AppCard(contentPadding = PaddingValues(0.dp)) {
-                    ToggleRow(
-                        settings = settings,
-                        backdrop = toggleBackdrop,
-                        title = stringResource(R.string.pref_navigation_blur),
-                        summary = stringResource(R.string.pref_navigation_blur_summary),
-                        checked = settings.navigationBlur,
-                    ) { onSettingsChange(settings.copy(navigationBlur = it)) }
-                    AppDivider()
-                    ToggleRow(
-                        settings = settings,
-                        backdrop = toggleBackdrop,
-                        title = stringResource(R.string.pref_navigation_ios_labels),
-                        summary = stringResource(R.string.pref_navigation_ios_labels_summary),
-                        checked = settings.navigationIosLabels,
-                    ) { onSettingsChange(settings.copy(navigationIosLabels = it)) }
-                }
-            }
-            item {
                 AppCard(contentPadding = PaddingValues(14.dp)) {
                     AppText(
                         text = stringResource(R.string.pref_toggle_style),
@@ -237,6 +218,25 @@ fun SettingsScreen(
                         selected = settings.toggleStyle,
                         onSelect = { onSettingsChange(settings.copy(toggleStyle = it)) },
                     )
+                }
+            }
+            item {
+                AppCard(contentPadding = PaddingValues(0.dp)) {
+                    ToggleRow(
+                        settings = settings,
+                        backdrop = toggleBackdrop,
+                        title = stringResource(R.string.pref_navigation_blur),
+                        summary = stringResource(R.string.pref_navigation_blur_summary),
+                        checked = settings.navigationBlur,
+                    ) { onSettingsChange(settings.copy(navigationBlur = it)) }
+                    AppDivider()
+                    ToggleRow(
+                        settings = settings,
+                        backdrop = toggleBackdrop,
+                        title = stringResource(R.string.pref_navigation_ios_labels),
+                        summary = stringResource(R.string.pref_navigation_ios_labels_summary),
+                        checked = settings.navigationIosLabels,
+                    ) { onSettingsChange(settings.copy(navigationIosLabels = it)) }
                 }
             }
 
