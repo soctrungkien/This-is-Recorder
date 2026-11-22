@@ -62,6 +62,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import com.hihi.recorder.ui.icons.RemixIcons
+import dev.oneuiproject.oneui.R as OneUiR
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
@@ -925,6 +928,16 @@ private fun navIconFor(style: IconStyle, index: Int): ImageVector = when (style)
         0 -> SolarIcons.Home
         1 -> SolarIcons.Videos
         else -> SolarIcons.Settings
+    }
+    IconStyle.ONEUI -> when (index) {
+        0 -> ImageVector.vectorResource(OneUiR.drawable.ic_oui_home)
+        1 -> ImageVector.vectorResource(OneUiR.drawable.ic_oui_video)
+        else -> ImageVector.vectorResource(OneUiR.drawable.ic_oui_settings)
+    }
+    IconStyle.REMIX -> when (index) {
+        0 -> RemixIcons.Home
+        1 -> RemixIcons.Videos
+        else -> RemixIcons.Settings
     }
 }
 

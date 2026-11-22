@@ -138,6 +138,7 @@ dependencies {
     // Icon packs selectable in settings.
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("io.github.ardasoyturk.compose.icons:lucide-android:2.0.7")
+    implementation("io.github.oneuiproject:icons:1.1.0")
 
     // COUI (ColorOS 17 style) as an alternative UI language.
     val couiVersion = "0.0.1-alpha14"

@@ -7,7 +7,6 @@ import com.hihi.recorder.data.AudioSource
 import com.hihi.recorder.data.AutoStop
 import com.hihi.recorder.data.CaptureMode
 import com.hihi.recorder.data.Countdown
-import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.ShellBackend
@@ -121,14 +120,6 @@ fun UiStyle.label(): String = stringResource(
         UiStyle.MIUIX -> R.string.ui_style_miuix
         UiStyle.MATERIAL -> R.string.ui_style_material
         UiStyle.COUI -> R.string.ui_style_coui
-    },
-)
-
-@Composable
-fun MaterialSpec.label(): String = stringResource(
-    when (this) {
-        MaterialSpec.SPEC_2021 -> R.string.material_spec_2021
-        MaterialSpec.SPEC_2025 -> R.string.material_spec_2025
     },
 )
 

@@ -23,8 +23,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.hihi.recorder.data.MaterialSpec
-import com.hihi.recorder.data.PaletteStyle
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
@@ -41,7 +39,6 @@ import top.yukonga.miuix.kmp.theme.ThemeController
 import top.yukonga.miuix.kmp.theme.ThemePaletteStyle
 
 val LocalUiStyle = staticCompositionLocalOf { UiStyle.MIUIX }
-val LocalMaterialSpec = staticCompositionLocalOf { MaterialSpec.SPEC_2025 }
 
 @Composable
 fun RecorderTheme(
@@ -53,9 +50,9 @@ fun RecorderTheme(
         RecorderTheme.LIGHT -> false
         RecorderTheme.DARK -> true
     }
-    // Dynamic color is only available on Android 12+. A restored preference
-    // from a newer device must not force a Monet controller on older systems.
-    val useMonet = settings.monetColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    // Monet is always on where the platform supports it. A restored preference
+    // from an older build must not disable dynamic color.
+    val useMonet = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val keyColor = if (useMonet && settings.monetKeyColor != 0) {
         Color(settings.monetKeyColor)
     } else {
@@ -64,9 +61,7 @@ fun RecorderTheme(
     val controller = remember(
         settings.theme,
         useMonet,
-        settings.materialSpec,
         settings.monetKeyColor,
-        settings.monetPalette,
         dark,
     ) {
         ThemeController(
@@ -90,16 +85,8 @@ fun RecorderTheme(
                 }
             },
             keyColor = keyColor,
-            colorSpec = if (settings.materialSpec == MaterialSpec.SPEC_2025) {
-                ThemeColorSpec.Spec2025
-            } else {
-                ThemeColorSpec.Spec2021
-            },
-            paletteStyle = if (keyColor != null) {
-                settings.monetPalette.toMiuix()
-            } else {
-                ThemePaletteStyle.TonalSpot
-            },
+            colorSpec = ThemeColorSpec.Spec2025,
+            paletteStyle = ThemePaletteStyle.TonalSpot,
             isDark = dark,
         )
     }
@@ -108,20 +95,14 @@ fun RecorderTheme(
 
     MiuixTheme(controller = controller) {
         val materialColors = MiuixTheme.colorScheme.toMaterialColors(dark)
-        val specification = settings.materialSpec
         MaterialTheme(
             colorScheme = materialColors,
-            shapes = if (specification == MaterialSpec.SPEC_2025) ExpressiveShapes else ClassicShapes,
-            typography = if (specification == MaterialSpec.SPEC_2025) {
-                ExpressiveTypography
-            } else {
-                Typography()
-            },
+            shapes = ExpressiveShapes,
+            typography = ExpressiveTypography,
         ) {
             val themedContent: @Composable () -> Unit = {
                 CompositionLocalProvider(
                     LocalUiStyle provides settings.uiStyle,
-                    LocalMaterialSpec provides specification,
                     LocalCouiDarkTheme provides dark,
                     content = content,
                 )
@@ -161,18 +142,6 @@ fun RecorderTheme(
             }
         }
     }
-}
-
-private fun PaletteStyle.toMiuix(): ThemePaletteStyle = when (this) {
-    PaletteStyle.TONAL_SPOT -> ThemePaletteStyle.TonalSpot
-    PaletteStyle.NEUTRAL -> ThemePaletteStyle.Neutral
-    PaletteStyle.VIBRANT -> ThemePaletteStyle.Vibrant
-    PaletteStyle.EXPRESSIVE -> ThemePaletteStyle.Expressive
-    PaletteStyle.RAINBOW -> ThemePaletteStyle.Rainbow
-    PaletteStyle.FRUIT_SALAD -> ThemePaletteStyle.FruitSalad
-    PaletteStyle.MONOCHROME -> ThemePaletteStyle.Monochrome
-    PaletteStyle.FIDELITY -> ThemePaletteStyle.Fidelity
-    PaletteStyle.CONTENT -> ThemePaletteStyle.Content
 }
 
 private fun Colors.toMaterialColors(dark: Boolean): ColorScheme {

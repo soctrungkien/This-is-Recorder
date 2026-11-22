@@ -98,28 +98,6 @@ enum class UiStyle {
     COUI,
 }
 
-/** Material 3 color/token generation used for Monet and Material components. */
-enum class MaterialSpec {
-    SPEC_2021,
-    SPEC_2025,
-}
-
-/**
- * Palette generation style used when [RecorderSettings.monetKeyColor] seeds the
- * Monet controller. Mirrors Miuix's `ThemePaletteStyle`.
- */
-enum class PaletteStyle {
-    TONAL_SPOT,
-    NEUTRAL,
-    VIBRANT,
-    EXPRESSIVE,
-    RAINBOW,
-    FRUIT_SALAD,
-    MONOCHROME,
-    FIDELITY,
-    CONTENT,
-}
-
 /**
  * Which bottom navigation bar to render.
  *
@@ -145,6 +123,8 @@ enum class IconStyle {
     LUCIDE,
     MATERIAL,
     SOLAR,
+    ONEUI,
+    REMIX,
 }
 
 /**
@@ -165,12 +145,8 @@ data class RecorderSettings(
     val stopOnScreenOff: Boolean = false,
     val theme: RecorderTheme = RecorderTheme.SYSTEM,
     val uiStyle: UiStyle = UiStyle.MIUIX,
-    val materialSpec: MaterialSpec = MaterialSpec.SPEC_2025,
-    val monetColor: Boolean = true,
-    /** ARGB seed for Monet; 0 follows the wallpaper. */
+    /** ARGB seed for Monet; 0 follows the wallpaper. Monet is always enabled. */
     val monetKeyColor: Int = 0,
-    /** Palette generation used when [monetKeyColor] is set. */
-    val monetPalette: PaletteStyle = PaletteStyle.TONAL_SPOT,
     val navigationBarStyle: NavigationBarStyle = NavigationBarStyle.LIQUID_IOS,
     /** Mirrors the upstream Miuix demo's `enableBlur` switch. */
     val navigationBlur: Boolean = true,

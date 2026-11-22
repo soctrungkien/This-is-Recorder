@@ -313,6 +313,22 @@ fun AboutPage(
                         )
                         AppDivider()
                         AppRow(
+                            title = stringResource(R.string.about_oneui_icons),
+                            summary = stringResource(R.string.about_oneui_icons_summary),
+                            leadingIcon = MiuixIcons.Info,
+                            onClick = {
+                                onOpenUrl("https://github.com/OneUIProject/oneui-icons")
+                            },
+                        )
+                        AppDivider()
+                        AppRow(
+                            title = stringResource(R.string.about_remix_icon),
+                            summary = stringResource(R.string.about_remix_icon_summary),
+                            leadingIcon = MiuixIcons.Info,
+                            onClick = { onOpenUrl("https://remixicon.com/") },
+                        )
+                        AppDivider()
+                        AppRow(
                             title = stringResource(R.string.about_framework),
                             summary = stringResource(R.string.about_framework_summary),
                             leadingIcon = MiuixIcons.Theme,

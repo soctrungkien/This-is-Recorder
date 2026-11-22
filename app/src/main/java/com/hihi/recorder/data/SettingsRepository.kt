@@ -57,17 +57,6 @@ class SettingsRepository(context: Context) {
     @Synchronized
     fun setUiStyle(value: UiStyle) = update { it.copy(uiStyle = value) }
 
-    @Synchronized
-    fun setMaterialSpec(value: MaterialSpec) = update { it.copy(materialSpec = value) }
-
-    @Synchronized
-    fun setMonetColor(value: Boolean) = update { it.copy(monetColor = value) }
-
-    @Synchronized
-    fun setMonetKeyColor(value: Int) = update { it.copy(monetKeyColor = value) }
-
-    @Synchronized
-    fun setMonetPalette(value: PaletteStyle) = update { it.copy(monetPalette = value) }
 
     @Synchronized
     fun setNavigationBarStyle(value: NavigationBarStyle) = update {
@@ -121,11 +110,11 @@ class SettingsRepository(context: Context) {
             hapticFeedback = preferences.getBoolean(KEY_HAPTIC, defaults.hapticFeedback),
             stopOnScreenOff = preferences.getBoolean(KEY_STOP_ON_SCREEN_OFF, defaults.stopOnScreenOff),
             theme = preferences.enumValue(KEY_THEME, defaults.theme),
-            uiStyle = preferences.enumValue(KEY_UI_STYLE, defaults.uiStyle),
-            materialSpec = preferences.enumValue(KEY_MATERIAL_SPEC, defaults.materialSpec),
-            monetColor = preferences.getBoolean(KEY_MONET, defaults.monetColor),
+            uiStyle = preferences.enumValue(KEY_UI_STYLE, defaults.uiStyle)
+                // COUI is no longer offered as an app-wide style; keep the
+                // components only in the test screen and the icon pack.
+                .takeIf { it != UiStyle.COUI } ?: defaults.uiStyle,
             monetKeyColor = preferences.getInt(KEY_MONET_KEY_COLOR, defaults.monetKeyColor),
-            monetPalette = preferences.enumValue(KEY_MONET_PALETTE, defaults.monetPalette),
             navigationBarStyle = preferences.enumValue(
                 KEY_NAVIGATION_BAR_STYLE,
                 defaults.navigationBarStyle,
@@ -160,10 +149,7 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_STOP_ON_SCREEN_OFF, settings.stopOnScreenOff)
             .putString(KEY_THEME, settings.theme.name)
             .putString(KEY_UI_STYLE, settings.uiStyle.name)
-            .putString(KEY_MATERIAL_SPEC, settings.materialSpec.name)
-            .putBoolean(KEY_MONET, settings.monetColor)
             .putInt(KEY_MONET_KEY_COLOR, settings.monetKeyColor)
-            .putString(KEY_MONET_PALETTE, settings.monetPalette.name)
             .putString(KEY_NAVIGATION_BAR_STYLE, settings.navigationBarStyle.name)
             .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
@@ -209,10 +195,7 @@ class SettingsRepository(context: Context) {
         const val KEY_STOP_ON_SCREEN_OFF = "stop_on_screen_off"
         const val KEY_THEME = "theme"
         const val KEY_UI_STYLE = "ui_style"
-        const val KEY_MATERIAL_SPEC = "material_spec"
-        const val KEY_MONET = "monet_color"
         const val KEY_MONET_KEY_COLOR = "monet_key_color"
-        const val KEY_MONET_PALETTE = "monet_palette"
         const val KEY_NAVIGATION_BAR_STYLE = "navigation_bar_style"
         const val KEY_NAVIGATION_BLUR = "navigation_blur"
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"

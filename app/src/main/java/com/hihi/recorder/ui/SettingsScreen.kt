@@ -27,9 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
 import com.hihi.recorder.R
 import com.hihi.recorder.data.IconStyle
-import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.NavigationBarStyle
-import com.hihi.recorder.data.PaletteStyle
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
@@ -51,8 +49,6 @@ import top.yukonga.miuix.kmp.icon.extended.Send
 private enum class SettingsPicker {
     THEME,
     ICON_STYLE,
-    MATERIAL_SPEC,
-    PALETTE_STYLE,
 }
 
 /** Switch row that follows the user's Toggle style preference. */
@@ -165,6 +161,8 @@ fun SettingsScreen(
                                 IconStyle.LUCIDE -> R.string.icon_style_lucide
                                 IconStyle.MATERIAL -> R.string.icon_style_material
                                 IconStyle.SOLAR -> R.string.icon_style_solar
+                                IconStyle.ONEUI -> R.string.icon_style_oneui
+                                IconStyle.REMIX -> R.string.icon_style_remix
                             },
                         ),
                         onClick = { picker = SettingsPicker.ICON_STYLE },
@@ -188,7 +186,6 @@ fun SettingsScreen(
                         options = listOf(
                             UiStyle.MIUIX to stringResource(R.string.ui_style_miuix),
                             UiStyle.MATERIAL to stringResource(R.string.ui_style_material),
-                            UiStyle.COUI to stringResource(R.string.ui_style_coui),
                         ),
                         selected = settings.uiStyle,
                         onSelect = { onSettingsChange(settings.copy(uiStyle = it)) },
@@ -196,31 +193,6 @@ fun SettingsScreen(
                 }
             }
             item {
-                AppCard(contentPadding = PaddingValues(0.dp)) {
-                    ToggleRow(
-                        settings = settings,
-                        backdrop = toggleBackdrop,
-                        title = stringResource(R.string.pref_monet),
-                        summary = stringResource(
-                            if (dynamicColorAvailable) R.string.pref_monet_summary
-                            else R.string.pref_monet_unavailable,
-                        ),
-                        checked = settings.monetColor,
-                        enabled = dynamicColorAvailable,
-                    ) { onSettingsChange(settings.copy(monetColor = it)) }
-                    AppDivider()
-                    AppSelectRow(
-                        title = stringResource(R.string.pref_material_spec),
-                        value = settings.materialSpec.label(),
-                        onClick = { picker = SettingsPicker.MATERIAL_SPEC },
-                    )
-                    AppDivider()
-                    AppSelectRow(
-                        title = stringResource(R.string.monet_palette_style),
-                        value = PaletteStyleLabel(settings.monetPalette),
-                        onClick = { picker = SettingsPicker.PALETTE_STYLE },
-                    )
-                }
                 AppCard(contentPadding = PaddingValues(top = 12.dp)) {
                     AppText(
                         text = stringResource(R.string.pref_monet_key_color),
@@ -228,14 +200,20 @@ fun SettingsScreen(
                         style = AppTextStyle.Subtitle,
                     )
                     AppText(
-                        text = stringResource(R.string.pref_monet_key_color_summary),
+                        text = stringResource(
+                            if (dynamicColorAvailable) {
+                                R.string.pref_monet_key_color_summary
+                            } else {
+                                R.string.pref_monet_unavailable
+                            },
+                        ),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 3.dp),
                         style = AppTextStyle.Footnote,
                         color = palette.onSurfaceVariant,
                     )
                     MonetKeyColorRow(
                         selected = settings.monetKeyColor,
-                        enabled = settings.monetColor && dynamicColorAvailable,
+                        enabled = dynamicColorAvailable,
                         onSelect = { onSettingsChange(settings.copy(monetKeyColor = it)) },
                         onCustom = { showCustomColor = true },
                     )
@@ -446,30 +424,14 @@ fun SettingsScreen(
                             IconStyle.LUCIDE -> R.string.icon_style_lucide
                             IconStyle.MATERIAL -> R.string.icon_style_material
                             IconStyle.SOLAR -> R.string.icon_style_solar
+                            IconStyle.ONEUI -> R.string.icon_style_oneui
+                            IconStyle.REMIX -> R.string.icon_style_remix
                         },
                     ),
                 )
             },
             selected = settings.iconStyle,
             onSelect = { value -> onSettingsChange(settings.copy(iconStyle = value)) },
-            onDismissRequest = { picker = null },
-        )
-
-        SettingsPicker.MATERIAL_SPEC -> AppSelectDialog(
-            title = stringResource(R.string.pref_material_spec),
-            options = MaterialSpec.entries.map { value -> SelectOption(value, value.label()) },
-            selected = settings.materialSpec,
-            onSelect = { value -> onSettingsChange(settings.copy(materialSpec = value)) },
-            onDismissRequest = { picker = null },
-        )
-
-        SettingsPicker.PALETTE_STYLE -> AppSelectDialog(
-            title = stringResource(R.string.monet_palette_style),
-            options = PaletteStyle.entries.map { value ->
-                SelectOption(value, PaletteStyleLabel(value))
-            },
-            selected = settings.monetPalette,
-            onSelect = { value -> onSettingsChange(settings.copy(monetPalette = value)) },
             onDismissRequest = { picker = null },
         )
 

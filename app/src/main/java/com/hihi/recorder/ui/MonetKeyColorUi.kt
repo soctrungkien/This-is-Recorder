@@ -229,17 +229,3 @@ internal fun CustomMonetColorDialog(
 internal fun initialCustomColor(value: Int): Int =
     if (isCustomKeyColor(value)) value else DefaultCustomKeyColor
 
-@Composable
-internal fun PaletteStyleLabel(style: com.hihi.recorder.data.PaletteStyle): String = stringResource(
-    when (style) {
-        com.hihi.recorder.data.PaletteStyle.TONAL_SPOT -> R.string.monet_style_tonal_spot
-        com.hihi.recorder.data.PaletteStyle.NEUTRAL -> R.string.monet_style_neutral
-        com.hihi.recorder.data.PaletteStyle.VIBRANT -> R.string.monet_style_vibrant
-        com.hihi.recorder.data.PaletteStyle.EXPRESSIVE -> R.string.monet_style_expressive
-        com.hihi.recorder.data.PaletteStyle.RAINBOW -> R.string.monet_style_rainbow
-        com.hihi.recorder.data.PaletteStyle.FRUIT_SALAD -> R.string.monet_style_fruit_salad
-        com.hihi.recorder.data.PaletteStyle.MONOCHROME -> R.string.monet_style_monochrome
-        com.hihi.recorder.data.PaletteStyle.FIDELITY -> R.string.monet_style_fidelity
-        com.hihi.recorder.data.PaletteStyle.CONTENT -> R.string.monet_style_content
-    },
-)

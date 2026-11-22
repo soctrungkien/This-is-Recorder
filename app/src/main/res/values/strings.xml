@@ -72,6 +72,10 @@
     <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass components</string>
     <string name="about_zeroui">ZeroUI</string>
     <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid toggle, slider, Monet key color swatches and custom color picker</string>
+    <string name="about_oneui_icons">OneUI Icons</string>
+    <string name="about_oneui_icons_summary">© 2022 Yanndroid &amp; BlackMesa123 · MIT · Samsung-style icon pack</string>
+    <string name="about_remix_icon">Remix Icon</string>
+    <string name="about_remix_icon_summary">© 2017–2026 Remix Design · Remix Icon License v1.0 · Neutral icon system</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
@@ -137,6 +141,8 @@
     <string name="icon_style_lucide">Lucide</string>
     <string name="icon_style_material">Material 3</string>
     <string name="icon_style_solar">Solar</string>
+    <string name="icon_style_oneui">OneUI</string>
+    <string name="icon_style_remix">Remix Icon</string>
     <string name="pref_liquid_glass">Liquid Glass</string>
     <string name="pref_liquid_glass_summary">Toggle switches, slider and navigation bar</string>
     <string name="liquid_off">Off</string>
@@ -393,14 +399,14 @@
     <string name="showcase_test_title">Testing</string>
     <string name="showcase_force_crash">Force crash</string>
     <string name="showcase_force_crash_summary">Throw an exception to open the crash screen</string>
-    <string name="showcase_force_stop">Force stop / exit app</string>
+    <string name="showcase_force_stop">Force stop</string>
     <string name="showcase_force_stop_summary">Close every screen and terminate the process</string>
     <string name="about_crash_handler">CrashHandler</string>
     <string name="about_crash_handler_summary">© 2024 Bhuvaneshwaran · GPL-3.0 · Crash log capture</string>
     <string name="about_coui">COUI-Kit</string>
     <string name="about_coui_summary">© ItosEO · MPL-2.0 · ColorOS 17 style UI components</string>
     <string name="about_icon_packs">Icon packs</string>
-    <string name="about_icon_packs_summary">Lucide (ISC), Solar (MIT) and Material Icons (Apache-2.0)</string>
+    <string name="about_icon_packs_summary">Lucide (ISC), Solar (MIT), OneUI Icons (MIT) and Material Icons (Apache-2.0)</string>
     <string name="licenses_title">Open-source licenses</string>
     <string name="licenses_subtitle">Bundled license texts</string>
     <string name="license_app">This is Recorder — MIT</string>
@@ -411,7 +417,9 @@
     <string name="license_crashhandler">CrashHandler — GPL-3.0</string>
     <string name="license_coui">COUI-Kit — MPL-2.0</string>
     <string name="license_lucide">Lucide — ISC</string>
-    <string name="license_solar">Solar icons — CC BY 4.0</string>
+    <string name="license_solar">Solar icons - CC BY 4.0</string>
+    <string name="license_oneui_icons">OneUI Icons - MIT</string>
+    <string name="license_remix_icon">Remix Icon - Remix Icon License v1.0</string>
     <string name="license_material_icons">Material Icons — Apache-2.0</string>
     <string name="license_shizuku">Shizuku API — MIT</string>
 </resources>

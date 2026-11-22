@@ -33,10 +33,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
+import com.itos.coui.theme.CouiPresets
+import com.itos.coui.theme.CouiTheme
+import com.itos.coui.theme.CouiTypography
+import dev.oneuiproject.oneui.R as OneUiR
 import com.itos.coui.checkbox.Checkbox as CouiCheckbox
 import com.itos.coui.radiobutton.RadioButton as CouiRadioButton
 import com.itos.coui.segmentbutton.SegmentedControl as CouiSegmentedControl
@@ -369,6 +375,8 @@ fun TestScreen(
                         "Lucide" to LucideIcons.LucideHouse,
                         "Material" to Icons.Filled.Home,
                         "Solar" to com.hihi.recorder.ui.icons.SolarIcons.Home,
+                        "OneUI" to ImageVector.vectorResource(OneUiR.drawable.ic_oui_home),
+                        "Remix" to com.hihi.recorder.ui.icons.RemixIcons.Home,
                     )
                     icons.chunked(3).forEach { row ->
                         Row(Modifier.fillMaxWidth()) {
@@ -419,9 +427,15 @@ fun TestScreen(
 
             item { AppSectionTitle("COUI components") }
             item {
-                AppCard(contentPadding = PaddingValues(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        AppText("COUI Switch", style = AppTextStyle.Body, modifier = Modifier.weight(1f))
+                val dark = appPalette().isDark
+                CouiTheme(
+                    darkTheme = dark,
+                    colorScheme = if (dark) CouiPresets.Dark else CouiPresets.Light,
+                    typography = CouiTypography(),
+                ) {
+                    AppCard(contentPadding = PaddingValues(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            AppText("COUI Switch", style = AppTextStyle.Body, modifier = Modifier.weight(1f))
                         CouiSwitch(
                             checked = couiSwitch,
                             onCheckedChange = { couiSwitch = it },
@@ -465,6 +479,7 @@ fun TestScreen(
                         )
                     }
                 }
+            }
             }
 
             item { AppSectionTitle(stringResource(R.string.showcase_test_title)) }

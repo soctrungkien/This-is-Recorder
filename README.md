@@ -148,8 +148,9 @@ app/src/main/java/com/hihi/recorder/
 - **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa từ dự án.
 - **[ZeroUI](https://github.com/Xocio/ZeroUI)** — © ZeroUI contributors, giấy phép Apache-2.0. Các thành phần `LiquidToggle` và `LiquidSlider` được lấy từ module `glass` của ZeroUI và chỉnh để đồng bộ màu với theme của ứng dụng (slider dùng cùng cơ chế `progress` với upstream). Dãy swatch màu khóa Monet, bảng màu và hộp chọn màu tùy chỉnh (`ColorPalette`) cũng được port từ màn hình theme của ZeroUI.
 - **[CrashHandler](https://github.com/Bhuvaneshw/CrashHandler)** — © 2024 Bhuvaneshwaran, giấy phép GPL-3.0. Ghi và lưu nhật ký crash; màn hình crash dùng Miuix theme với màu Monet và chế độ sáng/tối theo hệ thống.
-- **[Lucide](https://lucide.dev/)** (ISC), **[Solar icons](https://github.com/480design/solar-icons)** (MIT) và Material Icons (Apache-2.0) — các bộ icon có thể chọn cho thanh điều hướng.
-- **[COUI-Kit](https://github.com/ItosEO/COUI-Kit)** — © ItosEO, giấy phép MPL-2.0. Kiểu giao diện COUI (ColorOS 17) ngang hàng với Miuix và Material 3; ở chế độ COUI các component COUI native (thẻ, dòng, công tắc, nút, hộp thoại, thanh điều hướng) được dùng thay cho Material 3, vẫn giữ màu nhấn Monet.
+- **[Lucide](https://lucide.dev/)** (ISC), **[Solar icons](https://github.com/480design/solar-icons)** (MIT), **[OneUI Icons](https://github.com/OneUIProject/oneui-icons)** (MIT, © 2022 Yanndroid & BlackMesa123) và Material Icons (Apache-2.0) — các bộ icon có thể chọn cho thanh điều hướng.
+- **[Remix Icon](https://remixicon.com/)** — © 2017–2026 Remix Design, giấy phép Remix Icon License v1.0 (cho phép dùng trong app, sửa và phân phối như một phần của sản phẩm; không được bán riêng như bộ icon hay dùng làm logo/thương hiệu). Một vài icon được hand-trace thành `ImageVector` cho thanh điều hướng, kèm toàn văn giấy phép trong ứng dụng. Không dùng Geist của Vercel vì bộ icon UI của họ không có repo/giấy phép công khai rõ ràng và brand marks bị giới hạn.
+- **[COUI-Kit](https://github.com/ItosEO/COUI-Kit)** — © ItosEO, giấy phép MPL-2.0. Không còn là kiểu giao diện có thể chọn; component COUI và icon COUI chỉ còn trong màn hình thử nghiệm.
 - **[Jetpack Compose](https://developer.android.com/compose)** 1.12.0 (`foundation`, `ui`, `animation`) — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.4.0 — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[AndroidX Core KTX & Activity Compose](https://developer.android.com/jetpack/androidx)** 1.19.1 / 1.13.0 — © The Android Open Source Project, giấy phép Apache-2.0.
@@ -165,7 +166,7 @@ app/src/main/java/com/hihi/recorder/
 - Shizuku API: MIT, bản quyền © 2021 RikkaW.
 - CrashHandler: GPL-3.0, bản quyền © 2024 Bhuvaneshwaran.
 - COUI-Kit: MPL-2.0, bản quyền © ItosEO.
-- Toàn văn giấy phép của ứng dụng và các dependency (MIT, Apache-2.0, GPL-3.0, MPL-2.0, ISC, CC BY 4.0) được đóng gói trong `assets/licenses/` và có thể mở ngay trong ứng dụng tại **Giới thiệu → Giấy phép mã nguồn mở**.
+- Toàn văn giấy phép của ứng dụng và các dependency (MIT, Apache-2.0, GPL-3.0, MPL-2.0, ISC, CC BY 4.0, Remix Icon License v1.0) được đóng gói trong `assets/licenses/` và có thể mở ngay trong ứng dụng tại **Giới thiệu → Giấy phép mã nguồn mở**.
 
 ## Ghi chú kỹ thuật
 

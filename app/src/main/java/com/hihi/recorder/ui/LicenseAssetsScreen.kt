@@ -43,6 +43,8 @@ private val LicenseAssets = listOf(
     LicenseAsset("coui-mpl-2.0.txt", R.string.license_coui),
     LicenseAsset("lucide-isc.txt", R.string.license_lucide),
     LicenseAsset("solar-cc-by-4.0.txt", R.string.license_solar),
+    LicenseAsset("oneui-icons-mit.txt", R.string.license_oneui_icons),
+    LicenseAsset("remixicon-license.txt", R.string.license_remix_icon),
     LicenseAsset("shizuku-mit.txt", R.string.license_shizuku),
 )
 
