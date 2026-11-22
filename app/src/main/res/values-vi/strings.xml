@@ -331,8 +331,8 @@
     <string name="toggle_style_ui">Theo kiểu giao diện</string>
     <string name="toggle_style_liquid">Liquid Glass</string>
 
-    <string name="showcase_title">Xem thành phần giao diện</string>
-    <string name="showcase_subtitle">Thử các thành phần và hộp thoại</string>
+    <string name="showcase_title">Kiểm tra, test</string>
+    <string name="showcase_subtitle">Kiểm tra và thử các thành phần, tính năng</string>
     <string name="showcase_buttons">Nút</string>
     <string name="showcase_text_styles">Kiểu chữ</string>
     <string name="showcase_switches">Công tắc</string>

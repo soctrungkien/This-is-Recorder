@@ -331,8 +331,8 @@
     <string name="toggle_style_ui">UI Style</string>
     <string name="toggle_style_liquid">Liquid Glass</string>
 
-    <string name="showcase_title">Component showcase</string>
-    <string name="showcase_subtitle">Preview UI components and dialogs</string>
+    <string name="showcase_title">Test</string>
+    <string name="showcase_subtitle">Check and test components and features</string>
     <string name="showcase_buttons">Buttons</string>
     <string name="showcase_text_styles">Text styles</string>
     <string name="showcase_switches">Switches</string>

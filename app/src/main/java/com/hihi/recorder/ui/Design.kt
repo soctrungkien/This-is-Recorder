@@ -62,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -140,6 +141,27 @@ data class AppPalette(
 
 @Composable
 fun appPalette(): AppPalette {
+    if (LocalUiStyle.current == UiStyle.COUI) {
+        val colors = com.itos.coui.theme.CouiTheme.colorScheme
+        return AppPalette(
+            background = colors.background,
+            surface = colors.surface,
+            surfaceContainer = colors.card,
+            surfaceContainerHigh = colors.container,
+            surfaceContainerHighest = colors.container,
+            onSurface = colors.onSurface,
+            onSurfaceVariant = colors.onSurfaceVariant,
+            primary = colors.accent,
+            onPrimary = colors.onAccent,
+            primaryContainer = colors.accent,
+            onPrimaryContainer = colors.onAccent,
+            error = Color(0xFFB3261E),
+            onError = Color.White,
+            outline = colors.outlineVariant,
+            divider = colors.outlineVariant,
+            isDark = com.itos.coui.theme.CouiTheme.isDark,
+        )
+    }
     return if (LocalUiStyle.current == UiStyle.MIUIX) {
         val colors = MiuixTheme.colorScheme
         AppPalette(
@@ -232,6 +254,36 @@ fun AppText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
+    if (LocalUiStyle.current == UiStyle.COUI) {
+        val coui = com.itos.coui.theme.CouiTheme.typography
+        val base = when (style) {
+            AppTextStyle.Display,
+            AppTextStyle.Headline,
+            AppTextStyle.Title,
+            AppTextStyle.Subtitle -> coui.menuItem
+            AppTextStyle.Body -> coui.body
+            AppTextStyle.SmallBody,
+            AppTextStyle.Caption,
+            AppTextStyle.Label,
+            AppTextStyle.Footnote -> coui.label
+        }
+        androidx.compose.foundation.text.BasicText(
+            text = text,
+            modifier = modifier,
+            style = base.copy(
+                color = if (color.isSpecified) {
+                    color
+                } else {
+                    com.itos.coui.theme.CouiTheme.colorScheme.onSurface
+                },
+                fontWeight = fontWeight ?: base.fontWeight,
+                textAlign = textAlign ?: TextAlign.Start,
+            ),
+            maxLines = maxLines,
+            overflow = overflow,
+        )
+        return
+    }
     if (LocalUiStyle.current == UiStyle.MIUIX) {
         val miuixStyle = when (style) {
             AppTextStyle.Display -> MiuixTheme.textStyles.title1

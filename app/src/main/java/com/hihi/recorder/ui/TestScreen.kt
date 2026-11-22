@@ -41,6 +41,7 @@ import com.itos.coui.checkbox.Checkbox as CouiCheckbox
 import com.itos.coui.radiobutton.RadioButton as CouiRadioButton
 import com.itos.coui.segmentbutton.SegmentedControl as CouiSegmentedControl
 import com.itos.coui.slider.Slider as CouiSlider
+import com.hihi.recorder.ui.liquid.LiquidSlider
 import com.itos.coui.icons.CouiIcons
 import com.itos.coui.switch.Switch as CouiSwitch
 import compose.icons.LucideIcons
@@ -82,6 +83,7 @@ fun TestScreen(
     var demoInput by remember { mutableStateOf("") }
     var demoCheck by remember { mutableStateOf(false) }
     var demoRadio by remember { mutableIntStateOf(0) }
+    var liquidSliderValue by remember { mutableStateOf(0.4f) }
     val scope = rememberCoroutineScope()
     val palette = appPalette()
     val message = stringResource(R.string.showcase_dialog_message)
@@ -382,6 +384,35 @@ fun TestScreen(
                             }
                         }
                         Spacer(Modifier.height(10.dp))
+                    }
+                }
+            }
+
+            item { AppSectionTitle("Liquid Slider") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    AppText(
+                        text = "LiquidSlider: ${(liquidSliderValue * 100).toInt()}%",
+                        style = AppTextStyle.Subtitle,
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                    ) {
+                        // Source layer is a SIBLING of the slider, never an
+                        // ancestor of the surface sampling it.
+                        Box(Modifier.fillMaxSize().layerBackdrop(toggleBackdrop))
+                        LiquidSlider(
+                            value = { liquidSliderValue },
+                            onValueChange = { liquidSliderValue = it },
+                            backdrop = toggleBackdrop,
+                            valueRange = 0f..1f,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.Center),
+                        )
                     }
                 }
             }
