@@ -1,6 +1,8 @@
 package com.hihi.recorder.ui
 
 import android.app.Activity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,6 +31,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
+import com.itos.coui.checkbox.Checkbox as CouiCheckbox
+import com.itos.coui.radiobutton.RadioButton as CouiRadioButton
+import com.itos.coui.segmentbutton.SegmentedControl as CouiSegmentedControl
 import com.itos.coui.slider.Slider as CouiSlider
 import com.itos.coui.switch.Switch as CouiSwitch
 import com.kyant.backdrop.backdrops.layerBackdrop
@@ -57,6 +65,10 @@ fun TestScreen(
     var demoSwitch by remember { mutableStateOf(true) }
     var couiSwitch by remember { mutableStateOf(false) }
     var couiSlider by remember { mutableStateOf(0.4f) }
+    var couiCheck by remember { mutableStateOf(true) }
+    var couiRadio by remember { mutableStateOf(true) }
+    var couiSegment by remember { mutableIntStateOf(0) }
+    var demoSlider by remember { mutableStateOf(0.5f) }
     val scope = rememberCoroutineScope()
     val palette = appPalette()
     val message = stringResource(R.string.showcase_dialog_message)
@@ -226,6 +238,70 @@ fun TestScreen(
                 }
             }
 
+            item { AppSectionTitle("Controls") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    AppText("Segmented", style = AppTextStyle.Subtitle)
+                    Spacer(Modifier.height(8.dp))
+                    AppSegmentedControl(
+                        options = listOf("One" to "One", "Two" to "Two", "Three" to "Three"),
+                        selected = "One",
+                        onSelect = {},
+                    )
+                    Spacer(Modifier.height(18.dp))
+                    AppText("Slider: ${(demoSlider * 100).toInt()}%", style = AppTextStyle.Subtitle)
+                    Spacer(Modifier.height(8.dp))
+                    androidx.compose.material3.Slider(
+                        value = demoSlider,
+                        onValueChange = { demoSlider = it },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(18.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AppSpinner()
+                        Spacer(Modifier.width(10.dp))
+                        AppText("Loading indicator", style = AppTextStyle.SmallBody)
+                    }
+                }
+            }
+
+            item { AppSectionTitle("Theme colors") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    val colors = listOf(
+                        "primary" to palette.primary,
+                        "onPrimary" to palette.onPrimary,
+                        "primaryContainer" to palette.primaryContainer,
+                        "surface" to palette.surface,
+                        "surfaceContainer" to palette.surfaceContainer,
+                        "onSurface" to palette.onSurface,
+                        "onSurfaceVariant" to palette.onSurfaceVariant,
+                        "error" to palette.error,
+                        "outline" to palette.outline,
+                    )
+                    colors.chunked(3).forEach { row ->
+                        Row(Modifier.fillMaxWidth()) {
+                            row.forEach { (name, color) ->
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Box(
+                                        Modifier
+                                            .size(44.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(color),
+                                    )
+                                    Spacer(Modifier.height(4.dp))
+                                    AppText(name, style = AppTextStyle.Footnote)
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(10.dp))
+                    }
+                }
+            }
+
             item { AppSectionTitle("COUI components") }
             item {
                 AppCard(contentPadding = PaddingValues(16.dp)) {
@@ -244,6 +320,35 @@ fun TestScreen(
                         onValueChange = { couiSlider = it },
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    Spacer(Modifier.height(18.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CouiCheckbox(checked = couiCheck)
+                        Spacer(Modifier.width(8.dp))
+                        AppText(
+                            text = "COUI Checkbox: $couiCheck",
+                            style = AppTextStyle.SmallBody,
+                            modifier = Modifier.clickable { couiCheck = !couiCheck },
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CouiRadioButton(selected = couiRadio)
+                        Spacer(Modifier.width(8.dp))
+                        AppText(
+                            text = "COUI Radio: $couiRadio",
+                            style = AppTextStyle.SmallBody,
+                            modifier = Modifier.clickable { couiRadio = !couiRadio },
+                        )
+                    }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        Spacer(Modifier.height(18.dp))
+                        CouiSegmentedControl(
+                            labels = listOf("A", "B", "C"),
+                            selectedIndex = couiSegment,
+                            onSelected = { couiSegment = it },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
 
