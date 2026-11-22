@@ -32,7 +32,7 @@ android {
 
     defaultConfig {
         applicationId = "com.hihi.recorder"
-        minSdk = 34
+        minSdk = 24
         targetSdk = 37
         versionCode = 3
         versionName = "1.2.0"
@@ -141,7 +141,7 @@ dependencies {
 
     // COUI (ColorOS 17 style) as an alternative UI language.
     val couiVersion = "0.0.1-alpha14"
-    implementation("io.github.itoseo:coui-material3:$couiVersion")
+    implementation("io.github.itoseo:coui:$couiVersion")
     implementation("io.github.itoseo:coui-icons:$couiVersion")
 
     // Crash logging with a custom Miuix crash screen.

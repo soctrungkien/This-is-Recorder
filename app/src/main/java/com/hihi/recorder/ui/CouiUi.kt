@@ -1,5 +1,6 @@
 package com.hihi.recorder.ui
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -570,15 +571,59 @@ internal fun CouiSegmented(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    // minSdk is 34, so COUI's native SegmentedControl is always available.
-    com.itos.coui.segmentbutton.SegmentedControl(
-        modifier = modifier.fillMaxWidth(),
-        labels = labels,
-        selectedIndex = selectedIndex.coerceIn(0, labels.lastIndex.coerceAtLeast(0)),
-        onSelected = onSelected,
-        dark = CouiTheme.isDark,
-        enabled = enabled,
-    )
+    val colors = CouiTheme.colorScheme
+    val index = selectedIndex.coerceIn(0, labels.lastIndex.coerceAtLeast(0))
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        com.itos.coui.segmentbutton.SegmentedControl(
+            modifier = modifier.fillMaxWidth(),
+            labels = labels,
+            selectedIndex = index,
+            onSelected = onSelected,
+            dark = CouiTheme.isDark,
+            enabled = enabled,
+        )
+    } else {
+        // The native control needs API 34; below that keep the COUI capsule
+        // look with a plain indicator instead of falling back to Material 3.
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(CouiCapsuleShape)
+                .background(colors.container)
+                .padding(3.dp),
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            labels.forEachIndexed { i, label ->
+                val selected = i == index
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(CouiCapsuleShape)
+                        .background(if (selected) colors.accent else Color.Transparent)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            enabled = enabled && !selected,
+                        ) { onSelected(i) }
+                        .padding(horizontal = 10.dp, vertical = 9.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CouiText(
+                        text = label,
+                        kind = CouiTextKind.ItemValue,
+                        color = when {
+                            selected -> colors.onAccent
+                            enabled -> colors.onSurfaceVariant
+                            else -> colors.onSurfaceVariant.copy(alpha = 0.38f)
+                        },
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
 }
 
 /** COUI-styled bottom bar; COUI's own NavigationBar needs API 34 + CouiBackdrop. */

@@ -3,10 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        miuix-blur declares minSdk 33. Its APIs are only reached behind an
-        SDK_INT >= 33 guard, while older devices use the translucent fallback.
+        miuix-blur declares minSdk 33 and COUI declares minSdk 31, but their
+        newer APIs are only reached behind SDK_INT guards in this app. The
+        remaining dependencies already require at most API 24, so 24 is the
+        lowest minSdk reachable without forcing incompatible libraries.
     -->
-    <uses-sdk tools:overrideLibrary="top.yukonga.miuix.kmp.blur" />
+    <uses-sdk tools:overrideLibrary="top.yukonga.miuix.kmp.blur,com.itos.coui,com.itos.coui.icons" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
