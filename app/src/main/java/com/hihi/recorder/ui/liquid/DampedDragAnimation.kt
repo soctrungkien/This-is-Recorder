@@ -71,6 +71,9 @@ internal class DampedDragAnimation(
     private fun nowMillis(): Long = startMark.elapsedNow().inWholeMilliseconds
 
     val value: Float get() = valueAnimation.value
+    /** Normalised position inside [valueRange]; drives track fill and knob travel. */
+    val progress: Float
+        get() = (value - valueRange.start) / (valueRange.endInclusive - valueRange.start)
     val targetValue: Float get() = valueAnimation.targetValue
     val pressProgress: Float get() = pressProgressAnimation.value
     val scaleX: Float get() = scaleXAnimation.value

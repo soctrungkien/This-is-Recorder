@@ -152,7 +152,7 @@ fun LiquidSlider(
                     .layout { measurable, constraints ->
                         val placeable = measurable.measure(constraints)
                         val width =
-                            (constraints.maxWidth * dampedDragAnimation.pressProgress).roundToInt()
+                            (constraints.maxWidth * dampedDragAnimation.progress).roundToInt()
                         layout(width, placeable.height) { placeable.place(0, 0) }
                     }
             )
@@ -181,7 +181,7 @@ fun LiquidSlider(
         Box(
             Modifier
                 .graphicsLayer {
-                    translationX = (-size.width / 2f + trackWidth * dampedDragAnimation.pressProgress)
+                    translationX = (-size.width / 2f + trackWidth * dampedDragAnimation.progress)
                         .coerceIn(-size.width / 4f, trackWidth - size.width * 3f / 4f) *
                             if (isLtr) 1f else -1f
                 }

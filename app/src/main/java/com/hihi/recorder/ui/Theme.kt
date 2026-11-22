@@ -24,10 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.hihi.recorder.data.MaterialSpec
+import com.hihi.recorder.data.PaletteStyle
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
+import com.itos.coui.theme.CouiColorScheme
+import com.itos.coui.theme.CouiPresets
 import com.itos.coui.theme.CouiTheme
+import com.itos.coui.theme.CouiTypography
 import com.itos.coui.theme.LocalCouiDarkTheme
 import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 import top.yukonga.miuix.kmp.theme.Colors
@@ -52,10 +56,17 @@ fun RecorderTheme(
     // Dynamic color is only available on Android 12+. A restored preference
     // from a newer device must not force a Monet controller on older systems.
     val useMonet = settings.monetColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val keyColor = if (useMonet && settings.monetKeyColor != 0) {
+        Color(settings.monetKeyColor)
+    } else {
+        null
+    }
     val controller = remember(
         settings.theme,
         useMonet,
         settings.materialSpec,
+        settings.monetKeyColor,
+        settings.monetPalette,
         dark,
     ) {
         ThemeController(
@@ -78,12 +89,17 @@ fun RecorderTheme(
                     ColorSchemeMode.Dark
                 }
             },
+            keyColor = keyColor,
             colorSpec = if (settings.materialSpec == MaterialSpec.SPEC_2025) {
                 ThemeColorSpec.Spec2025
             } else {
                 ThemeColorSpec.Spec2021
             },
-            paletteStyle = ThemePaletteStyle.TonalSpot,
+            paletteStyle = if (keyColor != null) {
+                settings.monetPalette.toMiuix()
+            } else {
+                ThemePaletteStyle.TonalSpot
+            },
             isDark = dark,
         )
     }
@@ -113,26 +129,31 @@ fun RecorderTheme(
             // COUI must render with its native palette/typography. The global
             // CouiMaterial3Style only applies when no local CouiTheme exists.
             if (settings.uiStyle == UiStyle.COUI) {
-                // Keep Monet dynamic colors: feed the host M3 palette into the
-                // native COUI theme instead of using COUI's static blue preset.
+                // Keep Monet dynamic colors: use COUI's neutral native surfaces
+                // and only take the accent from the host palette. Feeding every
+                // M3 surface into COUI would make it look like Material 3.
                 val m3 = MaterialTheme.colorScheme
+                val preset = if (dark) CouiPresets.Dark else CouiPresets.Light
+                val accent = if (useMonet) m3.primary else preset.accent
+                val couiColors = CouiColorScheme(
+                    accent = accent,
+                    onAccent = if (useMonet) m3.onPrimary else preset.onAccent,
+                    surface = preset.surface,
+                    container = preset.container,
+                    onSurface = preset.onSurface,
+                    onSurfaceVariant = preset.onSurfaceVariant,
+                    outlineVariant = preset.outlineVariant,
+                    accentOnSurface = accent,
+                    menuSurface = preset.menuSurface,
+                    checkboxAccent = accent,
+                    menuCheckboxAccent = accent,
+                    background = preset.background,
+                    card = preset.card,
+                )
                 CouiTheme(
                     darkTheme = dark,
-                    colorScheme = com.itos.coui.theme.CouiColorScheme(
-                        accent = m3.primary,
-                        onAccent = m3.onPrimary,
-                        surface = m3.surface,
-                        container = m3.surfaceContainer,
-                        onSurface = m3.onSurface,
-                        onSurfaceVariant = m3.onSurfaceVariant,
-                        outlineVariant = m3.outlineVariant,
-                        accentOnSurface = m3.primary,
-                        menuSurface = m3.surfaceContainerHigh,
-                        checkboxAccent = m3.primary,
-                        menuCheckboxAccent = m3.primary,
-                        background = m3.background,
-                        card = m3.surfaceContainer,
-                    ),
+                    colorScheme = couiColors,
+                    typography = CouiTypography(),
                     content = themedContent,
                 )
             } else {
@@ -140,6 +161,18 @@ fun RecorderTheme(
             }
         }
     }
+}
+
+private fun PaletteStyle.toMiuix(): ThemePaletteStyle = when (this) {
+    PaletteStyle.TONAL_SPOT -> ThemePaletteStyle.TonalSpot
+    PaletteStyle.NEUTRAL -> ThemePaletteStyle.Neutral
+    PaletteStyle.VIBRANT -> ThemePaletteStyle.Vibrant
+    PaletteStyle.EXPRESSIVE -> ThemePaletteStyle.Expressive
+    PaletteStyle.RAINBOW -> ThemePaletteStyle.Rainbow
+    PaletteStyle.FRUIT_SALAD -> ThemePaletteStyle.FruitSalad
+    PaletteStyle.MONOCHROME -> ThemePaletteStyle.Monochrome
+    PaletteStyle.FIDELITY -> ThemePaletteStyle.Fidelity
+    PaletteStyle.CONTENT -> ThemePaletteStyle.Content
 }
 
 private fun Colors.toMaterialColors(dark: Boolean): ColorScheme {

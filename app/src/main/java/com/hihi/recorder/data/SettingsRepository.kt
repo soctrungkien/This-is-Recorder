@@ -64,6 +64,12 @@ class SettingsRepository(context: Context) {
     fun setMonetColor(value: Boolean) = update { it.copy(monetColor = value) }
 
     @Synchronized
+    fun setMonetKeyColor(value: Int) = update { it.copy(monetKeyColor = value) }
+
+    @Synchronized
+    fun setMonetPalette(value: PaletteStyle) = update { it.copy(monetPalette = value) }
+
+    @Synchronized
     fun setNavigationBarStyle(value: NavigationBarStyle) = update {
         it.copy(navigationBarStyle = value)
     }
@@ -118,6 +124,8 @@ class SettingsRepository(context: Context) {
             uiStyle = preferences.enumValue(KEY_UI_STYLE, defaults.uiStyle),
             materialSpec = preferences.enumValue(KEY_MATERIAL_SPEC, defaults.materialSpec),
             monetColor = preferences.getBoolean(KEY_MONET, defaults.monetColor),
+            monetKeyColor = preferences.getInt(KEY_MONET_KEY_COLOR, defaults.monetKeyColor),
+            monetPalette = preferences.enumValue(KEY_MONET_PALETTE, defaults.monetPalette),
             navigationBarStyle = preferences.enumValue(
                 KEY_NAVIGATION_BAR_STYLE,
                 defaults.navigationBarStyle,
@@ -154,6 +162,8 @@ class SettingsRepository(context: Context) {
             .putString(KEY_UI_STYLE, settings.uiStyle.name)
             .putString(KEY_MATERIAL_SPEC, settings.materialSpec.name)
             .putBoolean(KEY_MONET, settings.monetColor)
+            .putInt(KEY_MONET_KEY_COLOR, settings.monetKeyColor)
+            .putString(KEY_MONET_PALETTE, settings.monetPalette.name)
             .putString(KEY_NAVIGATION_BAR_STYLE, settings.navigationBarStyle.name)
             .putBoolean(KEY_NAVIGATION_BLUR, settings.navigationBlur)
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
@@ -201,6 +211,8 @@ class SettingsRepository(context: Context) {
         const val KEY_UI_STYLE = "ui_style"
         const val KEY_MATERIAL_SPEC = "material_spec"
         const val KEY_MONET = "monet_color"
+        const val KEY_MONET_KEY_COLOR = "monet_key_color"
+        const val KEY_MONET_PALETTE = "monet_palette"
         const val KEY_NAVIGATION_BAR_STYLE = "navigation_bar_style"
         const val KEY_NAVIGATION_BLUR = "navigation_blur"
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"

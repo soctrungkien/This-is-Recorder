@@ -3,8 +3,6 @@ package com.hihi.recorder
 import android.content.Intent
 import com.acutecoder.crashhandler.CrashHandlerApplication
 import com.acutecoder.crashhandler.util.installCrashHandler
-import com.itos.coui.material3.CouiMaterial3Style
-import com.itos.coui.theme.Coui
 import com.hihi.recorder.ui.CrashActivity
 import com.hihi.recorder.data.RecordingLibrary
 import com.hihi.recorder.data.RecordingStorage
@@ -40,7 +38,8 @@ class RecorderApplication : CrashHandlerApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        Coui.initialize(defaultStyle = CouiMaterial3Style())
+        // COUI components use their native style by default; RecorderTheme
+        // supplies a CouiTheme when the COUI UI style is selected.
         settingsRepository = SettingsRepository(this)
         recordingLibrary = RecordingLibrary(this)
         NotificationHelper.ensureChannels(this)

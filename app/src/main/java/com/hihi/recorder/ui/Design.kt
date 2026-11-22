@@ -365,6 +365,13 @@ fun AppCard(
                 content = content,
             )
         }
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiCardSurface(
+            modifier = modifier,
+            containerColor = containerColor,
+            contentPadding = contentPadding,
+            content = content,
+        )
     } else {
         MaterialCard(
             modifier = modifier.fillMaxWidth(),
@@ -389,6 +396,8 @@ fun AppSectionTitle(text: String, modifier: Modifier = Modifier) {
             text = text,
             modifier = modifier.padding(start = 6.dp, top = 6.dp, bottom = 1.dp),
         )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiSectionTitle(text = text, modifier = modifier)
     } else {
         AppText(
             text = text,
@@ -415,6 +424,8 @@ fun AppDivider(
             thickness = 0.75.dp,
             color = palette.divider,
         )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiDivider(modifier = modifier, horizontalPadding = horizontalPadding)
     } else {
         MaterialHorizontalDivider(
             modifier = dividerModifier,
@@ -472,6 +483,16 @@ fun AppRow(
             onClick = if (enabled && onClick != null) onClick else null,
             holdDownState = false,
             enabled = enabled,
+        )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiRow(
+            title = title,
+            modifier = modifier,
+            summary = summary,
+            enabled = enabled,
+            leadingIcon = leadingIcon,
+            onClick = onClick,
+            trailing = trailing,
         )
     } else {
         Row(
@@ -535,6 +556,13 @@ fun AppSwitch(
             modifier = modifier,
             enabled = enabled,
         )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiSwitchControl(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = modifier,
+            enabled = enabled,
+        )
     } else {
         MaterialSwitch(
             checked = checked,
@@ -555,6 +583,12 @@ fun AppRadioButton(
         MiuixRadioButton(
             selected = selected,
             onClick = null,
+            modifier = modifier,
+            enabled = enabled,
+        )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiRadioControl(
+            selected = selected,
             modifier = modifier,
             enabled = enabled,
         )
@@ -583,6 +617,14 @@ fun AppSwitchRow(
             title = title,
             summary = summary?.takeIf { it.isNotBlank() },
             insideMargin = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
+            enabled = enabled,
+        )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiSwitchRow(
+            title = title,
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            summary = summary,
             enabled = enabled,
         )
     } else {
@@ -628,6 +670,14 @@ fun AppSelectRow(
                     overflow = TextOverflow.Ellipsis,
                 )
             },
+        )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiSelectRow(
+            title = title,
+            value = value,
+            summary = summary,
+            enabled = enabled,
+            onClick = onClick,
         )
     } else {
         AppRow(
@@ -696,6 +746,15 @@ fun AppButton(
             }
             MiuixText(text = text, fontWeight = FontWeight.SemiBold)
         }
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiButton(
+            text = text,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            destructive = destructive,
+            loading = loading,
+        )
     } else {
         androidx.compose.material3.Button(
             onClick = onClick,
@@ -751,6 +810,15 @@ fun AppTextButton(
                 primary -> MiuixButtonDefaults.textButtonColorsPrimary()
                 else -> MiuixButtonDefaults.textButtonColors()
             },
+        )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiTextButton(
+            text = text,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            primary = primary,
+            destructive = destructive,
         )
     } else {
         MaterialTextButton(
@@ -815,6 +883,15 @@ fun AppIconButton(
         } else {
             button()
         }
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiIconButton(
+            icon = icon,
+            contentDescription = contentDescription,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            tint = tint,
+        )
     } else {
         MaterialIconButton(
             onClick = onClick,
@@ -877,6 +954,15 @@ fun AppTextField(
             useLabelAsPlaceholder = true,
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        )
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier,
+            placeholder = placeholder,
+            singleLine = singleLine,
+            keyboardType = keyboardType,
         )
     } else {
         OutlinedTextField(
@@ -945,6 +1031,14 @@ fun AppDialog(
                 )
             }
         }
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiDialog(
+            title = title,
+            message = message,
+            onDismissRequest = onDismissRequest,
+            buttons = buttons,
+            content = content,
+        )
     } else {
         Dialog(
             onDismissRequest = onDismissRequest,
@@ -1148,7 +1242,15 @@ fun <T> AppSegmentedControl(
     enabled: Boolean = true,
 ) {
     val palette = appPalette()
-    if (LocalUiStyle.current == UiStyle.MIUIX && options.isNotEmpty()) {
+    if (LocalUiStyle.current == UiStyle.COUI && options.isNotEmpty()) {
+        CouiSegmented(
+            labels = options.map { it.second },
+            selectedIndex = options.indexOfFirst { it.first == selected }.coerceAtLeast(0),
+            onSelected = { onSelect(options[it].first) },
+            modifier = modifier,
+            enabled = enabled,
+        )
+    } else if (LocalUiStyle.current == UiStyle.MIUIX && options.isNotEmpty()) {
         val selectedIndex = options.indexOfFirst { it.first == selected }.coerceAtLeast(0)
         MiuixTabRow(
             tabs = options.map { it.second },
@@ -1305,34 +1407,43 @@ fun AppScaffold(
             modifier = modifier,
             topBar = {
                 Box(modifier = topBarModifier.fillMaxWidth()) {
-                    TopAppBar(
-                        title = {
-                            Column {
-                                AppText(
-                                    text = title,
-                                    style = AppTextStyle.Title,
-                                    color = palette.onSurface,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                AppText(
-                                    text = subtitle,
-                                    style = AppTextStyle.Footnote,
-                                    color = palette.onSurfaceVariant,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                        },
-                        navigationIcon = navigationIcon ?: {},
-                        actions = actions,
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = topBarColor,
-                            scrolledContainerColor = topBarColor,
-                            titleContentColor = palette.onSurface,
-                            actionIconContentColor = palette.onSurface,
-                        ),
-                    )
+                    if (LocalUiStyle.current == UiStyle.COUI) {
+                        CouiTopBar(
+                            title = title,
+                            subtitle = subtitle,
+                            navigationIcon = navigationIcon,
+                            actions = actions,
+                        )
+                    } else {
+                        TopAppBar(
+                            title = {
+                                Column {
+                                    AppText(
+                                        text = title,
+                                        style = AppTextStyle.Title,
+                                        color = palette.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                    AppText(
+                                        text = subtitle,
+                                        style = AppTextStyle.Footnote,
+                                        color = palette.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
+                            },
+                            navigationIcon = navigationIcon ?: {},
+                            actions = actions,
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = topBarColor,
+                                scrolledContainerColor = topBarColor,
+                                titleContentColor = palette.onSurface,
+                                actionIconContentColor = palette.onSurface,
+                            ),
+                        )
+                    }
                 }
             },
             snackbarHost = snackbarHost,
@@ -1418,6 +1529,14 @@ fun AppNavigationBar(
                 )
             }
         }
+    } else if (LocalUiStyle.current == UiStyle.COUI) {
+        CouiNavigationBar(
+            items = items,
+            selectedIndex = selectedIndex,
+            onSelect = onSelect,
+            selectedLabelsOnly = selectedLabelsOnly,
+            modifier = barModifier,
+        )
     } else {
         // Material 3's defaults map selected content onto secondaryContainer,
         // which is too low-contrast after the Miuix-to-Material colour mapping.
