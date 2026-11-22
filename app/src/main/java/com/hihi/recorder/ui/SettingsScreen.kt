@@ -192,47 +192,38 @@ fun SettingsScreen(
                 }
             }
             item {
+                val liquidGlass = settings.toggleStyle == ToggleStyle.LIQUID &&
+                    settings.navigationBarStyle == NavigationBarStyle.LIQUID_IOS
                 AppCard(contentPadding = PaddingValues(14.dp)) {
                     AppText(
-                        text = stringResource(R.string.pref_navigation_bar),
+                        text = stringResource(R.string.pref_liquid_glass),
                         style = AppTextStyle.Subtitle,
                     )
                     Spacer(Modifier.height(3.dp))
                     AppText(
-                        text = stringResource(R.string.pref_navigation_bar_summary),
+                        text = stringResource(R.string.pref_liquid_glass_summary),
                         style = AppTextStyle.Footnote,
                         color = palette.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(10.dp))
                     AppSegmentedControl(
                         options = listOf(
-                            NavigationBarStyle.MONET to stringResource(R.string.navigation_bar_monet),
-                            NavigationBarStyle.LIQUID_IOS to stringResource(R.string.navigation_bar_liquid),
+                            false to stringResource(R.string.liquid_off),
+                            true to stringResource(R.string.liquid_on),
                         ),
-                        selected = settings.navigationBarStyle,
-                        onSelect = { onSettingsChange(settings.copy(navigationBarStyle = it)) },
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    AppDivider()
-                    Spacer(Modifier.height(16.dp))
-                    AppText(
-                        text = stringResource(R.string.pref_toggle_style),
-                        style = AppTextStyle.Subtitle,
-                    )
-                    Spacer(Modifier.height(3.dp))
-                    AppText(
-                        text = stringResource(R.string.pref_toggle_style_summary),
-                        style = AppTextStyle.Footnote,
-                        color = palette.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    AppSegmentedControl(
-                        options = listOf(
-                            ToggleStyle.UI to stringResource(R.string.toggle_style_ui),
-                            ToggleStyle.LIQUID to stringResource(R.string.toggle_style_liquid),
-                        ),
-                        selected = settings.toggleStyle,
-                        onSelect = { onSettingsChange(settings.copy(toggleStyle = it)) },
+                        selected = liquidGlass,
+                        onSelect = { enabled ->
+                            onSettingsChange(
+                                settings.copy(
+                                    toggleStyle = if (enabled) ToggleStyle.LIQUID else ToggleStyle.UI,
+                                    navigationBarStyle = if (enabled) {
+                                        NavigationBarStyle.LIQUID_IOS
+                                    } else {
+                                        NavigationBarStyle.MONET
+                                    },
+                                ),
+                            )
+                        },
                     )
                 }
             }

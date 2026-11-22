@@ -137,6 +137,10 @@
     <string name="icon_style_lucide">Lucide</string>
     <string name="icon_style_material">Material 3</string>
     <string name="icon_style_solar">Solar</string>
+    <string name="pref_liquid_glass">Liquid Glass</string>
+    <string name="pref_liquid_glass_summary">Toggle switches, slider and navigation bar</string>
+    <string name="liquid_off">Off</string>
+    <string name="liquid_on">On</string>
     <string name="pref_material_spec">Color specification</string>
     <string name="pref_material_spec_summary">2021 uses classic Material You. 2025 uses the updated tonal palette.</string>
     <string name="material_spec_2021">2021</string>

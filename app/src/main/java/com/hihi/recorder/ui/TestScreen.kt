@@ -3,6 +3,12 @@ package com.hihi.recorder.ui
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +41,10 @@ import com.itos.coui.checkbox.Checkbox as CouiCheckbox
 import com.itos.coui.radiobutton.RadioButton as CouiRadioButton
 import com.itos.coui.segmentbutton.SegmentedControl as CouiSegmentedControl
 import com.itos.coui.slider.Slider as CouiSlider
+import com.itos.coui.icons.CouiIcons
 import com.itos.coui.switch.Switch as CouiSwitch
+import compose.icons.LucideIcons
+import compose.icons.lucideicons.House as LucideHouse
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import kotlinx.coroutines.launch
@@ -45,6 +54,7 @@ import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.icon.extended.File
 import top.yukonga.miuix.kmp.icon.extended.Info
 import top.yukonga.miuix.kmp.icon.extended.Refresh
+import top.yukonga.miuix.kmp.icon.extended.ScreenCapture
 import kotlin.system.exitProcess
 
 /** Easter-egg screen: every local component and dialog in one place. */
@@ -69,6 +79,9 @@ fun TestScreen(
     var couiRadio by remember { mutableStateOf(true) }
     var couiSegment by remember { mutableIntStateOf(0) }
     var demoSlider by remember { mutableStateOf(0.5f) }
+    var demoInput by remember { mutableStateOf("") }
+    var demoCheck by remember { mutableStateOf(false) }
+    var demoRadio by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
     val palette = appPalette()
     val message = stringResource(R.string.showcase_dialog_message)
@@ -292,6 +305,77 @@ fun TestScreen(
                                             .clip(RoundedCornerShape(12.dp))
                                             .background(color),
                                     )
+                                    Spacer(Modifier.height(4.dp))
+                                    AppText(name, style = AppTextStyle.Footnote)
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(10.dp))
+                    }
+                }
+            }
+
+            item { AppSectionTitle("Input") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    OutlinedTextField(
+                        value = demoInput,
+                        onValueChange = { demoInput = it },
+                        label = { AppText("Demo text field") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            item { AppSectionTitle("Selection") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = demoCheck, onCheckedChange = { demoCheck = it })
+                        AppText("Checkbox: $demoCheck", style = AppTextStyle.SmallBody)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(selected = demoRadio == 0, onClick = { demoRadio = 0 })
+                        AppText("Option A", style = AppTextStyle.SmallBody)
+                        Spacer(Modifier.width(16.dp))
+                        RadioButton(selected = demoRadio == 1, onClick = { demoRadio = 1 })
+                        AppText("Option B", style = AppTextStyle.SmallBody)
+                    }
+                }
+            }
+
+            item { AppSectionTitle("Progress") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    LinearProgressIndicator(
+                        progress = { demoSlider },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+            }
+
+            item { AppSectionTitle("Icon packs") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    val icons = listOf(
+                        "Miuix" to MiuixIcons.ScreenCapture,
+                        "COUI" to CouiIcons.Outlined.Camera,
+                        "Lucide" to LucideIcons.LucideHouse,
+                        "Material" to Icons.Filled.Home,
+                        "Solar" to com.hihi.recorder.ui.icons.SolarIcons.Home,
+                    )
+                    icons.chunked(3).forEach { row ->
+                        Row(Modifier.fillMaxWidth()) {
+                            row.forEach { (name, icon) ->
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    AppIcon(icon = icon, contentDescription = name)
                                     Spacer(Modifier.height(4.dp))
                                     AppText(name, style = AppTextStyle.Footnote)
                                 }

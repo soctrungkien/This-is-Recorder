@@ -27,6 +27,7 @@ import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
+import com.itos.coui.theme.CouiTheme
 import com.itos.coui.theme.LocalCouiDarkTheme
 import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 import top.yukonga.miuix.kmp.theme.Colors
@@ -101,12 +102,21 @@ fun RecorderTheme(
                 Typography()
             },
         ) {
-            CompositionLocalProvider(
-                LocalUiStyle provides settings.uiStyle,
-                LocalMaterialSpec provides specification,
-                LocalCouiDarkTheme provides dark,
-                content = content,
-            )
+            val themedContent: @Composable () -> Unit = {
+                CompositionLocalProvider(
+                    LocalUiStyle provides settings.uiStyle,
+                    LocalMaterialSpec provides specification,
+                    LocalCouiDarkTheme provides dark,
+                    content = content,
+                )
+            }
+            // COUI must render with its native palette/typography. The global
+            // CouiMaterial3Style only applies when no local CouiTheme exists.
+            if (settings.uiStyle == UiStyle.COUI) {
+                CouiTheme(darkTheme = dark, content = themedContent)
+            } else {
+                themedContent()
+            }
         }
     }
 }

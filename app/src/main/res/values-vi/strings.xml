@@ -137,6 +137,10 @@
     <string name="icon_style_lucide">Lucide</string>
     <string name="icon_style_material">Material 3</string>
     <string name="icon_style_solar">Solar</string>
+    <string name="pref_liquid_glass">Liquid Glass</string>
+    <string name="pref_liquid_glass_summary">Bật tắt công tắc, thanh kéo và thanh điều hướng</string>
+    <string name="liquid_off">Tắt</string>
+    <string name="liquid_on">Bật</string>
     <string name="pref_material_spec">Chuẩn màu</string>
     <string name="pref_material_spec_summary">2021 dùng Material You cổ điển. 2025 dùng bảng màu mới hơn.</string>
     <string name="material_spec_2021">2021</string>
