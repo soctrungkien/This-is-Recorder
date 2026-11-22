@@ -142,6 +142,12 @@ private sealed interface AppRoute : NavKey {
 
     @Serializable
     data object Showcase : AppRoute
+
+    @Serializable
+    data object Licenses : AppRoute
+
+    @Serializable
+    data class LicenseDetail(val file: String, val titleRes: Int) : AppRoute
 }
 
 private val AppRoute.tabIndex: Int
@@ -153,7 +159,9 @@ private val AppRoute.tabIndex: Int
         AppRoute.MitLicense,
         AppRoute.ApacheLicense,
         AppRoute.ShizukuLicense,
-        AppRoute.Showcase -> 2
+        AppRoute.Showcase,
+        AppRoute.Licenses,
+        is AppRoute.LicenseDetail -> 2
     }
 
 private fun appRouteAt(index: Int): AppRoute = when (index) {
@@ -560,6 +568,11 @@ fun RecorderApp(
                                     backStack.add(AppRoute.Showcase)
                                 }
                             },
+                            onOpenLicenses = {
+                                if (backStack.lastOrNull() != AppRoute.Licenses) {
+                                    backStack.add(AppRoute.Licenses)
+                                }
+                            },
                         )
                     }
 
@@ -599,6 +612,29 @@ fun RecorderApp(
                         LicensePage(
                             kind = LicenseKind.SHIZUKU,
                             snackbarHostState = snackbarHostState,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.Licenses>(swipeDismiss = swipeDismiss) {
+                        LicenseListPage(
+                            snackbarHostState = snackbarHostState,
+                            onBack = {
+                                if (backStack.size > 1) backStack.removeLastOrNull()
+                            },
+                            onOpen = { entry ->
+                                backStack.add(
+                                    AppRoute.LicenseDetail(entry.file, entry.titleRes),
+                                )
+                            },
+                        )
+                    }
+
+                    entry<AppRoute.LicenseDetail>(swipeDismiss = swipeDismiss) { route ->
+                        AssetLicensePage(
+                            asset = LicenseAsset(route.file, route.titleRes),
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()
                             },

@@ -367,4 +367,17 @@
     <string name="about_coui_summary">© ItosEO · MPL-2.0 · ColorOS 17 style UI components</string>
     <string name="about_icon_packs">Icon packs</string>
     <string name="about_icon_packs_summary">Lucide (ISC), Solar (MIT) and Material Icons (Apache-2.0)</string>
+    <string name="licenses_title">Open-source licenses</string>
+    <string name="licenses_subtitle">Bundled license texts</string>
+    <string name="license_app">This is Recorder — MIT</string>
+    <string name="license_miuix">Miuix — Apache-2.0</string>
+    <string name="license_zeroui">ZeroUI — Apache-2.0</string>
+    <string name="license_kyant">AndroidLiquidGlass — Apache-2.0</string>
+    <string name="license_markdown">multiplatform-markdown-renderer — Apache-2.0</string>
+    <string name="license_crashhandler">CrashHandler — GPL-3.0</string>
+    <string name="license_coui">COUI-Kit — MPL-2.0</string>
+    <string name="license_lucide">Lucide — ISC</string>
+    <string name="license_solar">Solar icons — CC BY 4.0</string>
+    <string name="license_material_icons">Material Icons — Apache-2.0</string>
+    <string name="license_shizuku">Shizuku API — MIT</string>
 </resources>

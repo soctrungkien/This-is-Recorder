@@ -165,7 +165,7 @@ app/src/main/java/com/hihi/recorder/
 - Shizuku API: MIT, bản quyền © 2021 RikkaW.
 - CrashHandler: GPL-3.0, bản quyền © 2024 Bhuvaneshwaran.
 - COUI-Kit: MPL-2.0, bản quyền © ItosEO.
-- Toàn văn MIT của ứng dụng, MIT của Shizuku và Apache-2.0 có thể xem ngay trong ứng dụng tại **Giới thiệu → Giấy phép**.
+- Toàn văn giấy phép của ứng dụng và các dependency (MIT, Apache-2.0, GPL-3.0, MPL-2.0, ISC, CC BY 4.0) được đóng gói trong `assets/licenses/` và có thể mở ngay trong ứng dụng tại **Giới thiệu → Giấy phép mã nguồn mở**.
 
 ## Ghi chú kỹ thuật
 

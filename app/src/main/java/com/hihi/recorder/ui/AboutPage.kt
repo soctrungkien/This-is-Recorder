@@ -89,6 +89,7 @@ fun AboutPage(
     onOpenMitLicense: () -> Unit,
     onOpenApacheLicense: () -> Unit,
     onOpenShizukuLicense: () -> Unit,
+    onOpenLicenses: () -> Unit,
     onOpenShowcase: () -> Unit,
 ) {
     val palette = appPalette()
@@ -338,6 +339,13 @@ fun AboutPage(
                             summary = stringResource(R.string.about_shizuku_summary),
                             leadingIcon = MiuixIcons.Info,
                             onClick = onOpenShizukuLicense,
+                        )
+                        AppDivider()
+                        AppRow(
+                            title = stringResource(R.string.licenses_title),
+                            summary = stringResource(R.string.licenses_subtitle),
+                            leadingIcon = MiuixIcons.File,
+                            onClick = onOpenLicenses,
                         )
                         AppDivider()
                         AppRow(
