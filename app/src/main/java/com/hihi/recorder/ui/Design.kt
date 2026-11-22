@@ -1315,8 +1315,25 @@ fun AppNavigationBar(
     onSelect: (Int) -> Unit,
     selectedLabelsOnly: Boolean,
     modifier: Modifier = Modifier,
+    backdrop: LayerBackdrop? = null,
 ) {
     val palette = appPalette()
+    val barModifier = if (backdrop != null) {
+        modifier.textureBlur(
+            backdrop = backdrop,
+            shape = RectangleShape,
+            blurRadius = 40f,
+            colors = BlurDefaults.blurColors(
+                blendColors = listOf(
+                    BlendColorEntry(
+                        palette.surface.copy(alpha = if (palette.isDark) 0.5f else 0.6f),
+                    ),
+                ),
+            ),
+        )
+    } else {
+        modifier
+    }
     if (LocalUiStyle.current == UiStyle.MIUIX) {
         // Documented Miuix colour recipe: on-surface content for unselected
         // items (the component applies its own secondary opacity) and the theme
@@ -1326,7 +1343,7 @@ fun AppNavigationBar(
             selectedContentColor = MiuixTheme.colorScheme.primary,
         )
         MiuixNavigationBar(
-            modifier = modifier.fillMaxWidth(),
+            modifier = barModifier.fillMaxWidth(),
             mode = if (selectedLabelsOnly) {
                 NavigationBarDisplayMode.IconWithSelectedLabel
             } else {
@@ -1365,8 +1382,8 @@ fun AppNavigationBar(
             unselectedTextColor = palette.onSurfaceVariant,
         )
         MaterialNavigationBar(
-            modifier = modifier.fillMaxWidth(),
-            containerColor = palette.surface,
+            modifier = barModifier.fillMaxWidth(),
+            containerColor = if (backdrop != null) Color.Transparent else palette.surface,
             contentColor = palette.onSurface,
             tonalElevation = 0.dp,
         ) {

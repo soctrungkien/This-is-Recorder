@@ -50,7 +50,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -68,6 +73,13 @@ import com.hihi.recorder.data.RecordingState
 import com.hihi.recorder.data.SavedRecording
 import com.hihi.recorder.data.ShellBackend
 import com.hihi.recorder.data.ToggleStyle
+import com.hihi.recorder.data.IconStyle
+import com.hihi.recorder.ui.icons.SolarIcons
+import com.itos.coui.icons.CouiIcons
+import compose.icons.LucideIcons
+import compose.icons.lucideicons.House
+import compose.icons.lucideicons.Settings
+import compose.icons.lucideicons.Video
 import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.net.UpdateChecker
 import com.hihi.recorder.net.UpdateFailure
@@ -285,16 +297,16 @@ fun RecorderApp(
     val navItems = listOf(
         AppNavItem(
             label = stringResource(R.string.nav_record),
-            icon = MiuixIcons.ScreenCapture,
+            icon = navIconFor(settings.iconStyle, 0),
         ),
         AppNavItem(
             label = stringResource(R.string.nav_videos),
-            icon = MiuixIcons.Album,
+            icon = navIconFor(settings.iconStyle, 1),
             badgeCount = recordings.size,
         ),
         AppNavItem(
             label = stringResource(R.string.nav_settings),
-            icon = MiuixIcons.Settings,
+            icon = navIconFor(settings.iconStyle, 2),
         ),
     )
     val selectTab: (Int) -> Unit = { index ->
@@ -633,6 +645,7 @@ fun RecorderApp(
                     onSelect = selectTab,
                     selectedLabelsOnly = settings.navigationIosLabels,
                     modifier = Modifier.fillMaxWidth(),
+                    backdrop = surfaceBackdrop,
                 )
             }
         }
@@ -846,6 +859,36 @@ fun RecorderApp(
                 }
             }
         }
+    }
+}
+
+/** Returns the navigation icon from the selected icon pack. */
+@Composable
+private fun navIconFor(style: IconStyle, index: Int): ImageVector = when (style) {
+    IconStyle.MIUIX -> when (index) {
+        0 -> MiuixIcons.ScreenCapture
+        1 -> MiuixIcons.Album
+        else -> MiuixIcons.Settings
+    }
+    IconStyle.COUI -> when (index) {
+        0 -> CouiIcons.Outlined.Camera
+        1 -> CouiIcons.Outlined.Album
+        else -> CouiIcons.Outlined.Setting
+    }
+    IconStyle.LUCIDE -> when (index) {
+        0 -> LucideIcons.House
+        1 -> LucideIcons.Video
+        else -> LucideIcons.Settings
+    }
+    IconStyle.MATERIAL -> when (index) {
+        0 -> Icons.Filled.Home
+        1 -> Icons.Filled.VideoLibrary
+        else -> Icons.Filled.Settings
+    }
+    IconStyle.SOLAR -> when (index) {
+        0 -> SolarIcons.Home
+        1 -> SolarIcons.Videos
+        else -> SolarIcons.Settings
     }
 }
 

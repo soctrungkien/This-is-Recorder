@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.BuildConfig
 import com.hihi.recorder.R
+import com.hihi.recorder.data.IconStyle
 import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.NavigationBarStyle
 import com.hihi.recorder.data.RecorderSettings
@@ -48,6 +49,7 @@ import top.yukonga.miuix.kmp.icon.extended.Send
 
 private enum class SettingsPicker {
     THEME,
+    ICON_STYLE,
 }
 
 /** Switch row that follows the user's Toggle style preference. */
@@ -148,6 +150,20 @@ fun SettingsScreen(
                         title = stringResource(R.string.pref_theme),
                         value = settings.theme.label(),
                         onClick = { picker = SettingsPicker.THEME },
+                    )
+                    AppDivider()
+                    AppSelectRow(
+                        title = stringResource(R.string.pref_icon_style),
+                        value = stringResource(
+                            when (settings.iconStyle) {
+                                IconStyle.MIUIX -> R.string.icon_style_miuix
+                                IconStyle.COUI -> R.string.icon_style_coui
+                                IconStyle.LUCIDE -> R.string.icon_style_lucide
+                                IconStyle.MATERIAL -> R.string.icon_style_material
+                                IconStyle.SOLAR -> R.string.icon_style_solar
+                            },
+                        ),
+                        onClick = { picker = SettingsPicker.ICON_STYLE },
                     )
                 }
             }
@@ -374,6 +390,27 @@ fun SettingsScreen(
             },
             selected = settings.theme,
             onSelect = { value -> onSettingsChange(settings.copy(theme = value)) },
+            onDismissRequest = { picker = null },
+        )
+
+        SettingsPicker.ICON_STYLE -> AppSelectDialog(
+            title = stringResource(R.string.pref_icon_style),
+            options = IconStyle.entries.map { value ->
+                SelectOption(
+                    value,
+                    stringResource(
+                        when (value) {
+                            IconStyle.MIUIX -> R.string.icon_style_miuix
+                            IconStyle.COUI -> R.string.icon_style_coui
+                            IconStyle.LUCIDE -> R.string.icon_style_lucide
+                            IconStyle.MATERIAL -> R.string.icon_style_material
+                            IconStyle.SOLAR -> R.string.icon_style_solar
+                        },
+                    ),
+                )
+            },
+            selected = settings.iconStyle,
+            onSelect = { value -> onSettingsChange(settings.copy(iconStyle = value)) },
             onDismissRequest = { picker = null },
         )
 

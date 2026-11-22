@@ -122,6 +122,15 @@ enum class ToggleStyle {
     LIQUID,
 }
 
+/** Icon pack available for the bottom navigation. */
+enum class IconStyle {
+    MIUIX,
+    COUI,
+    LUCIDE,
+    MATERIAL,
+    SOLAR,
+}
+
 /**
  * Immutable snapshot of all user preferences. The recording service takes a
  * snapshot when a session starts, so changing a switch while recording cannot
@@ -149,6 +158,8 @@ data class RecorderSettings(
     val saveFolder: String = DEFAULT_SAVE_FOLDER,
     /** Component family used for every switch in the settings UI. */
     val toggleStyle: ToggleStyle = ToggleStyle.LIQUID,
+    /** Icon set used by the bottom navigation. */
+    val iconStyle: IconStyle = IconStyle.MIUIX,
 ) {
     val usesAudio: Boolean get() = audioSource != AudioSource.NONE
 

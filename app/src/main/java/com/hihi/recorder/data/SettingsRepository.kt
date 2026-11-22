@@ -80,6 +80,9 @@ class SettingsRepository(context: Context) {
     @Synchronized
     fun setToggleStyle(value: ToggleStyle) = update { it.copy(toggleStyle = value) }
 
+    @Synchronized
+    fun setIconStyle(value: IconStyle) = update { it.copy(iconStyle = value) }
+
     /**
      * Android 13+ notification permission is optional. Remember that we asked
      * once so the permission dialog does not appear before every recording.
@@ -131,6 +134,7 @@ class SettingsRepository(context: Context) {
                 ?.let(::normalizeSaveFolder)
                 ?: defaults.saveFolder,
             toggleStyle = preferences.enumValue(KEY_TOGGLE_STYLE, defaults.toggleStyle),
+            iconStyle = preferences.enumValue(KEY_ICON_STYLE, defaults.iconStyle),
         )
     }
 
@@ -155,6 +159,7 @@ class SettingsRepository(context: Context) {
             .putBoolean(KEY_NAVIGATION_IOS_LABELS, settings.navigationIosLabels)
             .putString(KEY_SAVE_FOLDER, normalizeSaveFolder(settings.saveFolder))
             .putString(KEY_TOGGLE_STYLE, settings.toggleStyle.name)
+            .putString(KEY_ICON_STYLE, settings.iconStyle.name)
             .apply()
     }
 
@@ -201,6 +206,7 @@ class SettingsRepository(context: Context) {
         const val KEY_NAVIGATION_IOS_LABELS = "navigation_ios_labels"
         const val KEY_SAVE_FOLDER = "save_folder"
         const val KEY_TOGGLE_STYLE = "toggle_style"
+        const val KEY_ICON_STYLE = "icon_style"
         const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
     }
 }

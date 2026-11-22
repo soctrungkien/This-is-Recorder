@@ -131,6 +131,12 @@
     <string name="ui_style_miuix">Miuix</string>
     <string name="ui_style_material">Material 3</string>
     <string name="ui_style_coui">COUI</string>
+    <string name="pref_icon_style">Icon style</string>
+    <string name="icon_style_miuix">Miuix</string>
+    <string name="icon_style_coui">COUI</string>
+    <string name="icon_style_lucide">Lucide</string>
+    <string name="icon_style_material">Material 3</string>
+    <string name="icon_style_solar">Solar</string>
     <string name="pref_material_spec">Color specification</string>
     <string name="pref_material_spec_summary">2021 uses classic Material You. 2025 uses the updated tonal palette.</string>
     <string name="material_spec_2021">2021</string>
@@ -359,4 +365,6 @@
     <string name="about_crash_handler_summary">© 2024 Bhuvaneshwaran · GPL-3.0 · Crash log capture</string>
     <string name="about_coui">COUI-Kit</string>
     <string name="about_coui_summary">© ItosEO · MPL-2.0 · ColorOS 17 style UI components</string>
+    <string name="about_icon_packs">Icon packs</string>
+    <string name="about_icon_packs_summary">Lucide (ISC), Solar (MIT) and Material Icons (Apache-2.0)</string>
 </resources>

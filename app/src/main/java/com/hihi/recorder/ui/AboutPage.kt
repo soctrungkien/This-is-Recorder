@@ -299,6 +299,13 @@ fun AboutPage(
                         )
                         AppDivider()
                         AppRow(
+                            title = stringResource(R.string.about_icon_packs),
+                            summary = stringResource(R.string.about_icon_packs_summary),
+                            leadingIcon = MiuixIcons.Info,
+                            onClick = { onOpenUrl("https://lucide.dev/") },
+                        )
+                        AppDivider()
+                        AppRow(
                             title = stringResource(R.string.about_framework),
                             summary = stringResource(R.string.about_framework_summary),
                             leadingIcon = MiuixIcons.Theme,

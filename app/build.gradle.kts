@@ -135,6 +135,10 @@ dependencies {
     // Optional Material 3 presentation for people who prefer stock Android.
     implementation("androidx.compose.material3:material3:1.4.0")
 
+    // Icon packs selectable in settings.
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("io.github.ardasoyturk.compose.icons:lucide-android:2.0.7")
+
     // COUI (ColorOS 17 style) as an alternative UI language.
     val couiVersion = "0.0.1-alpha14"
     implementation("io.github.itoseo:coui-material3:$couiVersion")
