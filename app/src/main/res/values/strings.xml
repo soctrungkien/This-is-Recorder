@@ -71,7 +71,7 @@
     <string name="about_liquid_glass">Liquid Glass components</string>
     <string name="about_liquid_glass_summary">© 2025 Kyant · Apache-2.0 · Liquid glass components</string>
     <string name="about_zeroui">ZeroUI</string>
-    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid toggle component</string>
+    <string name="about_zeroui_summary">© ZeroUI contributors · Apache-2.0 · Liquid toggle and slider components</string>
     <string name="about_framework">Jetpack Compose</string>
     <string name="about_framework_summary">© The Android Open Source Project · Apache-2.0</string>
     <string name="about_material3">Material 3</string>
