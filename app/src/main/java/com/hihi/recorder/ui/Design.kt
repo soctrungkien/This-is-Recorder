@@ -254,6 +254,7 @@ fun AppText(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
+    val resolvedColor = if (color.isSpecified) color else appPalette().onSurface
     if (LocalUiStyle.current == UiStyle.COUI) {
         val coui = com.itos.coui.theme.CouiTheme.typography
         val base = when (style) {
@@ -271,11 +272,7 @@ fun AppText(
             text = text,
             modifier = modifier,
             style = base.copy(
-                color = if (color.isSpecified) {
-                    color
-                } else {
-                    com.itos.coui.theme.CouiTheme.colorScheme.onSurface
-                },
+                color = resolvedColor,
                 fontWeight = fontWeight ?: base.fontWeight,
                 textAlign = textAlign ?: TextAlign.Start,
             ),
@@ -299,7 +296,7 @@ fun AppText(
         MiuixText(
             text = text,
             modifier = modifier,
-            color = color,
+            color = resolvedColor,
             style = miuixStyle,
             fontWeight = fontWeight,
             textAlign = textAlign,
@@ -321,7 +318,7 @@ fun AppText(
         MaterialText(
             text = text,
             modifier = modifier,
-            color = color,
+            color = resolvedColor,
             style = materialStyle,
             fontWeight = fontWeight,
             textAlign = textAlign,

@@ -113,7 +113,28 @@ fun RecorderTheme(
             // COUI must render with its native palette/typography. The global
             // CouiMaterial3Style only applies when no local CouiTheme exists.
             if (settings.uiStyle == UiStyle.COUI) {
-                CouiTheme(darkTheme = dark, content = themedContent)
+                // Keep Monet dynamic colors: feed the host M3 palette into the
+                // native COUI theme instead of using COUI's static blue preset.
+                val m3 = MaterialTheme.colorScheme
+                CouiTheme(
+                    darkTheme = dark,
+                    colorScheme = com.itos.coui.theme.CouiColorScheme(
+                        accent = m3.primary,
+                        onAccent = m3.onPrimary,
+                        surface = m3.surface,
+                        container = m3.surfaceContainer,
+                        onSurface = m3.onSurface,
+                        onSurfaceVariant = m3.onSurfaceVariant,
+                        outlineVariant = m3.outlineVariant,
+                        accentOnSurface = m3.primary,
+                        menuSurface = m3.surfaceContainerHigh,
+                        checkboxAccent = m3.primary,
+                        menuCheckboxAccent = m3.primary,
+                        background = m3.background,
+                        card = m3.surfaceContainer,
+                    ),
+                    content = themedContent,
+                )
             } else {
                 themedContent()
             }

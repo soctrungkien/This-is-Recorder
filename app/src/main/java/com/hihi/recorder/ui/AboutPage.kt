@@ -3,6 +3,8 @@
 package com.hihi.recorder.ui
 
 import android.os.SystemClock
+import android.widget.Toast
+import kotlin.random.Random
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -105,10 +108,13 @@ fun AboutPage(
     // Easter egg: five taps on the app logo open the component showcase.
     var logoTaps by remember { mutableIntStateOf(0) }
     var lastLogoTap by remember { mutableLongStateOf(0L) }
+    val context = LocalContext.current
     val onLogoTap = {
         val now = SystemClock.elapsedRealtime()
         logoTaps = if (now - lastLogoTap <= 2_000L) logoTaps + 1 else 1
         lastLogoTap = now
+        val random = (1..10).map { ('a'.code + Random.nextInt(26)).toChar() }.joinToString("")
+        Toast.makeText(context, random.toMorse(), Toast.LENGTH_SHORT).show()
         if (logoTaps >= 5) {
             logoTaps = 0
             onOpenShowcase()
@@ -393,6 +399,17 @@ fun AboutPage(
         }
     }
 }
+
+private val MorseCodes = mapOf(
+    'a' to ".-", 'b' to "-...", 'c' to "-.-.", 'd' to "-..", 'e' to ".",
+    'f' to "..-.", 'g' to "--.", 'h' to "....", 'i' to "..", 'j' to ".---",
+    'k' to "-.-", 'l' to ".-..", 'm' to "--", 'n' to "-.", 'o' to "---",
+    'p' to ".--.", 'q' to "--.-", 'r' to ".-.", 's' to "...", 't' to "-",
+    'u' to "..-", 'v' to "...-", 'w' to ".--", 'x' to "-..-", 'y' to "-.--",
+    'z' to "--..",
+)
+
+private fun String.toMorse(): String = map { MorseCodes[it] ?: "" }.joinToString(" ")
 
 @Composable
 private fun AboutHero(onLogoTap: () -> Unit) {
