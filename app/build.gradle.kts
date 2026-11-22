@@ -28,7 +28,7 @@ android {
             minorApiLevel = 2
         }
     }
-    buildToolsVersion = "36.0.0"
+    buildToolsVersion = "37.0.0"
 
     defaultConfig {
         applicationId = "com.hihi.recorder"
