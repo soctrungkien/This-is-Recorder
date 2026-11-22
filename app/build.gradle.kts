@@ -32,7 +32,7 @@ android {
 
     defaultConfig {
         applicationId = "com.hihi.recorder"
-        minSdk = 31
+        minSdk = 34
         targetSdk = 37
         versionCode = 3
         versionName = "1.2.0"
