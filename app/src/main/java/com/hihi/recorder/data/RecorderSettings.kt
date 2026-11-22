@@ -95,6 +95,7 @@ enum class RecorderTheme {
 enum class UiStyle {
     MIUIX,
     MATERIAL,
+    COUI,
 }
 
 /** Material 3 color/token generation used for Monet and Material components. */

@@ -120,6 +120,7 @@ fun UiStyle.label(): String = stringResource(
     when (this) {
         UiStyle.MIUIX -> R.string.ui_style_miuix
         UiStyle.MATERIAL -> R.string.ui_style_material
+        UiStyle.COUI -> R.string.ui_style_coui
     },
 )
 

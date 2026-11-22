@@ -292,6 +292,13 @@ fun AboutPage(
                         )
                         AppDivider()
                         AppRow(
+                            title = stringResource(R.string.about_coui),
+                            summary = stringResource(R.string.about_coui_summary),
+                            leadingIcon = MiuixIcons.Theme,
+                            onClick = { onOpenUrl("https://github.com/ItosEO/COUI-Kit") },
+                        )
+                        AppDivider()
+                        AppRow(
                             title = stringResource(R.string.about_framework),
                             summary = stringResource(R.string.about_framework_summary),
                             leadingIcon = MiuixIcons.Theme,

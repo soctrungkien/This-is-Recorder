@@ -148,6 +148,7 @@ app/src/main/java/com/hihi/recorder/
 - **[AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass)** — © 2025 Kyant, giấy phép Apache-2.0. Các thành phần Liquid Glass được phỏng theo và chỉnh sửa từ dự án.
 - **[ZeroUI](https://github.com/Xocio/ZeroUI)** — © ZeroUI contributors, giấy phép Apache-2.0. Thành phần `LiquidToggle` được lấy từ module `glass` của ZeroUI và chỉnh để đồng bộ màu với theme của ứng dụng.
 - **[CrashHandler](https://github.com/Bhuvaneshw/CrashHandler)** — © 2024 Bhuvaneshwaran, giấy phép GPL-3.0. Ghi và lưu nhật ký crash; màn hình crash dùng Miuix theme với màu Monet và chế độ sáng/tối theo hệ thống.
+- **[COUI-Kit](https://github.com/ItosEO/COUI-Kit)** — © ItosEO, giấy phép MPL-2.0. Kiểu giao diện COUI (ColorOS 17) ngang hàng với Miuix và Material 3; component COUI được dùng trong màn hình thử nghiệm.
 - **[Jetpack Compose](https://developer.android.com/compose)** 1.12.0 (`foundation`, `ui`, `animation`) — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[Material 3](https://developer.android.com/jetpack/compose/designsystems/material3)** 1.4.0 — © The Android Open Source Project, giấy phép Apache-2.0.
 - **[AndroidX Core KTX & Activity Compose](https://developer.android.com/jetpack/androidx)** 1.19.1 / 1.13.0 — © The Android Open Source Project, giấy phép Apache-2.0.
@@ -162,6 +163,7 @@ app/src/main/java/com/hihi/recorder/
 - Miuix, Jetpack Compose, Material 3, AndroidX, Kotlin và kotlinx: Apache-2.0. Tác giả của từng thư viện được ghi ở trên.
 - Shizuku API: MIT, bản quyền © 2021 RikkaW.
 - CrashHandler: GPL-3.0, bản quyền © 2024 Bhuvaneshwaran.
+- COUI-Kit: MPL-2.0, bản quyền © ItosEO.
 - Toàn văn MIT của ứng dụng, MIT của Shizuku và Apache-2.0 có thể xem ngay trong ứng dụng tại **Giới thiệu → Giấy phép**.
 
 ## Ghi chú kỹ thuật

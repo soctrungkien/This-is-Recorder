@@ -130,6 +130,7 @@
     <string name="pref_ui_style_summary">Choose Miuix for a HyperOS look, or Material 3 for stock Android.</string>
     <string name="ui_style_miuix">Miuix</string>
     <string name="ui_style_material">Material 3</string>
+    <string name="ui_style_coui">COUI</string>
     <string name="pref_material_spec">Color specification</string>
     <string name="pref_material_spec_summary">2021 uses classic Material You. 2025 uses the updated tonal palette.</string>
     <string name="material_spec_2021">2021</string>
@@ -356,4 +357,6 @@
     <string name="showcase_force_stop_summary">Close every screen and terminate the process</string>
     <string name="about_crash_handler">CrashHandler</string>
     <string name="about_crash_handler_summary">© 2024 Bhuvaneshwaran · GPL-3.0 · Crash log capture</string>
+    <string name="about_coui">COUI-Kit</string>
+    <string name="about_coui_summary">© ItosEO · MPL-2.0 · ColorOS 17 style UI components</string>
 </resources>

@@ -27,6 +27,7 @@ import com.hihi.recorder.data.MaterialSpec
 import com.hihi.recorder.data.RecorderSettings
 import com.hihi.recorder.data.RecorderTheme
 import com.hihi.recorder.data.UiStyle
+import com.itos.coui.theme.LocalCouiDarkTheme
 import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 import top.yukonga.miuix.kmp.theme.Colors
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -103,6 +104,7 @@ fun RecorderTheme(
             CompositionLocalProvider(
                 LocalUiStyle provides settings.uiStyle,
                 LocalMaterialSpec provides specification,
+                LocalCouiDarkTheme provides dark,
                 content = content,
             )
         }

@@ -130,6 +130,7 @@
     <string name="pref_ui_style_summary">Chọn Miuix cho phong cách HyperOS hoặc Material 3 cho Android gốc.</string>
     <string name="ui_style_miuix">Miuix</string>
     <string name="ui_style_material">Material 3</string>
+    <string name="ui_style_coui">COUI</string>
     <string name="pref_material_spec">Chuẩn màu</string>
     <string name="pref_material_spec_summary">2021 dùng Material You cổ điển. 2025 dùng bảng màu mới hơn.</string>
     <string name="material_spec_2021">2021</string>
@@ -356,4 +357,6 @@
     <string name="showcase_force_stop_summary">Đóng mọi màn hình và kết thúc tiến trình</string>
     <string name="about_crash_handler">CrashHandler</string>
     <string name="about_crash_handler_summary">© 2024 Bhuvaneshwaran · GPL-3.0 · Ghi nhật ký lỗi</string>
+    <string name="about_coui">COUI-Kit</string>
+    <string name="about_coui_summary">© ItosEO · MPL-2.0 · Component giao diện phong cách ColorOS 17</string>
 </resources>

@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -66,6 +67,7 @@ import com.hihi.recorder.data.RecordingPhase
 import com.hihi.recorder.data.RecordingState
 import com.hihi.recorder.data.SavedRecording
 import com.hihi.recorder.data.ShellBackend
+import com.hihi.recorder.data.ToggleStyle
 import com.hihi.recorder.data.UiStyle
 import com.hihi.recorder.net.UpdateChecker
 import com.hihi.recorder.net.UpdateFailure
@@ -86,7 +88,10 @@ import top.yukonga.miuix.kmp.basic.FloatingToolbar
 import top.yukonga.miuix.kmp.basic.NavigationItem
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
 import top.yukonga.miuix.kmp.basic.Text as MiuixText
+import top.yukonga.miuix.kmp.blur.blur
+import top.yukonga.miuix.kmp.blur.drawBackdrop
 import top.yukonga.miuix.kmp.blur.layerBackdrop
+import com.hihi.recorder.ui.liquid.lens
 import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Album
@@ -273,6 +278,9 @@ fun RecorderApp(
     } else {
         null
     }
+
+    val liquidToolbar = settings.toggleStyle == ToggleStyle.LIQUID &&
+        navigationBackdrop != null && canBlur
 
     val navItems = listOf(
         AppNavItem(
@@ -544,7 +552,7 @@ fun RecorderApp(
                     }
 
                     entry<AppRoute.Showcase>(swipeDismiss = swipeDismiss) {
-                        ShowcaseScreen(
+                        TestScreen(
                             settings = settings,
                             snackbarHostState = snackbarHostState,
                             onBack = {
@@ -659,8 +667,25 @@ fun RecorderApp(
                         end = 20.dp,
                         bottom = navigationBarHeightAboveInset + 10.dp,
                     )
-                    .fillMaxWidth(),
-                color = palette.surfaceContainerHigh,
+                    .fillMaxWidth()
+                    .then(
+                        if (liquidToolbar && navigationBackdrop != null) {
+                            Modifier.drawBackdrop(
+                                backdrop = navigationBackdrop,
+                                shape = { RoundedCornerShape(26.dp) },
+                                effects = {
+                                    blur(4.dp.toPx(), 4.dp.toPx())
+                                    lens(refractionHeight = 8.dp.toPx(), refractionAmount = 8.dp.toPx())
+                                },
+                                onDrawSurface = {
+                                    drawRect(palette.surfaceContainerHigh.copy(alpha = 0.5f))
+                                },
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ),
+                color = if (liquidToolbar) Color.Transparent else palette.surfaceContainerHigh,
                 cornerRadius = 26.dp,
                 outSidePadding = PaddingValues(0.dp),
                 shadowElevation = 6.dp,
@@ -833,7 +858,7 @@ private fun sampleUpdateInfo() = UpdateInfo(
         ## What's new in 9.9.9
 
         - **Markdown** release notes now render properly
-        - Direct download links — no more **gh-proxy** for updates
+        - Direct download links â€” no more **gh-proxy** for updates
         - New *component showcase* screen (you found it!)
 
         ### Improvements

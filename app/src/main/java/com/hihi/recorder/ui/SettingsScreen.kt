@@ -168,6 +168,7 @@ fun SettingsScreen(
                         options = listOf(
                             UiStyle.MIUIX to stringResource(R.string.ui_style_miuix),
                             UiStyle.MATERIAL to stringResource(R.string.ui_style_material),
+                            UiStyle.COUI to stringResource(R.string.ui_style_coui),
                         ),
                         selected = settings.uiStyle,
                         onSelect = { onSettingsChange(settings.copy(uiStyle = it)) },
@@ -195,10 +196,9 @@ fun SettingsScreen(
                         selected = settings.navigationBarStyle,
                         onSelect = { onSettingsChange(settings.copy(navigationBarStyle = it)) },
                     )
-                }
-            }
-            item {
-                AppCard(contentPadding = PaddingValues(14.dp)) {
+                    Spacer(Modifier.height(16.dp))
+                    AppDivider()
+                    Spacer(Modifier.height(16.dp))
                     AppText(
                         text = stringResource(R.string.pref_toggle_style),
                         style = AppTextStyle.Subtitle,

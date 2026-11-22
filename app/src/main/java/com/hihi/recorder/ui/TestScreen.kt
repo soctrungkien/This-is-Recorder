@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.hihi.recorder.R
+import com.itos.coui.slider.Slider as CouiSlider
+import com.itos.coui.switch.Switch as CouiSwitch
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import kotlinx.coroutines.launch
@@ -39,7 +41,7 @@ import kotlin.system.exitProcess
 
 /** Easter-egg screen: every local component and dialog in one place. */
 @Composable
-fun ShowcaseScreen(
+fun TestScreen(
     settings: com.hihi.recorder.data.RecorderSettings,
     snackbarHostState: SnackbarHostState,
     onBack: () -> Unit,
@@ -53,6 +55,8 @@ fun ShowcaseScreen(
     var taps by remember { mutableIntStateOf(0) }
     var selection by remember { mutableStateOf("A") }
     var demoSwitch by remember { mutableStateOf(true) }
+    var couiSwitch by remember { mutableStateOf(false) }
+    var couiSlider by remember { mutableStateOf(0.4f) }
     val scope = rememberCoroutineScope()
     val palette = appPalette()
     val message = stringResource(R.string.showcase_dialog_message)
@@ -218,6 +222,27 @@ fun ShowcaseScreen(
                         onClick = {
                             scope.launch { snackbarHostState.showSnackbar(message) }
                         },
+                    )
+                }
+            }
+
+            item { AppSectionTitle("COUI components") }
+            item {
+                AppCard(contentPadding = PaddingValues(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AppText("COUI Switch", style = AppTextStyle.Body, modifier = Modifier.weight(1f))
+                        CouiSwitch(
+                            checked = couiSwitch,
+                            onCheckedChange = { couiSwitch = it },
+                        )
+                    }
+                    Spacer(Modifier.height(18.dp))
+                    AppText("COUI Slider", style = AppTextStyle.Body)
+                    Spacer(Modifier.height(10.dp))
+                    CouiSlider(
+                        value = couiSlider,
+                        onValueChange = { couiSlider = it },
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
