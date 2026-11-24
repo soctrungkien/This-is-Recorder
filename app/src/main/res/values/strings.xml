@@ -420,6 +420,7 @@
     <string name="license_solar">Solar icons - CC BY 4.0</string>
     <string name="license_oneui_icons">OneUI Icons - MIT</string>
     <string name="license_remix_icon">Remix Icon - Remix Icon License v1.0</string>
+    <string name="license_not_available">License text is not available in credit.json.</string>
     <string name="license_material_icons">Material Icons — Apache-2.0</string>
     <string name="license_shizuku">Shizuku API — MIT</string>
 </resources>

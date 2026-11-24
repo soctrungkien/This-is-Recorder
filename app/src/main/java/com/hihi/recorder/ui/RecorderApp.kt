@@ -135,22 +135,13 @@ private sealed interface AppRoute : NavKey {
     data object About : AppRoute
 
     @Serializable
-    data object MitLicense : AppRoute
-
-    @Serializable
-    data object ApacheLicense : AppRoute
-
-    @Serializable
-    data object ShizukuLicense : AppRoute
-
-    @Serializable
     data object Showcase : AppRoute
 
     @Serializable
     data object Licenses : AppRoute
 
     @Serializable
-    data class LicenseDetail(val file: String, val titleRes: Int) : AppRoute
+    data class LicenseDetail(val id: String) : AppRoute
 }
 
 private val AppRoute.tabIndex: Int
@@ -159,9 +150,6 @@ private val AppRoute.tabIndex: Int
         AppRoute.Videos -> 1
         AppRoute.Settings,
         AppRoute.About,
-        AppRoute.MitLicense,
-        AppRoute.ApacheLicense,
-        AppRoute.ShizukuLicense,
         AppRoute.Showcase,
         AppRoute.Licenses,
         is AppRoute.LicenseDetail -> 2
@@ -552,19 +540,13 @@ fun RecorderApp(
                             onOpenUrl = onOpenUrl,
                             onShowHelp = { showHelp = true },
                             onOpenMitLicense = {
-                                if (backStack.lastOrNull() != AppRoute.MitLicense) {
-                                    backStack.add(AppRoute.MitLicense)
-                                }
+                                backStack.add(AppRoute.LicenseDetail("app"))
                             },
                             onOpenApacheLicense = {
-                                if (backStack.lastOrNull() != AppRoute.ApacheLicense) {
-                                    backStack.add(AppRoute.ApacheLicense)
-                                }
+                                backStack.add(AppRoute.LicenseDetail("miuix"))
                             },
                             onOpenShizukuLicense = {
-                                if (backStack.lastOrNull() != AppRoute.ShizukuLicense) {
-                                    backStack.add(AppRoute.ShizukuLicense)
-                                }
+                                backStack.add(AppRoute.LicenseDetail("shizuku"))
                             },
                             onOpenShowcase = {
                                 if (backStack.lastOrNull() != AppRoute.Showcase) {
@@ -591,53 +573,22 @@ fun RecorderApp(
                         )
                     }
 
-                    entry<AppRoute.MitLicense>(swipeDismiss = swipeDismiss) {
-                        LicensePage(
-                            kind = LicenseKind.MIT,
-                            snackbarHostState = snackbarHostState,
-                            onBack = {
-                                if (backStack.size > 1) backStack.removeLastOrNull()
-                            },
-                        )
-                    }
-
-                    entry<AppRoute.ApacheLicense>(swipeDismiss = swipeDismiss) {
-                        LicensePage(
-                            kind = LicenseKind.APACHE,
-                            snackbarHostState = snackbarHostState,
-                            onBack = {
-                                if (backStack.size > 1) backStack.removeLastOrNull()
-                            },
-                        )
-                    }
-
-                    entry<AppRoute.ShizukuLicense>(swipeDismiss = swipeDismiss) {
-                        LicensePage(
-                            kind = LicenseKind.SHIZUKU,
-                            snackbarHostState = snackbarHostState,
-                            onBack = {
-                                if (backStack.size > 1) backStack.removeLastOrNull()
-                            },
-                        )
-                    }
-
                     entry<AppRoute.Licenses>(swipeDismiss = swipeDismiss) {
-                        LicenseListPage(
+                        CreditListPage(
                             snackbarHostState = snackbarHostState,
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()
                             },
                             onOpen = { entry ->
-                                backStack.add(
-                                    AppRoute.LicenseDetail(entry.file, entry.titleRes),
-                                )
+                                backStack.add(AppRoute.LicenseDetail(entry.id))
                             },
                         )
                     }
 
                     entry<AppRoute.LicenseDetail>(swipeDismiss = swipeDismiss) { route ->
-                        AssetLicensePage(
-                            asset = LicenseAsset(route.file, route.titleRes),
+                        CreditDetailPage(
+                            creditId = route.id,
+                            snackbarHostState = snackbarHostState,
                             onBack = {
                                 if (backStack.size > 1) backStack.removeLastOrNull()
                             },
